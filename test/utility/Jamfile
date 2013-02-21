@@ -1,0 +1,2 @@
+alias "utility" : [ run storage.cpp ] ;
+

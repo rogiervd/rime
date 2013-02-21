@@ -1,0 +1,16 @@
+test-suite "rime" :
+    [ run core.cpp ]
+    [ run core_operators.cpp ]
+    [ run detail_switch.cpp ]
+    [ run detail_variant_dispatch.cpp ]
+    [ run detail_merge_types.cpp ]
+    [ run detail_generalise_type.cpp ]
+    [ run variant.cpp ]
+    [ run if.cpp ]
+    [ run call_if.cpp ]
+
+    [ run cast.cpp ]
+    [ run sign.cpp ]
+    [ run min_max.cpp ]
+    ;
+

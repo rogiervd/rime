@@ -1,0 +1,13 @@
+import testing ;
+
+project
+    : requirements
+      <library>/boost/test//boost_unit_test_framework
+      <library>/rime//rime
+      <cxxflags>"-Werror"
+      <testing.launcher>"valgrind --leak-check=full --error-exitcode=1"
+    ;
+
+# Run the tests in the subdirectories.
+alias "rime-tests" : utility rime ;
+

@@ -1,0 +1,11 @@
+project /rime :
+    requirements
+    <library>/meta//meta
+    ;
+
+# Declare target /rime//rime as a header-only library.
+alias rime : : : :
+    <include>include
+    <cxxflags>"-std=c++0x"
+    ;
+
