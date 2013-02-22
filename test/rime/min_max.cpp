@@ -30,8 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 BOOST_AUTO_TEST_SUITE(test_rime_min_max)
 
-BOOST_AUTO_TEST_CASE (test_rime_min_max)
-{
+BOOST_AUTO_TEST_CASE (test_rime_min_max) {
     using rime::min;
     using rime::max;
 

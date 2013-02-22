@@ -35,7 +35,8 @@ BOOST_AUTO_TEST_SUITE(test_rime_detail_variant_dispatch)
 BOOST_AUTO_TEST_CASE (test_rime_detail_dispatch) {
     {
         typedef possible_actual_types_for <meta::vector <
-            rime::variant <int, long> const &, rime::variant <bool, double> const >> list;
+            rime::variant <int, long> const &,
+            rime::variant <bool, double> const>> list;
         BOOST_MPL_ASSERT ((std::is_same <list::type,
             meta::vector <
                 meta::vector <int, bool>,
@@ -68,13 +69,15 @@ BOOST_AUTO_TEST_CASE (test_rime_detail_dispatch) {
         BOOST_CHECK_EQUAL (list::get_index (4, 5l), 0u);
     }
     {
-        typedef possible_actual_types_for <meta::vector <int const &, long>> list;
+        typedef possible_actual_types_for <meta::vector <int const &, long>>
+            list;
         BOOST_MPL_ASSERT ((std::is_same <list::type,
             meta::vector<meta::vector<int const &, long> > >));
         BOOST_CHECK_EQUAL (list::get_index (4, 5l), 0u);
     }
     {
-        typedef possible_actual_types_for <meta::vector <rime::variant <int, long> >> list;
+        typedef possible_actual_types_for <
+            meta::vector <rime::variant <int, long>>> list;
         BOOST_MPL_ASSERT ((std::is_same <list::type,
             meta::vector<meta::vector<int>, meta::vector <long> > >));
         // Postpone checking get_index
@@ -97,7 +100,8 @@ BOOST_AUTO_TEST_CASE (test_rime_detail_dispatch) {
     }
     {
         typedef possible_actual_types_for <meta::vector <
-            rime::variant <int, long> const &, rime::variant <bool, double> const >> list;
+            rime::variant <int, long> const &,
+            rime::variant <bool, double> const>> list;
         BOOST_MPL_ASSERT ((std::is_same <list::type,
             meta::vector <
                 meta::vector <int, bool>,
@@ -113,7 +117,8 @@ BOOST_AUTO_TEST_CASE (test_rime_detail_dispatch_runtime) {
     rime::variant <bool, double> b (true);
     rime::variant <bool, double> d (5.5);
     {
-        typedef possible_actual_types_for <meta::vector <rime::variant <int, long>& >> list;
+        typedef possible_actual_types_for <
+            meta::vector <rime::variant <int, long> &>> list;
         BOOST_CHECK_EQUAL (list::get_index (i), 0u);
         BOOST_CHECK_EQUAL (list::get_index (l), 1u);
     }
@@ -131,7 +136,8 @@ BOOST_AUTO_TEST_CASE (test_rime_detail_dispatch_runtime) {
     }
     {
         typedef possible_actual_types_for <meta::vector <
-            rime::variant <int, long> const &, rime::variant <bool, double>& >> list;
+            rime::variant <int, long> const &, rime::variant <bool, double> &>>
+            list;
         BOOST_CHECK_EQUAL (list::get_index (i, b), 0u);
         BOOST_CHECK_EQUAL (list::get_index (i, d), 1u);
         BOOST_CHECK_EQUAL (list::get_index (l, b), 2u);

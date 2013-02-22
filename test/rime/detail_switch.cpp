@@ -26,18 +26,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 BOOST_AUTO_TEST_SUITE(test_rime_detail_switch)
 
-struct struct_default
-{
+struct struct_default {
     float operator() (float f) const { return -1.0; }
 };
 
-struct struct_times_5
-{
+struct struct_times_5 {
     float operator() (float f) const { return 5*f; }
 };
 
-struct struct_times_7
-{
+struct struct_times_7 {
     float operator() (float f) const { return 7*f; }
 };
 

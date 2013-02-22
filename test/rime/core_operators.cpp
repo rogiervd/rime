@@ -49,9 +49,12 @@ template <class Type, Type Content, class ReferenceType>
     /* Explicit function */ \
     check_constant_equals (rime::NAME (left, right), (LEFT OPERATOR RIGHT)); \
     /* Infect with MPL constant: return compile-time constant */ \
-    check_constant_equals (rime::NAME (mpl_left, right), (LEFT OPERATOR RIGHT)); \
-    check_constant_equals (rime::NAME (left, mpl_right), (LEFT OPERATOR RIGHT)); \
-    check_constant_equals (rime::NAME (mpl_left, mpl_right), (LEFT OPERATOR RIGHT)); \
+    check_constant_equals (rime::NAME (mpl_left, right), \
+        (LEFT OPERATOR RIGHT)); \
+    check_constant_equals (rime::NAME (left, mpl_right), \
+        (LEFT OPERATOR RIGHT)); \
+    check_constant_equals (rime::NAME (mpl_left, mpl_right), \
+        (LEFT OPERATOR RIGHT)); \
     /* Infect with runtime value: return runtime value */ \
     RIME_CHECK_EQUAL (rime::NAME (left, RIGHT), (LEFT OPERATOR RIGHT)); \
     RIME_CHECK_EQUAL (rime::NAME (LEFT, right), (LEFT OPERATOR RIGHT)); \

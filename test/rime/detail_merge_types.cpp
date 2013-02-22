@@ -31,13 +31,11 @@ BOOST_AUTO_TEST_SUITE(test_rime_detail_merge_types)
 //#include "check_set.hpp"
 
 // Simple constant class to check merging
-template <class Type, Type N> struct constant
-{
+template <class Type, Type N> struct constant {
     operator Type () const { return N; }
 };
 
-template <class Base> struct merge_constant
-{
+template <class Base> struct merge_constant {
     template <class Type1, class Type2> struct apply
     : Base::template apply <Type1, Type2> {};
 
@@ -216,8 +214,9 @@ BOOST_AUTO_TEST_CASE (test_merge_types_reference) {
 BOOST_AUTO_TEST_CASE (test_merge_types_full) {
     using rime::detail::merge_types;
     using meta::vector;
-    typedef rime::detail::merge_two::reference <rime::detail::merge_two::const_ <
-        merge_constant <rime::detail::merge_two::same<> > > > merge_two;
+    typedef rime::detail::merge_two::reference <
+        rime::detail::merge_two::const_ <
+            merge_constant <rime::detail::merge_two::same<> > > > merge_two;
 
     {
         BOOST_MPL_ASSERT ((std::is_same <

@@ -40,8 +40,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <array>
 
 struct convertee {};
-struct converted
-{
+struct converted {
     converted() {}
     converted (convertee) {}
 };
@@ -68,34 +67,23 @@ typedef rime::variant <
     /* 3 */ int const, /* 4 */ int const &
 > other_variant;
 
-template <typename T>
-    variant make_variant (T && o)
-{
-    return variant (std::forward <T> (o));
-}
-template <typename T>
-    variant const make_const_variant (T && o)
-{
-    return variant (std::forward <T> (o));
-}
+template <typename T> variant make_variant (T && o)
+{ return variant (std::forward <T> (o)); }
 
-template <typename T>
-    other_variant make_other_variant (T && o)
-{
-    return other_variant (std::forward <T> (o));
-}
-template <typename T>
-    other_variant const make_const_other_variant (T && o)
-{
-    return other_variant (std::forward <T> (o));
-}
+template <typename T> variant const make_const_variant (T && o)
+{ return variant (std::forward <T> (o)); }
+
+template <typename T> other_variant make_other_variant (T && o)
+{ return other_variant (std::forward <T> (o)); }
+
+template <typename T> other_variant const make_const_other_variant (T && o)
+{ return other_variant (std::forward <T> (o)); }
 
 // Make void versions
 variant make_variant() { return variant(); }
 variant const make_const_variant() { return variant(); }
 
 BOOST_AUTO_TEST_SUITE(test_rime_variant)
-
 
 BOOST_AUTO_TEST_CASE (test_rime_variant_get_types) {
     // return types for "get"
@@ -1002,8 +990,7 @@ BOOST_AUTO_TEST_CASE (test_rime_variant_copy_construct) {
     }
 }
 
-struct counts
-{
+struct counts {
     int construct;
     int copy_construct;
     int move_construct;
@@ -1017,8 +1004,7 @@ struct counts
         destruct(), destruct_moved(),
         copy_assign(), move_assign() {}
 
-    bool consistent() const
-    {
+    bool consistent() const {
         // All constructed objects must have been destructed.
         if (construct + copy_construct + move_construct !=
             destruct + destruct_moved)
@@ -1030,59 +1016,44 @@ struct counts
     }
 };
 
-class counted
-{
+class counted {
     counts & count;
     bool moved;
 
 public:
     counted (counts & count)
     : count (count), moved (false)
-    {
-        ++ count.construct;
-    }
+    { ++ count.construct; }
 
     counted (counted const & that)
     : count (that.count), moved (false)
-    {
-        ++ count.copy_construct;
-    }
+    { ++ count.copy_construct; }
 
     counted (counted && that)
-    : count (that.count), moved (false)
-    {
+    : count (that.count), moved (false) {
         BOOST_CHECK (that.valid());
         ++ count.move_construct;
         that.move();
     }
 
-    ~counted()
-    {
+    ~counted() {
         if (this->moved)
             ++ count.destruct_moved;
         else
             ++ count.destruct;
     }
 
-    bool valid() const
-    {
-        return !this->moved;
-    }
+    bool valid() const { return !this->moved; }
 
-    void move()
-    {
-        this->moved = true;
-    }
+    void move() { this->moved = true; }
 
-    counted & operator = (counted const & that)
-    {
+    counted & operator = (counted const & that) {
         BOOST_CHECK (that.valid());
         ++ count.copy_assign;
         return *this;
     }
 
-    counted & operator = (counted && that)
-    {
+    counted & operator = (counted && that) {
         BOOST_CHECK (that.valid());
         ++ count.move_assign;
         that.move();
@@ -1094,12 +1065,9 @@ public:
 
 counted make_counted (counts & c) { return counted (c); }
 
-struct counted_assignable
-{
+struct counted_assignable {
     counted_assignable & operator = (counted const &)
-    {
-        return *this;
-    }
+    { return *this; }
 };
 
 template <typename Variant, typename Variant2>
@@ -1706,8 +1674,7 @@ public:
     { return first * (*this) (rest ...); }
 };
 
-struct add_one_visitor
-{
+struct add_one_visitor {
     std::type_info const * & argument_type;
 public:
     add_one_visitor (std::type_info const * & argument_type)
@@ -1721,8 +1688,7 @@ public:
     }
 };
 
-struct plus_assign
-{
+struct plus_assign {
 public:
     template <typename Left, typename Right>
         Left && operator() (Left && left, Right && right) const
@@ -1755,8 +1721,7 @@ struct plus_assign_void {
     }
 };
 
-struct count_arguments
-{
+struct count_arguments {
     template <typename First, typename ... Arguments>
     int operator() (First, Arguments... arguments) const
     { return 1 + (*this) (arguments...); }
@@ -1957,9 +1922,8 @@ BOOST_AUTO_TEST_CASE (test_rime_variant_call) {
     }
 }
 
-double take_two_arguments (int a, float b) {
-    return double (a) + b;
-}
+double take_two_arguments (int a, float b)
+{ return double (a) + b; }
 
 /**
 Try to make compiler output on errors understandable.

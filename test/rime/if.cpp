@@ -36,8 +36,7 @@ struct return_as_long {
     long operator() (long l) const { return l; }
 };
 
-BOOST_AUTO_TEST_CASE (test_rime_if)
-{
+BOOST_AUTO_TEST_CASE (test_rime_if) {
     // Run-time conditions
     RIME_CHECK_EQUAL (rime::if_ (false, 3, 10), 10);
     RIME_CHECK_EQUAL (rime::if_ (true, 3, 10), 3);

@@ -39,8 +39,7 @@ struct return_as_long {
     long operator() (long l) const { return l; }
 };
 
-BOOST_AUTO_TEST_CASE (test_rime_call_if)
-{
+BOOST_AUTO_TEST_CASE (test_rime_call_if) {
     auto vd = rime::call_if (true, return_as_double(), return_as_long(), 2);
     BOOST_CHECK (vd.contains <double>());
     BOOST_CHECK_EQUAL (rime::get <double> (vd), 2.);
