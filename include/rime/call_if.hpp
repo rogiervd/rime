@@ -31,7 +31,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "variant.hpp"
 
 namespace rime {
+
 namespace callable {
+
     /**
     Function that calls one function or another.
     \param condition The condition.

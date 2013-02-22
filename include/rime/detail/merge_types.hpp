@@ -40,10 +40,7 @@ Merge duplicate types (according to a stack of criteria) in a type sequence.
 #include "meta/range.hpp"
 #include "meta/fold.hpp"
 
-namespace rime
-{
-namespace detail
-{
+namespace rime { namespace detail {
 
 namespace mpl = ::boost::mpl;
 
@@ -58,11 +55,10 @@ metafunction.
 This recursion would allow us to surmise that, for example, const int & and
 boost::reference_wrapper<int> are the same type. (Not implemented.)
 */
-namespace merge_two
-{
+namespace merge_two {
+
     // Does not have "type" member type.
-    struct unimplemented
-    {
+    struct unimplemented {
         // Does not have "type" member type.
         template <class Type1, class Type2> struct apply {};
     };
@@ -77,16 +73,12 @@ namespace merge_two
         struct is_unimplemented
     : mpl::not_ <is_implemented <MetafunctionClass, Type1, Type2> > {};
 
-    template <class Base = unimplemented>
-        struct same
-    {
+    template <class Base = unimplemented> struct same {
         template <class Type1, class Type2> struct apply
         : Base::template apply <Type1, Type2> {};
 
         template <class Type> struct apply <Type, Type>
-        {
-            typedef Type type;
-        };
+        { typedef Type type; };
     };
 
     template <class MergeTwo, class Type1, class Type2,
@@ -107,19 +99,14 @@ namespace merge_two
     : mpl::if_ <is_implemented <MergeTwo, Type1, Type2>,
         lazy <MergeTwo, Type1, Type2, Transform>, unimplemented>::type {};
 
-    template <class Base = same<> >
-        struct const_
-    {
-        template <class Type1, class Type2>
-            struct apply
+    template <class Base = same<>> struct const_ {
+        template <class Type1, class Type2> struct apply
         : Base::template apply <Type1, Type2> {};
 
-        template <class Type1, class Type2>
-            struct apply <Type1 const, Type2>
+        template <class Type1, class Type2> struct apply <Type1 const, Type2>
         : merge_transform <Base, Type1, Type2, std::add_const> {};
 
-        template <class Type1, class Type2>
-            struct apply <Type1, Type2 const>
+        template <class Type1, class Type2> struct apply <Type1, Type2 const>
         : merge_transform <Base, Type1, Type2, std::add_const> {};
 
         template <class Type1, class Type2>
@@ -127,112 +114,26 @@ namespace merge_two
         : merge_transform <Base, Type1, Type2, std::add_const> {};
     };
 
-    template <class Base = const_<> >
-        struct reference
-    {
-        template <class Type1, class Type2>
-            struct apply
+    template <class Base = const_<> > struct reference {
+        template <class Type1, class Type2> struct apply
         : Base::template apply <Type1, Type2> {};
 
-        template <class Type1, class Type2>
-            struct apply <Type1 &, Type2>
+        template <class Type1, class Type2> struct apply <Type1 &, Type2>
         : apply <Type1, Type2> {};
 
-        template <class Type1, class Type2>
-            struct apply <Type1, Type2 &>
+        template <class Type1, class Type2> struct apply <Type1, Type2 &>
         : apply <Type1, Type2> {};
 
-        template <class Type1, class Type2>
-            struct apply <Type1 &, Type2 &>
+        template <class Type1, class Type2> struct apply <Type1 &, Type2 &>
         : apply <Type1, Type2> {};
 
-        template <class Type>
-            struct apply <Type &, Type &>
-        {
-            typedef Type & type;
-        };
+        template <class Type> struct apply <Type &, Type &>
+        { typedef Type & type; };
     };
 
-}  // namespace merge_two
+} // namespace merge_two
 
-namespace merge
-{
-    /**
-    Try to merge New with any of the types in Types, a meta::vector.
-    \return a mpl::pair of a new type and a meta::vector of other types.
-        The types in the meta::vector are a subset of the types in Types.
-    */
-    /*template <typename MergeTwo, typename New, typename Types>
-        struct insert_impl;
-
-    // Trivial case
-    template <typename MergeTwo, typename New>
-        struct insert_impl <MergeTwo, New, meta::vector<> >
-    {
-        typedef New new_;
-        typedef meta::vector<> rest;
-    };*/
-
-    /**
-    Merge New and First.
-    Then check whether the merger merges with anything in Rest.
-    */
-    /*template <typename MergeTwo, typename New, typename First, typename Rest>
-        struct insert_merge
-    : insert_impl <MergeTwo,
-        typename MergeTwo::template apply <New, First>::type, Rest> {};*/
-
-    /**
-    If New fuses with First, try to insert it in Rest.
-    Otherwise, just return New and vector <First, Rest ...>.
-    */
-    /*template <typename MergeTwo, typename New, typename First, typename Rest>
-        struct insert_first
-    : boost::mpl::if_ <
-        merge_two::is_implemented <MergeTwo, New, First>,*/
-
-
-    /**
-    Recursively call insert.
-    */
-    /*template <typename MergeTwo, typename New, typename First, typename Rest>
-        struct insert_dont_merge
-    {
-        typedef insert_impl <MergeTwo, New, Rest> merge_rest;
-        typedef typename merge_rest::new_ merged_new;
-        typedef typename merge_rest::rest merged_rest;
-
-        typedef typename mpl::eval_if <
-            merge_two::is_implemented <MergeTwo, new_new, First>
-            insert_merge <MergeTwo, new_new, First, new_rest>,
-            identity <mpl::pair <new_new, meta::vector <First, new_rest ...> > >
-        >::type type;
-    };
-
-    template <typename MergeTwo, typename New,
-            typename First, typename ... Rest>
-        struct insert_impl <MergeTwo, New, meta::vector <First, Rest...> >
-    : boost::mpl::eval_if <
-        merge_two::is_implemented <MergeTwo, New, First>,
-        insert_merge <MergeTwo, New, First, Rest...>,
-        insert_dont_merge <MergeTwo, New, First, Rest ...>
-    > {};
-
-    template <typename MergeTwo, typename New, typename Types>
-        struct insert
-    {
-        // mpl::pair <LastType, meta::vector <Rest ...> >
-        typedef typename insert_impl <MergeTwo, New, Types>::type pair;
-        typedef typename meta::push <
-            typename pair::first, typename pair::second>::type type;
-    };*/
-
-
-
-
-
-
-
+namespace merge {
 
     /*
     In pseudo-code:
@@ -257,9 +158,7 @@ namespace merge
     // Trivial case
     template <typename MergeTwo, typename New>
         struct insert_impl <MergeTwo, New, meta::vector<> >
-    {
-        typedef mpl::pair <New, meta::vector<> > type;
-    };
+    { typedef mpl::pair <New, meta::vector<>> type; };
 
     template <typename MergeTwo, typename New, typename First, typename Rest>
         struct do_merge_and_recurse
@@ -274,7 +173,8 @@ namespace merge
         struct merge_first_else;
     template <typename MergeTwo, typename New,
             typename First, typename ... Rest, typename Else>
-        struct merge_first_else <MergeTwo, New, meta::vector <First, Rest...>, Else>
+        struct merge_first_else <
+            MergeTwo, New, meta::vector <First, Rest...>, Else>
     : mpl::eval_if <
         merge_two::is_implemented <MergeTwo, New, First>,
         do_merge_and_recurse <MergeTwo, New, First, meta::vector <Rest...> >,
@@ -283,8 +183,9 @@ namespace merge
 
     template <typename MergeTwo, typename New, typename Current>
         struct insert_skip_first;
-    template <typename MergeTwo, typename New, typename First, typename ... Rest>
-        struct insert_skip_first <MergeTwo, New, meta::vector <First, Rest ...> >
+    template <typename MergeTwo, typename New, typename First,
+            typename ... Rest>
+    struct insert_skip_first <MergeTwo, New, meta::vector <First, Rest ...>>
     {
         typedef insert_impl <MergeTwo, New, meta::vector <Rest...> >
             merge_rest;
@@ -299,21 +200,21 @@ namespace merge
             >::type type;
     };
 
-    template <typename MergeTwo, typename New, typename First, typename ... Rest>
-        struct insert_impl <MergeTwo, New, meta::vector <First, Rest ...> >
+    template <typename MergeTwo, typename New, typename First,
+            typename ... Rest>
+    struct insert_impl <MergeTwo, New, meta::vector <First, Rest ...>>
     : merge_first_else <MergeTwo, New, meta::vector <First, Rest ...>,
         // Else =
         insert_skip_first <MergeTwo, New, meta::vector <First, Rest ...> > > {};
 
-    template <typename MergeTwo, typename New, typename Types>
-        struct insert
-    {
+    template <typename MergeTwo, typename New, typename Types> struct insert {
         // mpl::pair <LastType, meta::vector <Rest ...> >
         typedef typename insert_impl <MergeTwo, New, Types>::type pair;
         typedef typename meta::push <
             typename pair::first, typename pair::second>::type type;
     };
-}   // namespace merge
+
+} // namespace merge
 
 /**
 Return a compile-time list of types, where all types that can be merged
@@ -324,7 +225,7 @@ template <typename MergeTwo, typename Types>
 : meta::fold <meta::back, merge::insert <MergeTwo, mpl::_2, mpl::_1>,
     meta::vector<>, Types> {};
 
-}}   // namespace rime::detail
+}} // namespace rime::detail
 
 #endif // RIME_DETAIL_MERGE_TYPES_HPP_INCLUDED
 

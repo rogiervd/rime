@@ -68,8 +68,7 @@ Define a variant type, similar to boost::variant.
 #include "rime/detail/variant_dispatch.hpp"
 #include "rime/detail/variant_operator.hpp"
 
-namespace rime
-{
+namespace rime {
 
 struct bad_get : std::runtime_error {
     bad_get()
@@ -77,8 +76,8 @@ struct bad_get : std::runtime_error {
         "get (variant<...>) called with a type that was not contained") {}
 };
 
-namespace variant_detail
-{
+namespace variant_detail {
+
     /**
     Find the best match for the Actual type amongst the VariantTypes.
     */
@@ -106,7 +105,7 @@ namespace variant_detail
 
     template <typename Actual> struct get;
 
-}   // namespace variant_detail
+} // namespace variant_detail
 
 /**
 A variant type: it contains exactly one of the types from Types.
@@ -160,8 +159,7 @@ The following operators are not overloaded:
     operator&& and operator|| (short-circuiting would not be possible)
     operator, (makes no sense in the usual setting)
 */
-template <typename ... Types> class variant
-{
+template <typename ... Types> class variant {
 public:
     typedef meta::vector <Types...> types;
     typedef typename meta::as_vector <typename meta::enumerate <types>::type
@@ -469,8 +467,7 @@ private:
     { void operator() (void *) const {}; };
 
 public:
-    ~variant()
-    {
+    ~variant() {
         /*
         This constructs an object of type destruct <Actual>,
         and calls it with this->memory().
@@ -671,8 +668,7 @@ private:
     };
 
     // This class is necessary to wrap decltype() in GCC 4.6.
-    template <typename Variant, typename Argument> struct subscript_with
-    {
+    template <typename Variant, typename Argument> struct subscript_with {
         typedef decltype (visit (subscript()) (
             std::declval <Variant &>(), std::declval <Argument &&>()))
             result_type;
@@ -799,8 +795,7 @@ Metafunction that returns a type that can represent any of Types.
 In the process, it merges the types according to meta::merge_types.
 If the types merge into one type, the returned type is just that type.
 */
-template <typename Types, typename MergeTwo>
-    struct make_variant_over
+template <typename Types, typename MergeTwo> struct make_variant_over
 {
 private:
     // E.g. vector <int, variant <int, float>, double>
@@ -827,8 +822,8 @@ public:
 };
 
 
-namespace variant_detail
-{
+namespace variant_detail {
+
     namespace mpl = boost::mpl;
 
     template <typename Actual, typename NumberedTypes, typename ... Matches>
@@ -837,9 +832,7 @@ namespace variant_detail
     // No matches found
     template <typename Actual, typename NumberedTypes>
         struct find_candidates <Actual, NumberedTypes>
-    {
-        typedef meta::vector<> type;
-    };
+    { typedef meta::vector<> type; };
 
     template <typename Actual, typename NumberedTypes,
         typename FirstMatch, typename ... OtherMatches>
@@ -884,16 +877,14 @@ namespace variant_detail
 
     template <typename ... Types>
         struct make_variant <meta::vector <Types ...> >
-    {
-        typedef variant <Types ...> type;
-    };
+    { typedef variant <Types ...> type; };
 
-}   // namespace variant_detail
+} // namespace variant_detail
 
 struct merge_two
 : variant_detail::merge_constant <rime::detail::merge_two::same<> > {};
 
-}   // namespace rime
+} // namespace rime
 
 #endif  // RIME_VARIANT_HPP_INCLUDED
 

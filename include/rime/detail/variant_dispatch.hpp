@@ -257,7 +257,8 @@ Represent the list of all possible combinations of actual types that a list of
 types including variants can be.
 This list is at the basis of multiple dispatch.
 For example,
-    possible_actual_types_for <meta::vector <variant <int, long>, variant <bool, double> > >
+    possible_actual_types_for <meta::vector <
+        variant <int, long>, variant <bool, double> > >
 will have as type:
 meta::vector <
     meta::vector <F1, int, char>,
@@ -358,8 +359,8 @@ template <typename Function> class visitor {
     This does the actual work.
 
     \internal
-    By giving the types default values here, they are available as template packs
-    in the specialisation that does the actual work.
+    By giving the types default values here, they are available as template
+    packs in the specialisation that does the actual work.
     This reduces the number of instantiations and produces shorter errors.
     */
     template <typename Arguments,

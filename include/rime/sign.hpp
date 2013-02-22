@@ -148,11 +148,6 @@ static auto const make_zero = callable::make_zero();
 
 namespace callable {
 
-    namespace detail {
-
-
-    } // namespace detail
-
     class less_sign_safe {
         // Default implementation.
         template <class Left, class Right>

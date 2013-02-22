@@ -32,10 +32,7 @@ is too limited for general use.
 #include "meta/vector.hpp"
 #include "rime/core.hpp"
 
-namespace rime
-{
-namespace detail
-{
+namespace rime { namespace detail {
 
 template <class Choice, typename Result, typename ... Arguments>
     Result call_object (Arguments && ... arguments)
@@ -57,9 +54,8 @@ template <typename Result, typename ... Arguments, class ... Choices>
     struct switch_impl <Result, meta::vector <Arguments ...>,
         meta::vector <Choices ...> >
 {
-    switch_impl() {
-        set_pointers (&functions[0], get_function <Choices>() ...);
-    }
+    switch_impl()
+    { set_pointers (&functions[0], get_function <Choices>() ...); }
 
     typedef Result (*function_pointer) (Arguments && ...);
 
@@ -68,9 +64,8 @@ template <typename Result, typename ... Arguments, class ... Choices>
     function_pointer functions [choice_num];
 
 private:
-    template <class Choice> function_pointer get_function() const {
-        return  &call_object <Choice, Result, Arguments ...>;
-    };
+    template <class Choice> function_pointer get_function() const
+    { return  &call_object <Choice, Result, Arguments ...>; };
 
     template <class FirstPointer, class ... OtherPointers>
         static void set_pointers (function_pointer * destination,
@@ -113,8 +108,7 @@ template <typename ResultType, typename ... Choices>
     }
 };
 
-}   // namespace detail
-}   // namespace rime
+}} // namespace rime::detail
 
 #endif  // RIME_DETAIL_SWITCH_HPP_INCLUDED
 

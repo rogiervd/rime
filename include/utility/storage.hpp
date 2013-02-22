@@ -29,6 +29,7 @@ For example, reference types are stored as boost::reference_wrapper's.
 #include <utility>
 
 namespace detail { namespace storage {
+
     /**
     Returns a type that can be used to store a user-specified type.
 

@@ -46,7 +46,7 @@ namespace rime {
             { assert (condition); }
         };
 
-    } // namespace assert_detail
+    } // namespace detail
 
     template <class Condition> inline
         void assert_ (Condition const & condition)

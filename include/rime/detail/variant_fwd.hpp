@@ -28,8 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "meta/contains.hpp"
 #include "meta/merge_types.hpp"
 
-namespace rime
-{
+namespace rime {
 
 template <typename ... Types> class variant;
 
@@ -51,7 +50,7 @@ template <typename Actual, typename Variant>
     >::type
     get_unsafe (Variant && variant);
 
-}   // namespace rime
+} // namespace rime
 
 #endif  // RIME_VARIANT_FWD_HPP
 

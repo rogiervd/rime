@@ -36,8 +36,7 @@ MPL constants: the behaviour of existing code does not change.
 
 #include "rime/core.hpp"
 
-namespace rime
-{
+namespace rime {
 
 /*
 Produce something like the following:
@@ -51,7 +50,8 @@ namespace callable
         -> typename boost::enable_if <
             mpl::and_ <is_constant <Left>, is_constant <Right> >,
             constant <
-                typename std::decay <decltype (Left::value + Right::value)>::type,
+                typename std::decay <decltype (Left::value + Right::value)
+                    >::type,
                 (Left::value + Right::value)
             >
         >::type
@@ -221,11 +221,10 @@ RIME_DEFINE_UNARY_OPERATOR(bitwise_not, ~)
 
 #undef RIME_DEFINE_UNARY_OPERATOR
 
-/** "and" and "or" **/
-namespace callable
-{
-    namespace detail
-    {
+/* "and" and "or" */
+namespace callable {
+
+    namespace detail {
         template <typename Constant, typename... Arguments>
             struct any_equal_constant;
         template <typename Constant>
@@ -247,16 +246,14 @@ namespace callable
             equal_constant <Constant, Head>,
             all_equal_constant <Constant, Tail...>
         > {};
-    }   // namespace detail
+    } // namespace detail
 
-    template <typename Type> struct return_
-    {
+    template <typename Type> struct return_ {
         template <typename... Arguments>
             Type operator() (Arguments const &...) const
-        {
-            return Type();
-        }
+        { return Type(); }
     };
+
 } // namespace callable
 
 
@@ -308,7 +305,8 @@ namespace callable \
             detail::any_equal_constant <bool_ <overrideValue>, Arguments...>, \
             return_ <bool_ <overrideValue> >, \
             typename mpl::if_ < \
-                detail::all_equal_constant <bool_ <defaultValue>, Arguments...>, \
+                detail::all_equal_constant <bool_ <defaultValue>, \
+                    Arguments...>, \
                 return_ <bool_ <defaultValue> >, \
                 detail::name##runtime <void, Arguments...> \
             >::type \
@@ -342,7 +340,7 @@ RIME_DEFINE_BINARY_BOOLEAN_OPERATOR(and_, &&, false, true)
 
 #undef RIME_DEFINE_BINARY_BOOLEAN_OPERATOR
 
-}   // namespace rime
+} // namespace rime
 
 #endif  // RIME_OPERATORS_HPP_INCLUDED
 

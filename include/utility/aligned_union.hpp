@@ -22,8 +22,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 Define an aligned_union type that takes a compile-time type list.
 */
 
-#ifndef RANGE_DETAIL_ALIGNED_UNION_HPP_INCLUDED
-#define RANGE_DETAIL_ALIGNED_UNION_HPP_INCLUDED
+#ifndef RANGE_UTILITY_ALIGNED_UNION_HPP_INCLUDED
+#define RANGE_UTILITY_ALIGNED_UNION_HPP_INCLUDED
 
 #include <type_traits>
 
@@ -32,8 +32,7 @@ Define an aligned_union type that takes a compile-time type list.
 
 #include "meta/max_element.hpp"
 
-namespace detail {
-namespace storage {
+namespace detail { namespace storage {
     /**
     Compute a POD type that can be used as aligned storage for each of the
     types in type container Types.
@@ -55,9 +54,7 @@ namespace storage {
         typedef typename std::aligned_storage <storage_size, alignment>::type
             type;
     };
+}} // namespace detail::storage
 
-} // namespace storage
-} // namespace detail
-
-#endif  // RANGE_DETAIL_ALIGNED_UNION_HPP_INCLUDED
+#endif  // RANGE_UTILITY_ALIGNED_UNION_HPP_INCLUDED
 

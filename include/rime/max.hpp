@@ -27,15 +27,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "utility/returns.hpp"
 
 namespace rime {
-namespace callable {
 
+namespace callable {
     struct max {
         template <class Left, class Right>
             auto operator() (Left && left, Right && right) const
         RETURNS (rime::if_ (rime::less_sign_safe (left, right),
             std::forward <Right> (right), std::forward <Left> (left)))
     };
-
 } // namespace callable
 
 /**

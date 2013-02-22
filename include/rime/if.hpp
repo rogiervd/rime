@@ -31,6 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "variant.hpp"
 
 namespace rime {
+
 namespace callable {
     /**
     Function that can is passed three parameters: the condition, the result
