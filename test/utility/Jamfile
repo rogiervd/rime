@@ -1,2 +1,5 @@
-alias "utility" : [ run storage.cpp ] ;
+alias "utility" :
+    [ run storage.cpp ]
+    [ run returns.cpp ]
+    ;
 

@@ -32,7 +32,7 @@ This looks like
 This macro simplifies those expressions into
     auto f (...) RETURNS (x)
 */
-#define RETURNS(...) -> decltype(__VA_ARGS__) { return (__VA_ARGS__); }
+#define RETURNS(...) -> decltype(__VA_ARGS__) { return __VA_ARGS__; }
 
 #endif  // RANGE_DETAIL_RETURNS_HPP_INCLUDED
 
