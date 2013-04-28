@@ -1,7 +1,7 @@
 /*
 Copyright 2013 Rogier van Dalen.
 
-This file is part of Rogier van Dalen's Range library for C++.
+This file is part of Rogier van Dalen's Rime library for C++.
 
 This library is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
