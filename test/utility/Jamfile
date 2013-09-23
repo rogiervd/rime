@@ -2,5 +2,7 @@ alias "utility" :
     [ run storage.cpp ]
     [ run returns.cpp ]
     [ run test_is_assignable.cpp ]
+
+    [ run counted.cpp ]
     ;
 
