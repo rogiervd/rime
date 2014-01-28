@@ -40,13 +40,11 @@ namespace detail { namespace storage {
     template <typename Types> struct aligned_union {
     private:
         typedef boost::mpl::_ _;
-        typedef typename meta::transform <std::alignment_of <_>, Types>::type
-            alignments;
+        typedef meta::transform <std::alignment_of <_>, Types> alignments;
         static const size_t alignment
             = meta::max_element <alignments>::type::value;
 
-        typedef typename meta::transform <boost::mpl::sizeof_ <_>, Types>::type
-            sizeofs;
+        typedef meta::transform <boost::mpl::sizeof_ <_>, Types> sizeofs;
         static const size_t storage_size
             = meta::max_element <sizeofs>::type::value;
 

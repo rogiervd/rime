@@ -90,7 +90,8 @@ The interface is too basic for exposure to the world at large.
 What does this mean for performance?
 Should this be replaced by a big telescoping switch statement?
 */
-template <typename ResultType, class Choices> struct switch_;
+template <typename ResultType, class Choices> struct switch_
+: switch_ <ResultType, typename meta::as_vector <Choices>::type> {};
 
 template <typename ResultType, typename ... Choices>
     struct switch_ <ResultType, meta::vector <Choices ...> >

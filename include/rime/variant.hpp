@@ -42,8 +42,6 @@ Define a variant type, similar to boost::variant.
 #include <boost/mpl/not.hpp>
 #include <boost/mpl/empty.hpp>
 #include <boost/mpl/size.hpp>
-#include <boost/mpl/front.hpp>
-#include <boost/mpl/back.hpp>
 #include <boost/mpl/placeholders.hpp>
 #include <boost/mpl/eval_if.hpp>
 #include <boost/mpl/bind.hpp>
@@ -172,8 +170,8 @@ private:
         static_assert (!is_variant <Type>::value,
             "variant<...> cannot contain a variant<..>.");
 
-        typedef typename meta::filter <
-                std::is_same <Type, boost::mpl::_>, types>::type
+        typedef typename meta::as_vector <meta::filter <
+                std::is_same <Type, boost::mpl::_>, types>>::type
             duplicate_types;
 
         static_assert (meta::size <duplicate_types>::value == 1,
@@ -188,12 +186,11 @@ private:
     // Set up storage size and alignment
     typedef typename meta::filter <
             mpl::not_ <std::is_same <boost::mpl::_, void> >, types
-        >::type types_without_void;
+        > types_without_void;
 
-    // Using transform_view does not influence compile speed noticeably.
-    typedef typename meta::transform <
+    typedef typename meta::as_vector <meta::transform <
             ::detail::storage::store_as <boost::mpl::_>, types_without_void
-        >::type stored_types;
+        >>::type stored_types;
 
     typedef typename ::detail::storage::aligned_union <stored_types>::type
         storage_type;
@@ -261,8 +258,8 @@ private:
         };
 
         // For a clearer error message
-        typedef typename meta::transform <
-            mpl::second <mpl::_>, numbered_candidates>::type candidates;
+        typedef typename meta::as_vector <meta::transform <
+            mpl::second <mpl::_>, numbered_candidates>>::type candidates;
 
         typedef assert_unambiguous_conversion <candidates> assert_unambiguous;
     };
@@ -412,10 +409,10 @@ private:
             construct_from_variant_containing <Actual>,
         and calls it with (*this, that).
         */
-        typedef typename meta::transform <
+        typedef meta::transform <
                 construct_from_variant_containing <boost::mpl::_>,
                 typename variant_types <ThatVariant>::type
-            >::type specialisations;
+            > specialisations;
         ::rime::detail::switch_ <void, specialisations> s;
         s (that.which(), *this, std::forward <ThatVariant> (that));
     }
@@ -472,8 +469,8 @@ public:
         This constructs an object of type destruct <Actual>,
         and calls it with this->memory().
         */
-        typedef typename meta::transform <
-            destruct <boost::mpl::_>, types>::type specialisations;
+        typedef meta::transform <destruct <boost::mpl::_>, types>
+            specialisations;
         ::rime::detail::switch_ <void, specialisations> s;
         s (this->which(), this->memory());
     }
@@ -487,12 +484,10 @@ public:
     Find the index of type Actual amongst the possible types of this variant.
     */
     template <typename Actual> struct index_of {
-        typedef typename meta::filter <
-                std::is_same <mpl::second <mpl::_>, Actual>,
-                numbered_types
-            >::type candidates;
+        typedef meta::filter <std::is_same <mpl::second <mpl::_>, Actual>,
+            numbered_types> candidates;
 
-        typedef typename mpl::front <candidates>::type index_and_type;
+        typedef typename meta::first <candidates>::type index_and_type;
 
         static_assert (std::is_same <
             typename mpl::second <index_and_type>::type, Actual>::value,
@@ -619,9 +614,9 @@ private:
         // Unified result type.
         typedef typename compute_specialisations::result_type result_type;
         // Specialisations with the result type converted to result_type.
-        typedef typename meta::transform <
+        typedef meta::transform <
             variant_detail::convert_result <result_type, boost::mpl::_>,
-            specialisations>::type coerced_specialisations;
+            specialisations> coerced_specialisations;
 
         static rime::detail::switch_ <result_type, coerced_specialisations> s;
         return s (variant.which(),
@@ -802,9 +797,9 @@ private:
     typedef typename meta::as_vector <Types>::type input_types;
 
     // E.g. vector <vector <int>, vector <int, float>, vector <double> >
-    typedef typename meta::transform <
+    typedef typename meta::as_vector <typename meta::transform <
             variant_types <boost::mpl::_>, input_types
-        >::type type_sequences;
+        >::type>::type type_sequences;
 
     // E.g. vector <int, int, float, double>
     typedef typename meta::flatten <type_sequences>::type type_sequence;
@@ -817,7 +812,7 @@ public:
     typedef typename boost::mpl::eval_if <
         boost::mpl::greater <boost::mpl::size <types>, boost::mpl::int_ <1> >,
         variant_detail::make_variant <types>,
-        boost::mpl::front <types>
+        meta::first <types>
     >::type type;
 };
 
@@ -839,10 +834,10 @@ namespace variant_detail {
     struct find_candidates <
         Actual, NumberedTypes, FirstMatch, OtherMatches ...>
     {
-        typedef typename meta::filter <
+        typedef typename meta::as_vector <meta::filter <
                 FirstMatch,
                 NumberedTypes
-            >::type numbered_candidates;
+            >>::type numbered_candidates;
 
         typedef typename mpl::eval_if <
             mpl::greater_equal <mpl::size <numbered_candidates>, mpl::int_ <1>>,

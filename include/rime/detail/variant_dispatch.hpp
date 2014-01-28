@@ -309,10 +309,10 @@ private:
             meta::vector <F1, int, long> >.
     */
     template <typename FirstChoice> struct types_starting_with
-    : meta::transform <
+    : meta::as_vector <meta::transform <
         meta::push <meta::front, FirstChoice, boost::mpl::_>,
         types_rest
-    >::type {};
+    >>::type {};
 
 public:
     /**
@@ -324,9 +324,9 @@ public:
             meta::vector <F2, int, char>,
             meta::vector <F2, int, long> >.
     */
-    typedef typename meta::flatten <typename meta::transform <
+    typedef typename meta::flatten <typename meta::as_vector <meta::transform <
             types_starting_with <boost::mpl::_1>, type_first
-        >::type>::type type;
+        >>::type>::type type;
 
     /**
     Compute the index into choices that gives the correct actual type.
@@ -366,9 +366,10 @@ template <typename Function> class visitor {
     template <typename Arguments,
         typename PossibleActualArguments
             = variant_detail::possible_actual_types_for <Arguments>,
-        typename PossibleRecipients = typename meta::transform <
-            variant_detail::dispatch_recipient <Arguments, boost::mpl::_>,
-            typename PossibleActualArguments::type>::type
+        typename PossibleRecipients =
+            typename meta::as_vector <meta::transform <
+                variant_detail::dispatch_recipient <Arguments, boost::mpl::_>,
+                typename PossibleActualArguments::type>>::type
         > struct variant_dispatcher;
 
     template <typename ... Arguments, typename PossibleActualArguments,
