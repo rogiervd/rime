@@ -28,6 +28,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <boost/mpl/assert.hpp>
 
+struct base {};
+struct derived : base {};
+
 BOOST_AUTO_TEST_SUITE(test_rime)
 
 /**
@@ -50,17 +53,27 @@ BOOST_AUTO_TEST_CASE (test_rime_core) {
     BOOST_MPL_ASSERT_NOT ((rime::is_rime_constant <boost::mpl::true_>));
     BOOST_MPL_ASSERT_NOT ((rime::is_rime_constant <boost::mpl::int_ <3> >));
     BOOST_MPL_ASSERT ((rime::is_rime_constant <rime::bool_<true> >));
-    BOOST_MPL_ASSERT ((rime::is_rime_constant <rime::int_ <3> >));
-    BOOST_MPL_ASSERT ((rime::is_rime_constant <rime::constant <long, 3> >));
+    BOOST_MPL_ASSERT ((rime::is_rime_constant <rime::int_ <3> const>));
+    BOOST_MPL_ASSERT ((rime::is_rime_constant <rime::constant <long, 3> &>));
 
     // is_constant
     BOOST_MPL_ASSERT ((rime::is_constant <std::true_type>));
-    BOOST_MPL_ASSERT ((rime::is_constant <std::integral_constant <int, 3> >));
+    BOOST_MPL_ASSERT ((rime::is_constant <std::integral_constant <int, 3> &>));
+    BOOST_MPL_ASSERT ((rime::is_constant <std::is_integral <int> const>));
+    BOOST_MPL_ASSERT ((rime::is_constant <std::is_same <int, bool> const &>));
+    BOOST_MPL_ASSERT ((rime::is_constant <std::is_base_of <base, derived>>));
+    BOOST_MPL_ASSERT ((rime::is_constant <std::is_base_of <derived, base>>));
+
     BOOST_MPL_ASSERT ((rime::is_constant <boost::mpl::true_>));
-    BOOST_MPL_ASSERT ((rime::is_constant <boost::mpl::int_ <3> >));
+    BOOST_MPL_ASSERT ((rime::is_constant <boost::mpl::int_ <3> &>));
     BOOST_MPL_ASSERT ((rime::is_constant <rime::bool_<true> >));
-    BOOST_MPL_ASSERT ((rime::is_constant <rime::int_ <3> >));
+    BOOST_MPL_ASSERT ((rime::is_constant <rime::int_ <3> const>));
     BOOST_MPL_ASSERT ((rime::is_constant <rime::constant <long, 3> >));
+
+    BOOST_MPL_ASSERT_NOT ((rime::is_constant <int>));
+    BOOST_MPL_ASSERT_NOT ((rime::is_constant <double>));
+    BOOST_MPL_ASSERT_NOT ((rime::is_constant <derived>));
+    BOOST_MPL_ASSERT_NOT ((rime::is_constant <void>));
 
     // value
     BOOST_MPL_ASSERT ((std::is_same <

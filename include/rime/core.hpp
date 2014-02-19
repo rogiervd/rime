@@ -60,8 +60,8 @@ and it returns a compile-time constant.
 The behaviour of (boost::mpl::true_() || boost::mpl::true_()) is not changed.
 
 \internal
-It is necessary to derive from constant_base so that is_constant_bare can also
-pick up types derived from this.
+It is necessary to derive from constant_base so that is_decayed_constant can
+also pick up types derived from this.
 */
 template <class Type, Type content> class constant
 : public constant_base {
@@ -95,40 +95,37 @@ static const auto true_ = true_type();
 /**
 Specialise this for Rime constants that don't derive from constant_base.
 */
-template <class Type> struct is_rime_constant_bare
+template <class Type> struct is_decayed_rime_constant
 : std::is_base_of <constant_base, Type> {};
 
 /**
 True iff Type is a Rime constant.
 */
 template <class Type> struct is_rime_constant
-: is_rime_constant_bare <typename std::decay <Type>::type> {};
+: is_decayed_rime_constant <typename std::decay <Type>::type> {};
 
-namespace detail {
+namespace is_constant_detail {
 
-    template <class Type> struct is_std_integral_constant_bare
-    : std::false_type {};
-
-    template <typename Type, Type value>
-        struct is_std_integral_constant_bare <
-            std::integral_constant <Type, value>>
-    : std::true_type {};
+    struct take_std_integral_constant {
+        // Standard library constants derive from std::integral_constant.
+        template <class Type, Type value> take_std_integral_constant (
+            std::integral_constant <Type, value> const &);
+    };
 
     template <class Type> struct is_std_integral_constant
-    : is_std_integral_constant_bare <typename std::decay <Type>::type> {};
+    : std::is_convertible <Type, take_std_integral_constant> {};
 
-    struct initialisable_from_mpl_integral_constant {
-        // Pick up MPL integral constants.
-        template <typename IntegralConstant>
-            initialisable_from_mpl_integral_constant (IntegralConstant const &,
-                typename IntegralConstant::tag = boost::mpl::integral_c_tag())
-        {}
+    struct take_mpl_integral_constant {
+        // MPL constants have a typedef integral_c_tag tag.
+        template <typename Constant> take_mpl_integral_constant (
+            Constant const &,
+            typename Constant::tag = boost::mpl::integral_c_tag());
     };
 
     template <class Type> struct is_mpl_integral_constant
-    : std::is_convertible <Type, initialisable_from_mpl_integral_constant> {};
+    : std::is_convertible <Type, take_mpl_integral_constant> {};
 
-} // namespace detail
+} // namespace is_constant_detail
 
 /**
 True iff Type can be used as a compile-time constant.
@@ -136,8 +133,9 @@ I.e. iff Type is an integral constant from C++11 or Boost.MPL,
 or a Rime constant.
 */
 template <class Type> struct is_constant
-: mpl::or_ <is_rime_constant <Type>, detail::is_mpl_integral_constant <Type>,
-    detail::is_std_integral_constant <Type>> {};
+: mpl::or_ <is_rime_constant <Type>,
+    is_constant_detail::is_mpl_integral_constant <Type>,
+    is_constant_detail::is_std_integral_constant <Type>> {};
 
 /**
 Convert any constant into a rime::constant<>.
