@@ -1454,6 +1454,22 @@ BOOST_AUTO_TEST_CASE (test_rime_make_variant_over) {
             meta::vector <rime::true_type, rime::bool_ <false>>>::type,
         bool>));
 
+    // Constants with the same value type and value,
+    // but different apparent type.
+    BOOST_MPL_ASSERT ((rime::same_constant <
+        rime::constant <int, 10>, rime::int_ <10>>));
+
+    BOOST_MPL_ASSERT ((std::is_same <
+        make_variant_over <
+            meta::vector <rime::constant <int, 10>, rime::int_ <10>>>::type,
+        rime::constant <int, 10>>));
+
+    BOOST_MPL_ASSERT ((std::is_same <
+        make_variant_over <
+            meta::vector <rime::false_type,
+                rime::constant <bool, false>>>::type,
+        rime::constant <bool, false>>));
+
     // Don't turn two constants with the same type into their value type.
     BOOST_MPL_ASSERT ((std::is_same <
         make_variant_over <

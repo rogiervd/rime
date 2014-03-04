@@ -848,6 +848,24 @@ namespace variant_detail {
         >::type type;
     };
 
+    template <class Type1, class Type2>
+        struct merge_two_equal_constants
+    {
+        static_assert (std::is_same <
+            typename rime::value <Type1>::type,
+            typename rime::value <Type2>::type>::value,
+            "Use this only when the value types are the same.");
+        static_assert (Type1::value == Type2::value,
+            "Use this only when the values are the same.");
+
+        typedef rime::constant <typename rime::value <Type1>::type,
+            std::decay <Type1>::type::value> type;
+    };
+
+    // If the types are exactly the same,
+    template <class Type> struct merge_two_equal_constants <Type, Type>
+    { typedef Type type; };
+
     /**
     MergeTwo class for constants.
     This forwards to Base the value types of the two types.
@@ -859,7 +877,8 @@ namespace variant_detail {
     template <class Base> struct merge_constant {
         template <typename Type1, typename Type2> struct apply
         : mpl::if_ <rime::same_constant <Type1, Type2>,
-            typename Base::template apply <Type1, Type2>,
+            merge_two_equal_constants <typename std::decay <Type1>::type,
+                typename std::decay <Type2>::type>,
             typename Base::template apply <
                 typename rime::value <Type1>::type,
                 typename rime::value <Type2>::type>
