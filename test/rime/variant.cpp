@@ -24,6 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <boost/mpl/assert.hpp>
 
+#include "utility/test/tracked.hpp"
 #include <string>
 
 // GCC rightfully complains about comparisons between signed and unsigned
@@ -990,233 +991,152 @@ BOOST_AUTO_TEST_CASE (test_rime_variant_copy_construct) {
     }
 }
 
-struct counts {
-    int construct;
-    int copy_construct;
-    int move_construct;
-    int destruct;
-    int destruct_moved;
-    int copy_assign;
-    int move_assign;
-
-    counts()
-    : construct(), copy_construct(), move_construct(),
-        destruct(), destruct_moved(),
-        copy_assign(), move_assign() {}
-
-    bool consistent() const {
-        // All constructed objects must have been destructed.
-        if (construct + copy_construct + move_construct !=
-            destruct + destruct_moved)
-            return false;
-        // All carcasses must have been destructed.
-        if (move_construct + move_assign != destruct_moved)
-            return false;
-        return true;
-    }
-};
-
-class counted {
-    counts & count;
-    bool moved;
-
-public:
-    counted (counts & count)
-    : count (count), moved (false)
-    { ++ count.construct; }
-
-    counted (counted const & that)
-    : count (that.count), moved (false)
-    { ++ count.copy_construct; }
-
-    counted (counted && that)
-    : count (that.count), moved (false) {
-        BOOST_CHECK (that.valid());
-        ++ count.move_construct;
-        that.move();
-    }
-
-    ~counted() {
-        if (this->moved)
-            ++ count.destruct_moved;
-        else
-            ++ count.destruct;
-    }
-
-    bool valid() const { return !this->moved; }
-
-    void move() { this->moved = true; }
-
-    counted & operator = (counted const & that) {
-        BOOST_CHECK (that.valid());
-        ++ count.copy_assign;
-        return *this;
-    }
-
-    counted & operator = (counted && that) {
-        BOOST_CHECK (that.valid());
-        ++ count.move_assign;
-        that.move();
-        return *this;
-    }
-
-    counts & get_counts() { return count; }
-};
-
-counted make_counted (counts & c) { return counted (c); }
-
-struct counted_assignable {
-    counted_assignable & operator = (counted const &)
+struct tracked_assignable {
+    tracked_assignable & operator = (utility::tracked<> const &)
     { return *this; }
 };
 
 template <typename Variant, typename Variant2>
-    void test_rime_variant_objects_counted()
+    void test_rime_variant_objects_tracked()
 {
+    using utility::tracked;
     // Construction and destruction
     {
-        counts count;
+        utility::tracked_registry registry;
         {
-            Variant v (make_counted (count));
+            Variant v = tracked<> (registry);
         }
-        BOOST_CHECK_EQUAL (count.construct, 1);
-        BOOST_CHECK_EQUAL (count.move_construct, 1);
-        BOOST_CHECK_EQUAL (count.destruct, 1);
-        BOOST_CHECK_EQUAL (count.destruct_moved, 1);
-        BOOST_CHECK (count.consistent());
+        BOOST_CHECK_EQUAL (registry.value_construct_count(), 1);
+        BOOST_CHECK_EQUAL (registry.move_count(), 1);
+        BOOST_CHECK_EQUAL (registry.destruct_count(), 1);
+        BOOST_CHECK_EQUAL (registry.destruct_moved_count(), 1);
+        BOOST_CHECK (registry.consistent());
     }
-
     // Copy-construction
     {
-        counts count;
+        utility::tracked_registry registry;
         {
-            counted c (count);
+            tracked<> c (registry);
             // Copy-construct v from c
 
             Variant v (c);
-            BOOST_CHECK_EQUAL (count.copy_construct, 1);
-            BOOST_CHECK_EQUAL (&(rime::get <counted> (v).get_counts()), &count);
+            BOOST_CHECK_EQUAL (registry.copy_count(), 1);
 
             // Copy-construct v2 from v.
-            // Underneath, this should copy-construct the counted in v2 from
-            // the counted in v.
+            // Underneath, this should copy-construct the tracked in v2 from
+            // the tracked in v.
             Variant2 v2 (v);
-            BOOST_CHECK_EQUAL (count.copy_construct, 2);
-            BOOST_CHECK_EQUAL (&(rime::get <counted> (v2).get_counts()),
-                &count);
+            BOOST_CHECK_EQUAL (registry.copy_count(), 2);
         }
-        BOOST_CHECK_EQUAL (count.construct, 1);
-        BOOST_CHECK_EQUAL (count.move_construct, 0);
-        BOOST_CHECK_EQUAL (count.copy_construct, 2);
-        BOOST_CHECK_EQUAL (count.destruct, 3);
-        BOOST_CHECK_EQUAL (count.destruct_moved, 0);
-        BOOST_CHECK (count.consistent());
+        BOOST_CHECK_EQUAL (registry.value_construct_count(), 1);
+        BOOST_CHECK_EQUAL (registry.move_count(), 0);
+        BOOST_CHECK_EQUAL (registry.copy_count(), 2);
+        BOOST_CHECK_EQUAL (registry.destruct_count(), 3);
+        BOOST_CHECK_EQUAL (registry.destruct_moved_count(), 0);
+        BOOST_CHECK (registry.consistent());
     }
 
     // Move-construction
     {
-        counts count;
+        utility::tracked_registry registry;
         {
-            counted c (count);
-            BOOST_CHECK_EQUAL (count.copy_construct, 0);
+            tracked<> c (registry);
+            BOOST_CHECK_EQUAL (registry.copy_count(), 0);
 
             // Move-construct v from c
             Variant v (std::move (c));
-            BOOST_CHECK_EQUAL (count.copy_construct, 0);
-            BOOST_CHECK_EQUAL (count.move_construct, 1);
-            BOOST_CHECK_EQUAL (&(rime::get <counted> (v).get_counts()), &count);
+            BOOST_CHECK_EQUAL (registry.copy_count(), 0);
+            BOOST_CHECK_EQUAL (registry.move_count(), 1);
 
             // Move-construct v2 from v.
-            // Underneath, this should move-construct the counted in v2 from
-            // the counted in v.
+            // Underneath, this should move-construct the tracked in v2 from
+            // the tracked in v.
             Variant2 v2 (std::move (v));
-            BOOST_CHECK_EQUAL (count.copy_construct, 0);
-            BOOST_CHECK_EQUAL (count.move_construct, 2);
-            BOOST_CHECK_EQUAL (&(rime::get <counted> (v2).get_counts()),
-                &count);
+            BOOST_CHECK_EQUAL (registry.copy_count(), 0);
+            BOOST_CHECK_EQUAL (registry.move_count(), 2);
         }
-        BOOST_CHECK_EQUAL (count.construct, 1);
-        BOOST_CHECK_EQUAL (count.move_construct, 2);
-        BOOST_CHECK_EQUAL (count.copy_construct, 0);
-        BOOST_CHECK_EQUAL (count.destruct, 1);
-        BOOST_CHECK_EQUAL (count.destruct_moved, 2);
-        BOOST_CHECK (count.consistent());
+        BOOST_CHECK_EQUAL (registry.value_construct_count(), 1);
+        BOOST_CHECK_EQUAL (registry.move_count(), 2);
+        BOOST_CHECK_EQUAL (registry.copy_count(), 0);
+        BOOST_CHECK_EQUAL (registry.destruct_count(), 1);
+        BOOST_CHECK_EQUAL (registry.destruct_moved_count(), 2);
+        BOOST_CHECK (registry.consistent());
     }
 
     // Move get.
     // If the variant is a temporary, "get" should return an rvalue reference.
     {
-        counts count;
+        utility::tracked_registry registry;
         {
-            counted c (count);
-            BOOST_CHECK_EQUAL (count.copy_construct, 0);
+            tracked<> c (registry);
+            BOOST_CHECK_EQUAL (registry.copy_count(), 0);
 
             Variant v (std::move (c));
             // Sanity check; see previous test.
-            BOOST_CHECK_EQUAL (count.copy_construct, 0);
-            BOOST_CHECK_EQUAL (count.move_construct, 1);
+            BOOST_CHECK_EQUAL (registry.copy_count(), 0);
+            BOOST_CHECK_EQUAL (registry.move_count(), 1);
 
             // get
-            counted c2 (rime::get <counted> (std::move (v)));
-            BOOST_CHECK_EQUAL (count.copy_construct, 0);
-            BOOST_CHECK_EQUAL (count.move_construct, 2);
+            tracked<> c2 (rime::get <tracked<>> (std::move (v)));
+            BOOST_CHECK_EQUAL (registry.copy_count(), 0);
+            BOOST_CHECK_EQUAL (registry.move_count(), 2);
 
             Variant v2 (std::move (c2));
             // unsafe_get
-            counted c3 (rime::get_unsafe <counted> (std::move (v2)));
-            BOOST_CHECK_EQUAL (count.copy_construct, 0);
-            BOOST_CHECK_EQUAL (count.move_construct, 4);
+            tracked<> c3 (rime::get_unsafe <tracked<>> (std::move (v2)));
+            BOOST_CHECK_EQUAL (registry.copy_count(), 0);
+            BOOST_CHECK_EQUAL (registry.move_count(), 4);
         }
-        BOOST_CHECK_EQUAL (count.construct, 1);
-        BOOST_CHECK_EQUAL (count.move_construct, 4);
-        BOOST_CHECK_EQUAL (count.copy_construct, 0);
-        BOOST_CHECK_EQUAL (count.destruct, 1);
-        BOOST_CHECK_EQUAL (count.destruct_moved, 4);
-        BOOST_CHECK (count.consistent());
+        BOOST_CHECK_EQUAL (registry.value_construct_count(), 1);
+        BOOST_CHECK_EQUAL (registry.move_count(), 4);
+        BOOST_CHECK_EQUAL (registry.copy_count(), 0);
+        BOOST_CHECK_EQUAL (registry.destruct_count(), 1);
+        BOOST_CHECK_EQUAL (registry.destruct_moved_count(), 4);
+        BOOST_CHECK (registry.consistent());
     }
 }
 
 // Test construction, destruction, copying, moving
 BOOST_AUTO_TEST_CASE (test_rime_variant_objects) {
-    typedef rime::variant <counted, int> variant1;
-    typedef rime::variant <int, counted> variant2;
-    typedef rime::variant <counted> variant3;
-    typedef rime::variant <int, counted, float> variant4;
+    typedef rime::variant <utility::tracked<>, int> variant1;
+    typedef rime::variant <int, utility::tracked<>> variant2;
+    typedef rime::variant <utility::tracked<>> variant3;
+    typedef rime::variant <int, utility::tracked<>, float> variant4;
 
-    test_rime_variant_objects_counted <variant1, variant1>();
-    test_rime_variant_objects_counted <variant2, variant2>();
-    test_rime_variant_objects_counted <variant3, variant3>();
-    test_rime_variant_objects_counted <variant4, variant4>();
+    test_rime_variant_objects_tracked <variant1, variant1>();
+    test_rime_variant_objects_tracked <variant2, variant2>();
+    test_rime_variant_objects_tracked <variant3, variant3>();
+    test_rime_variant_objects_tracked <variant4, variant4>();
 
-    test_rime_variant_objects_counted <variant1, variant2>();
-    test_rime_variant_objects_counted <variant3, variant4>();
-    test_rime_variant_objects_counted <variant4, variant1>();
+    test_rime_variant_objects_tracked <variant1, variant2>();
+    test_rime_variant_objects_tracked <variant3, variant4>();
+    test_rime_variant_objects_tracked <variant4, variant1>();
 
-    test_rime_variant_objects_counted <variant2, variant4>();
-    test_rime_variant_objects_counted <variant3, variant1>();
-    test_rime_variant_objects_counted <variant4, variant2>();
+    test_rime_variant_objects_tracked <variant2, variant4>();
+    test_rime_variant_objects_tracked <variant3, variant1>();
+    test_rime_variant_objects_tracked <variant4, variant2>();
 
-    test_rime_variant_objects_counted <variant1, variant4>();
-    test_rime_variant_objects_counted <variant2, variant1>();
-    test_rime_variant_objects_counted <variant3, variant2>();
+    test_rime_variant_objects_tracked <variant1, variant4>();
+    test_rime_variant_objects_tracked <variant2, variant1>();
+    test_rime_variant_objects_tracked <variant3, variant2>();
 
     // Moving from references.
     {
-        counts count;
+        utility::tracked_registry registry;
         {
-            counted c (count);
-            rime::variant <counted &, int> v (c);
-            BOOST_CHECK_EQUAL (count.construct, 1);
-            BOOST_CHECK_EQUAL (count.copy_construct, 0);
+            utility::tracked<> c (registry);
+            rime::variant <utility::tracked<> &, int> v (c);
+            BOOST_CHECK_EQUAL (registry.value_construct_count(), 1);
+            BOOST_CHECK_EQUAL (registry.copy_count(), 0);
 
             variant1 v2 (std::move (v));
             // c must be unaffected and not moved, just copied.
-            BOOST_CHECK_EQUAL (count.construct, 1);
-            BOOST_CHECK_EQUAL (count.move_construct, 0);
-            BOOST_CHECK_EQUAL (count.copy_construct, 1);
+            BOOST_CHECK_EQUAL (registry.value_construct_count(), 1);
+            BOOST_CHECK_EQUAL (registry.move_count(), 0);
+            BOOST_CHECK_EQUAL (registry.copy_count(), 1);
         }
-        BOOST_CHECK_EQUAL (count.destruct, 2);
-        BOOST_CHECK (count.consistent());
+        BOOST_CHECK_EQUAL (registry.destruct_count(), 2);
+        BOOST_CHECK (registry.consistent());
     }
 }
 
@@ -1303,42 +1223,43 @@ BOOST_AUTO_TEST_CASE (test_rime_variant_assign) {
 
     // Assign with objects and moving
     {
-        counts count;
+        utility::tracked_registry registry;
+        using utility::tracked;
         {
-            counted c (count);
-            rime::variant <counted, counted_assignable> v (
-                make_counted (count));
+            tracked<> c (registry);
+            rime::variant <tracked<>, tracked_assignable> v =
+                tracked<> (registry);
 
             // Sanity
-            BOOST_CHECK_EQUAL (count.construct, 2);
-            BOOST_CHECK_EQUAL (count.move_construct, 1);
-            BOOST_CHECK_EQUAL (count.copy_assign, 0);
-            BOOST_CHECK_EQUAL (count.move_assign, 0);
+            BOOST_CHECK_EQUAL (registry.value_construct_count(), 2);
+            BOOST_CHECK_EQUAL (registry.move_count(), 1);
+            BOOST_CHECK_EQUAL (registry.copy_assign_count(), 0);
+            BOOST_CHECK_EQUAL (registry.move_assign_count(), 0);
 
             // Copy assignment
-            counted c2 (count);
-            BOOST_CHECK_EQUAL (count.construct, 3);
+            tracked<> c2 (registry);
+            BOOST_CHECK_EQUAL (registry.value_construct_count(), 3);
             v = c2;
-            BOOST_CHECK_EQUAL (count.copy_assign, 1);
-            BOOST_CHECK_EQUAL (count.move_assign, 0);
+            BOOST_CHECK_EQUAL (registry.copy_assign_count(), 1);
+            BOOST_CHECK_EQUAL (registry.move_assign_count(), 0);
 
             // Move assignment
-            v = make_counted (count);
-            BOOST_CHECK_EQUAL (count.construct, 4);
-            BOOST_CHECK_EQUAL (count.move_construct, 1);
-            BOOST_CHECK_EQUAL (count.copy_assign, 1);
-            BOOST_CHECK_EQUAL (count.move_assign, 1);
+            v = tracked<> (registry);
+            BOOST_CHECK_EQUAL (registry.value_construct_count(), 4);
+            BOOST_CHECK_EQUAL (registry.move_count(), 1);
+            BOOST_CHECK_EQUAL (registry.copy_assign_count(), 1);
+            BOOST_CHECK_EQUAL (registry.move_assign_count(), 1);
 
             // From other variant type.
             // All possible content types for v2 must be convertible to
-            // counted.
-            rime::variant <counted, counted &> v2 (make_counted (count));
-            BOOST_CHECK_EQUAL (count.construct, 5);
-            BOOST_CHECK_EQUAL (count.move_construct, 2);
+            // tracked.
+            rime::variant <tracked<>, tracked<> &> v2 = tracked<> (registry);
+            BOOST_CHECK_EQUAL (registry.value_construct_count(), 5);
+            BOOST_CHECK_EQUAL (registry.move_count(), 2);
             v = v2;
-            BOOST_CHECK_EQUAL (count.copy_assign, 2);
+            BOOST_CHECK_EQUAL (registry.copy_assign_count(), 2);
         }
-        BOOST_CHECK (count.consistent());
+        BOOST_CHECK (registry.consistent());
     }
 }
 
