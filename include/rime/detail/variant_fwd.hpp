@@ -46,7 +46,7 @@ template <typename Actual, typename Variant>
         boost::mpl::and_ <
             is_variant <Variant>,
             meta::contains <Actual, typename variant_types <Variant>::type>>,
-        typename::detail::storage::get_as <Actual, Variant>::type
+        typename ::utility::storage::get_as <Actual, Variant>::type
     >::type
     get_unsafe (Variant && variant);
 

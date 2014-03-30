@@ -189,7 +189,7 @@ private:
         > types_without_void;
 
     typedef typename meta::as_vector <meta::transform <
-            ::detail::storage::store_as <boost::mpl::_>, types_without_void
+            ::utility::storage::store_as <boost::mpl::_>, types_without_void
         >>::type stored_types;
 
     typedef typename utility::aligned_union <stored_types>::type
@@ -282,7 +282,7 @@ private:
         template <typename ... Arguments> struct int_ { typedef int type; };
 
         typedef typename int_ <typename conversion_for <typename
-            ::detail::storage::get_as <
+            ::utility::storage::get_as <
             ContainedTypes, OtherVariant>::type>::
             assert_unambiguous::dummy...>::type dummy;
     };
@@ -311,7 +311,7 @@ private:
         static const std::size_t index =
             mpl::first <interpretation>::type::value;
         typedef typename mpl::second <interpretation>::type type;
-        typedef typename ::detail::storage::store_as <type>::type store_type;
+        typedef typename ::utility::storage::store_as <type>::type store_type;
 
         static_assert (sizeof (store_type) <= sizeof (storage),
             "Sanity check: there should be enough space to contain type");
@@ -454,7 +454,7 @@ private:
     template <typename Actual, typename Dummy = void> struct destruct {
         void operator() (void * memory) const
         {
-            typedef typename ::detail::storage::store_as <Actual>::type
+            typedef typename ::utility::storage::store_as <Actual>::type
                 stored_type;
             static_cast <stored_type *> (memory)->~stored_type();
         }
@@ -704,26 +704,26 @@ namespace variant_detail {
     */
     template <typename Actual> struct get {
         template <class Variant>
-            typename ::detail::storage::get_as <Actual, Variant>::type
+            typename ::utility::storage::get_as <Actual, Variant>::type
             operator() (Variant && variant) const
         {
             assert (variant.template contains <Actual>());
             // This is a different pointer type than returned by the other
             // operator() if Actual is a reference type.
-            typedef typename ::detail::storage::store_as <Actual, Variant>
+            typedef typename ::utility::storage::store_as <Actual, Variant>
                 ::type * pointer_type;
-            typedef typename ::detail::storage::get_as <Actual, Variant
+            typedef typename ::utility::storage::get_as <Actual, Variant
                 >::type result_type;
             return static_cast <result_type> (
                 * static_cast <pointer_type> (variant.memory()));
         }
 
         template <class Variant>
-            typename ::detail::storage::get_pointer <Actual, Variant>::type
+            typename ::utility::storage::get_pointer <Actual, Variant>::type
             operator() (Variant * variant) const
         {
             assert (variant->template contains <Actual>());
-            typedef typename ::detail::storage::store_as <Actual, Variant>
+            typedef typename ::utility::storage::store_as <Actual, Variant>
                 ::type * pointer_type;
             return static_cast <pointer_type> (variant->memory());
         }
@@ -747,7 +747,7 @@ template <typename Actual, typename Variant>
         boost::mpl::and_ <
             is_variant <Variant>,
             meta::contains <Actual, typename variant_types <Variant>::type>>,
-        typename::detail::storage::get_as <Actual, Variant>::type
+        typename ::utility::storage::get_as <Actual, Variant>::type
     >::type
     get_unsafe (Variant && variant)
 {
@@ -760,7 +760,7 @@ template <typename Actual, typename Variant>
         boost::mpl::and_ <
             is_variant <Variant>,
             meta::contains <Actual, typename variant_types <Variant>::type>>,
-        typename::detail::storage::get_as <Actual, Variant>::type
+        typename ::utility::storage::get_as <Actual, Variant>::type
     >::type
     get (Variant && variant)
 {
@@ -774,7 +774,7 @@ template <typename Actual, typename Variant>
         boost::mpl::and_ <
             is_variant <Variant>,
             meta::contains <Actual, typename variant_types <Variant>::type>>,
-        typename ::detail::storage::get_pointer <Actual, Variant>::type
+        typename ::utility::storage::get_pointer <Actual, Variant>::type
     >::type
     get (Variant * variant)
 {
