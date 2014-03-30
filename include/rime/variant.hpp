@@ -192,7 +192,7 @@ private:
             ::detail::storage::store_as <boost::mpl::_>, types_without_void
         >>::type stored_types;
 
-    typedef typename ::detail::storage::aligned_union <stored_types>::type
+    typedef typename utility::aligned_union <stored_types>::type
         storage_type;
     storage_type storage;
 
