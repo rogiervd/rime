@@ -1595,7 +1595,7 @@ public:
 
     template <typename First, typename ... Rest>
         auto operator() (First first, Rest ... rest) const
-    -> decltype (first + (std::declval <plus>()) (rest ...))
+    -> decltype (first + (std::declval <plus const &>()) (rest ...))
     { return first + (*this) (rest ...); }
 };
 
@@ -1607,7 +1607,7 @@ public:
 
     template <typename First, typename ... Rest>
         auto operator() (First first, Rest ... rest) const
-    -> decltype (first * (std::declval <plus>()) (rest ...))
+    -> decltype (first * (std::declval <plus const &>()) (rest ...))
     { return first * (*this) (rest ...); }
 };
 
