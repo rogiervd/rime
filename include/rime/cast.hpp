@@ -74,13 +74,13 @@ If v is a constant, the result will be a constant with value type Target.
 If v is a run-time value, the result will be of type Target.
 */
 template <class Target, class Type> inline auto cast (Type const & v)
-RETURNS (callable::cast <Target>() (v))
+RETURNS (callable::cast <Target>() (v));
 
 /**
 Cast a constant or a run-time value to the value type of Target.
 */
 template <class Target, class Type> inline auto cast_value (Type const & v)
-RETURNS (callable::cast_value <Target>() (v))
+RETURNS (callable::cast_value <Target>() (v));
 
 } // namespace rime
 

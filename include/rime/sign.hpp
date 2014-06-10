@@ -159,7 +159,7 @@ namespace callable {
                         types::is_signed <Left>, types::is_unsigned <Right>>
                     >
                 >::type * = 0)
-        RETURNS (rime::less (left, right))
+        RETURNS (rime::less (left, right));
 
         // Unsigned < signed: consider special case of signed < 0.
         template <class Unsigned, class Signed>
@@ -169,7 +169,7 @@ namespace callable {
                 >::type * = 0)
         RETURNS (rime::and_ (
             !rime::less (s, rime::make_zero (s)),
-            rime::less (u, rime::make_unsigned (s))))
+            rime::less (u, rime::make_unsigned (s))));
 
         // Signed < unsigned: consider special case of signed < 0.
         template <class Signed, class Unsigned>
@@ -179,7 +179,7 @@ namespace callable {
                 >::type * = 0)
         RETURNS (rime::or_ (
             rime::less (s, rime::make_zero (s)),
-            rime::less (rime::make_unsigned (s), u)))
+            rime::less (rime::make_unsigned (s), u)));
 
         // GCC 4.6 workaround.
         template <class Left, class Right> struct result {

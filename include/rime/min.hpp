@@ -33,7 +33,7 @@ namespace callable {
         template <class Left, class Right>
             auto operator() (Left && left, Right && right) const
         RETURNS (rime::if_ (rime::less_sign_safe (left, right),
-            std::forward <Left> (left), std::forward <Right> (right)))
+            std::forward <Left> (left), std::forward <Right> (right)));
     };
 } // namespace callable
 
