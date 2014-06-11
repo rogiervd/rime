@@ -9,5 +9,5 @@ project
     ;
 
 # Run the tests in the subdirectories.
-alias "rime-tests" : utility rime ;
+alias "rime-tests" : rime ;
 
