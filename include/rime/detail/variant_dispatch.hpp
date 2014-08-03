@@ -133,7 +133,7 @@ convert_to_actual (Argument && argument)
 template <typename Variant, typename Actual>
     inline
     typename boost::enable_if <is_variant <Variant>,
-        typename ::utility::storage::get_as <Actual, Variant>::type
+        typename ::utility::storage::get <Actual, Variant &&>::type
     >::type
 convert_to_actual (Variant && v)
 { return rime::get_unsafe <Actual> (std::forward <Variant> (v)); }
