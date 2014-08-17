@@ -1,5 +1,5 @@
 /*
-Copyright 2011, 2012 Rogier van Dalen.
+Copyright 2011, 2012, 2014 Rogier van Dalen.
 
 This file is part of Rogier van Dalen's Rime library for C++.
 
@@ -27,6 +27,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "meta/vector.hpp"
 
+#include "utility/returns.hpp"
+
 #include "core.hpp"
 #include "variant.hpp"
 
@@ -47,8 +49,12 @@ namespace callable {
     If the condition is a run-time value, then it is decided at run-time which
     function is called, and the return type is the unified type of the two
     possible results.
+
+    \tparam MergePolicy (optional)
+        The type that is used to merge two return types. types.
+        By default, merge constants and types that are exactly the same.
     */
-    struct call_if {
+    template <class MergePolicy = merge_policy::default_policy> struct call_if {
         // Condition known to be true at compile time.
         template <class Condition, class IfTrue, class IfFalse,
                 class ... Arguments>
@@ -85,10 +91,9 @@ namespace callable {
         // value.
         template <class Function1, class Function2, class ... Arguments>
             struct merged_result_type
-        : make_variant_over <meta::vector <
+        : MergePolicy::template apply <
             typename std::result_of <Function1 (Arguments ...)>::type,
-            typename std::result_of <Function2 (Arguments ...)>::type
-        >> {};
+            typename std::result_of <Function2 (Arguments ...)>::type> {};
 
         // Run-time condition.
         template <class Condition, class IfTrue, class IfFalse,
@@ -111,9 +116,29 @@ namespace callable {
     };
 } // namespace callable
 
-static const auto call_if = callable::call_if();
+// Without MergePolicy.
+template <class Condition, class FunctionIfTrue, class FunctionIfFalse,
+    class ... Arguments>
+inline auto call_if (Condition && condition,
+    FunctionIfTrue && if_true, FunctionIfFalse && if_false,
+    Arguments && ... arguments)
+RETURNS (callable::call_if <>() (std::forward <Condition> (condition),
+    std::forward <FunctionIfTrue> (if_true),
+    std::forward <FunctionIfFalse> (if_false),
+    std::forward <Arguments> (arguments) ...));
+
+// With MergePolicy.
+template <class MergePolicy, class Condition,
+    class FunctionIfTrue, class FunctionIfFalse, class ... Arguments>
+inline auto call_if (Condition && condition,
+    FunctionIfTrue && if_true, FunctionIfFalse && if_false,
+    Arguments && ... arguments)
+RETURNS (callable::call_if <MergePolicy>() (
+    std::forward <Condition> (condition),
+    std::forward <FunctionIfTrue> (if_true),
+    std::forward <FunctionIfFalse> (if_false),
+    std::forward <Arguments> (arguments) ...));
 
 } // namespace rime
 
 #endif  // RIME_CALL_IF_HPP_INCLUDED
-

@@ -1,5 +1,5 @@
 /*
-Copyright 2013 Rogier van Dalen.
+Copyright 2013, 2014 Rogier van Dalen.
 
 This file is part of Rogier van Dalen's Rime library for C++.
 
@@ -35,6 +35,9 @@ struct fail {};
 struct return_as_double {
     double operator() (double d) const { return d; }
 };
+struct return_as_float {
+    float operator() (long l) const { return float (l); }
+};
 struct return_as_long {
     long operator() (long l) const { return l; }
 };
@@ -55,5 +58,31 @@ BOOST_AUTO_TEST_CASE (test_rime_call_if) {
     RIME_CHECK_EQUAL (l, 7l);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+template <class Base> struct merge_float {
+    template <class Type1, class Type2, class Dummy = void> struct apply
+    : Base::template apply <Type1, Type2> {};
 
+    template <class Dummy> struct apply <float, double, Dummy>
+    { typedef double type; };
+    template <class Dummy> struct apply <double, float, Dummy>
+    { typedef double type; };
+};
+
+BOOST_AUTO_TEST_CASE (test_rime_call_if_merge) {
+    namespace merge_policy = rime::merge_policy;
+    typedef merge_policy::to_variant <
+        merge_policy::reference <merge_policy::const_ <
+            merge_float <merge_policy::same<>>>>> policy;
+
+    auto v1 = rime::call_if <policy> (false,
+        return_as_double(), return_as_long(), 2);
+    BOOST_CHECK (v1.contains <long>());
+    BOOST_CHECK_EQUAL (rime::get <long> (v1), 2);
+
+    auto v2 = rime::call_if <policy> (false,
+        return_as_double(), return_as_float(), 7);
+    BOOST_MPL_ASSERT ((std::is_same <decltype (v2), double>));
+    BOOST_CHECK_EQUAL (v2, 7.);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
