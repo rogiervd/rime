@@ -1,5 +1,5 @@
 /*
-Copyright 2013 Rogier van Dalen.
+Copyright 2013, 2014 Rogier van Dalen.
 
 This file is part of Rogier van Dalen's Rime library for C++.
 
@@ -29,10 +29,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 namespace rime {
 
 namespace callable {
-    struct max {
+    template <class MergePolicy = merge_policy::default_policy> struct max {
         template <class Left, class Right>
             auto operator() (Left && left, Right && right) const
-        RETURNS (rime::if_ (rime::less_sign_safe (left, right),
+        RETURNS (rime::if_ <MergePolicy> (rime::less_sign_safe (left, right),
             std::forward <Right> (right), std::forward <Left> (left)));
     };
 } // namespace callable
@@ -40,7 +40,18 @@ namespace callable {
 /**
 Return the maximum of two values, as a compile-time constant if possible.
 */
-static const auto max = callable::max();
+static const auto max = callable::max<>();
+
+/**
+Return the maximum of two values, as a compile-time constant if possible.
+If the versions with and without merge policy have the same name, compile errors
+occur when the overloads are resolved.
+Therefore, this has an underscore in the name.
+*/
+template <class MergePolicy, class Left, class Right>
+    inline auto max_ (Left && left, Right && right)
+RETURNS (callable::max <MergePolicy>() (
+    std::forward <Left> (left), std::forward <Right> (right)));
 
 } // namespace rime
 
