@@ -1,5 +1,5 @@
 /*
-Copyright 2011, 2012 Rogier van Dalen.
+Copyright 2011, 2012, 2014 Rogier van Dalen.
 
 This file is part of Rogier van Dalen's Rime library for C++.
 
@@ -201,5 +201,25 @@ BOOST_AUTO_TEST_CASE (test_rime_core) {
     BOOST_CHECK (rime_three == 3);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+struct merge_same {
+    template <class Type1, class Type2> struct apply {};
 
+    template <class Type> struct apply <Type, Type> { typedef Type type; };
+};
+
+BOOST_AUTO_TEST_CASE (test_rime_core_merge_constants) {
+    typedef rime::merge_policy::constant <merge_same> constant;
+
+    BOOST_MPL_ASSERT ((std::is_same <
+        constant::apply <int, int>::type, int>));
+    BOOST_MPL_ASSERT ((std::is_same <
+        constant::apply <rime::int_ <5>, int>::type, int>));
+    BOOST_MPL_ASSERT ((std::is_same <
+        constant::apply <unsigned, rime::constant <unsigned, 12>>::type,
+        unsigned>));
+    BOOST_MPL_ASSERT ((std::is_same <
+        constant::apply <rime::int_ <6>, rime::constant <int, 6>>::type,
+        rime::constant <int, 6>>));
+}
+
+BOOST_AUTO_TEST_SUITE_END()

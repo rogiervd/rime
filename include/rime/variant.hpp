@@ -1,5 +1,5 @@
 /*
-Copyright 2011, 2012 Rogier van Dalen.
+Copyright 2011, 2012, 2014 Rogier van Dalen.
 
 This file is part of Rogier van Dalen's Rime library for C++.
 
@@ -56,7 +56,7 @@ Define a variant type, similar to boost::variant.
 #include "meta/flatten.hpp"
 #include "meta/contains.hpp"
 #include "meta/max_element.hpp"
-#include "rime/detail/merge_types.hpp"
+#include "rime/merge_types.hpp"
 #include "rime/core.hpp"
 
 #include "rime/detail/switch.hpp"
@@ -93,8 +93,6 @@ namespace variant_detail {
 
     template <typename Actual, typename Candidates>
         struct assert_unambiguous_conversion;
-
-    template <typename Base> struct merge_constant;
 
     /**
     Metafunction that produces a variant <...> over the types in Types.
@@ -822,8 +820,7 @@ private:
     typedef typename meta::flatten <type_sequences>::type type_sequence;
 
     // E.g. mpl::set <int, float, double>
-    typedef typename rime::detail::merge_types <MergeTwo, type_sequence>::type
-        types;
+    typedef typename rime::merge_types <MergeTwo, type_sequence>::type types;
 
 public:
     typedef typename boost::mpl::eval_if <
@@ -832,7 +829,6 @@ public:
         meta::first <types>
     >::type type;
 };
-
 
 namespace variant_detail {
 
@@ -865,43 +861,6 @@ namespace variant_detail {
         >::type type;
     };
 
-    template <class Type1, class Type2>
-        struct merge_two_equal_constants
-    {
-        static_assert (std::is_same <
-            typename rime::value <Type1>::type,
-            typename rime::value <Type2>::type>::value,
-            "Use this only when the value types are the same.");
-        static_assert (Type1::value == Type2::value,
-            "Use this only when the values are the same.");
-
-        typedef rime::constant <typename rime::value <Type1>::type,
-            std::decay <Type1>::type::value> type;
-    };
-
-    // If the types are exactly the same,
-    template <class Type> struct merge_two_equal_constants <Type, Type>
-    { typedef Type type; };
-
-    /**
-    MergeTwo class for constants.
-    This forwards to Base the value types of the two types.
-    If Type1 or Type2 are constants, therefore, this will cause the merge to be
-    attempted on their value types.
-    However, if the constants are of the same type and value, then Type1 and
-    Type2 will be merged as is.
-    */
-    template <class Base> struct merge_constant {
-        template <typename Type1, typename Type2> struct apply
-        : mpl::if_ <rime::same_constant <Type1, Type2>,
-            merge_two_equal_constants <typename std::decay <Type1>::type,
-                typename std::decay <Type2>::type>,
-            typename Base::template apply <
-                typename rime::value <Type1>::type,
-                typename rime::value <Type2>::type>
-        >::type {};
-    };
-
     template <typename Types>
         struct make_variant
     : make_variant <typename meta::as_vector <Types>::type> {};
@@ -912,8 +871,29 @@ namespace variant_detail {
 
 } // namespace variant_detail
 
-struct merge_two
-: variant_detail::merge_constant <rime::detail::merge_two::same<> > {};
+namespace merge_policy {
+
+    /**
+    Merge policy that merges constants and types that are the same, but nothing
+    else.
+    */
+    struct conservative : constant <same<> > {};
+
+    /**
+    Merge policy, a metafunction, that takes any number of types and merges
+    them.
+    This works by repeatedly applying \a MergeTwo to combine types.
+    If one type is left, it is returned.
+    If multiple types are left, a variant is built from all of them.
+    */
+    template <class MergeTwo> struct to_variant {
+        template <class ... Types> struct apply
+        : make_variant_over <meta::vector <Types ...>, MergeTwo> {};
+    };
+
+    struct default_policy : to_variant <conservative> {};
+
+} // namespace merge_policy
 
 } // namespace rime
 

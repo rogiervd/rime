@@ -1,5 +1,5 @@
 /*
-Copyright 2011, 2012 Rogier van Dalen.
+Copyright 2011, 2012, 2014 Rogier van Dalen.
 
 This file is part of Rogier van Dalen's Rime library for C++.
 
@@ -31,6 +31,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <boost/mpl/equal_to.hpp>
 
 #include <boost/utility/enable_if.hpp>
+
+#include "utility/overload_order.hpp"
 
 namespace rime {
 
@@ -216,9 +218,81 @@ template <class Left, class Right> struct equal_constant
 : as_rime_constant <boost::mpl::and_ <is_constant <Left>, is_constant <Right>,
     detail::constant_equals <Left, Right>>>::type {};
 
+namespace merge_policy {
+
+    /**
+    Merge two types, special-casing constants.
+    If both types are constants, then an attempt is made to unify their value
+    types (using merge policy \a Base) and then to unify their values.
+    int_ <5> and constant <unsigned, 5> could therefore become
+    constant <unsigned, 5> is Base merges int and unsigned to int.
+    */
+    template <class Base> class constant {
+        template <class Type1, class Type2> struct merge_value_type
+        : Base::template apply <
+            typename rime::value <Type1>::type,
+            typename rime::value <Type2>::type> {};
+
+        template <class Type> struct has_type_implementation {
+            template <class Contained> struct yes : true_type {};
+            struct no : false_type {};
+
+            template <class TypeAgain>
+                static yes <typename TypeAgain::type>
+                check_has_type (utility::overload_order <1> *);
+
+            template <class TypeAgain>
+                static no check_has_type (utility::overload_order <2> *);
+
+            typedef decltype (check_has_type <Type> (utility::pick_overload()))
+                answer;
+        };
+
+        /**
+        Constant with boolean value which is \c true iff \a Type has a type
+        member \c type.
+        */
+        template <class Type> struct has_type
+        : has_type_implementation <Type>::answer {};
+
+        /**
+        Merge two constants.
+        First merge the value types.
+        If the values in this merged value type turn out to be the same, return
+        a rime::constant.
+        If not, return the merged value type.
+        */
+        template <class Type1, class Type2> struct merge_constant {
+            typedef typename merge_value_type <Type1, Type2>::type value_type;
+            static const value_type value1 = std::decay <Type1>::type::value;
+            static const value_type value2 = std::decay <Type2>::type::value;
+            typedef typename std::conditional <(value1 == value2),
+                rime::constant <value_type, value1>, value_type>::type type;
+        };
+
+        // Law of least surprise: two constants with the exact same type are
+        // merged to the same type.
+        template <class Type> struct merge_constant <Type, Type>
+        { typedef Type type; };
+
+    public:
+        template <class Type1, class Type2, class Enable = void> struct apply
+        : merge_value_type <Type1, Type2> {};
+
+        // Specialisation only for when both are constants and the value types
+        // can be merged.
+        // Then, try to turn this into one constant.
+        template <class Type1, class Type2>
+            struct apply <Type1, Type2, typename boost::enable_if <
+                mpl::and_ <is_constant <Type1>, is_constant <Type2>,
+                    has_type <merge_value_type <Type1, Type2>>>>::type>
+        : merge_constant <Type1, Type2> {};
+    };
+
+} // namespace merge_policy
+
 } // namespace rime
 
 #include "detail/operators.hpp"
 
 #endif // RIME_CORE_HPP_INCLUDED
-

@@ -1,5 +1,5 @@
 /*
-Copyright 2011, 2012 Rogier van Dalen.
+Copyright 2011, 2012, 2014 Rogier van Dalen.
 
 This file is part of Rogier van Dalen's Rime library for C++.
 
@@ -36,9 +36,13 @@ template <typename Type> struct is_variant;
 
 template <typename Type> struct variant_types;
 
-struct merge_two;
+namespace merge_policy {
 
-template <typename Types, typename MergeTwo = merge_two>
+    struct conservative;
+
+} // namespace merge_policy
+
+template <typename Types, typename MergeTwo = merge_policy::conservative>
     struct make_variant_over;
 
 template <typename Actual, typename Variant>

@@ -1,5 +1,5 @@
 /*
-Copyright 2011, 2012 Rogier van Dalen.
+Copyright 2011, 2012, 2014 Rogier van Dalen.
 
 This file is part of Rogier van Dalen's Rime library for C++.
 
@@ -24,11 +24,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <boost/mpl/assert.hpp>
 
-#include "rime/detail/merge_types.hpp"
+#include "rime/merge_types.hpp"
 
 BOOST_AUTO_TEST_SUITE(test_rime_detail_merge_types)
-
-//#include "check_set.hpp"
 
 // Simple constant class to check merging
 template <class Type, Type N> struct constant {
@@ -52,12 +50,14 @@ template <class Base> struct merge_constant {
     : Base::template apply <Type1, Type2> {};
 };
 
-BOOST_AUTO_TEST_CASE (test_merge_types_internal_merge_two) {
-    using rime::detail::merge_two::is_implemented;
-    using rime::detail::merge_two::is_unimplemented;
-    typedef rime::detail::merge_two::same<> same;
-    typedef rime::detail::merge_two::const_<> const_;
-    typedef rime::detail::merge_two::reference<> reference;
+BOOST_AUTO_TEST_CASE (test_merge_types_merge_policy) {
+    using rime::merge_policy::is_implemented;
+    using rime::merge_policy::is_unimplemented;
+    typedef rime::merge_policy::same<> same;
+    typedef rime::merge_policy::const_<> const_;
+    typedef rime::merge_policy::reference<> reference;
+    typedef rime::merge_policy::decay<> decay;
+    typedef rime::merge_policy::common_type common_type;
 
     // same
     BOOST_MPL_ASSERT ((is_implemented <same, int, int>));
@@ -94,9 +94,15 @@ BOOST_AUTO_TEST_CASE (test_merge_types_internal_merge_two) {
 
     // reference
     BOOST_MPL_ASSERT ((is_implemented <reference, int, int>));
-    BOOST_MPL_ASSERT ((is_implemented <reference, int &, int>));
     BOOST_MPL_ASSERT ((is_implemented <reference, int, int &>));
+    BOOST_MPL_ASSERT ((is_implemented <reference, int, int &&>));
+    BOOST_MPL_ASSERT ((is_implemented <reference, int &, int>));
     BOOST_MPL_ASSERT ((is_implemented <reference, int &, int &>));
+    BOOST_MPL_ASSERT ((is_implemented <reference, int &, int &&>));
+    BOOST_MPL_ASSERT ((is_implemented <reference, int &&, int>));
+    BOOST_MPL_ASSERT ((is_implemented <reference, int &&, int &>));
+    BOOST_MPL_ASSERT ((is_implemented <reference, int &&, int &&>));
+
     BOOST_MPL_ASSERT ((is_unimplemented <reference, int &, long &>));
     BOOST_MPL_ASSERT ((is_unimplemented <reference, int, long &>));
 
@@ -111,12 +117,51 @@ BOOST_AUTO_TEST_CASE (test_merge_types_internal_merge_two) {
     BOOST_MPL_ASSERT ((std::is_same <
         reference::apply <int &, int &>::type,
         int &>));
+
+    // const_ underlies reference.
+    BOOST_MPL_ASSERT ((std::is_same <
+        reference::apply <int &, int const>::type,
+        int const>));
+
+    // decay
+    BOOST_MPL_ASSERT ((is_implemented <decay, int, int>));
+    BOOST_MPL_ASSERT ((is_implemented <decay, int &, int>));
+    BOOST_MPL_ASSERT ((is_implemented <decay, int, int &&>));
+    BOOST_MPL_ASSERT ((is_implemented <decay, int const &, int &>));
+    BOOST_MPL_ASSERT ((is_unimplemented <decay, int, long>));
+    BOOST_MPL_ASSERT ((is_unimplemented <decay, int &, long &>));
+    BOOST_MPL_ASSERT ((is_unimplemented <decay, int, long &>));
+
+    // Forward to "same".
+    BOOST_MPL_ASSERT ((std::is_same <
+        decay::apply <int, int>::type, int>));
+    BOOST_MPL_ASSERT ((std::is_same <
+        decay::apply <int const, int const>::type, int const>));
+    BOOST_MPL_ASSERT ((std::is_same <
+        decay::apply <int &&, int &&>::type, int &&>));
+    // Decay and forward to "same".
+    BOOST_MPL_ASSERT ((std::is_same <
+        decay::apply <int &&, int &>::type, int>));
+    BOOST_MPL_ASSERT ((std::is_same <
+        decay::apply <int const &, int>::type, int>));
+    BOOST_MPL_ASSERT ((std::is_same <
+        decay::apply <int const &, int>::type, int>));
+
+    // common_type
+    BOOST_MPL_ASSERT ((std::is_same <
+        common_type::apply <int, int>::type, int>));
+    BOOST_MPL_ASSERT ((std::is_same <
+        common_type::apply <int, long>::type, long>));
+    BOOST_MPL_ASSERT ((std::is_same <
+        common_type::apply <unsigned char, unsigned>::type, unsigned>));
+    BOOST_MPL_ASSERT ((std::is_same <
+        common_type::apply <unsigned char, float>::type, float>));
 }
 
 BOOST_AUTO_TEST_CASE (test_merge_types_internal_insert) {
-    using rime::detail::merge::insert;
+    using rime::merge_detail::insert;
     using meta::vector;
-    typedef rime::detail::merge_two::reference<> merge_two;
+    typedef rime::merge_policy::reference<> merge_two;
 
     BOOST_MPL_ASSERT ((std::is_same <
         insert <merge_two, int, vector<>>::type,
@@ -144,9 +189,9 @@ BOOST_AUTO_TEST_CASE (test_merge_types_internal_insert) {
 }
 
 BOOST_AUTO_TEST_CASE (test_merge_types_reference) {
-    using rime::detail::merge_types;
+    using rime::merge_types;
     using meta::vector;
-    typedef rime::detail::merge_two::reference<> merge_two;
+    typedef rime::merge_policy::reference<> merge_two;
 
     {
         BOOST_MPL_ASSERT ((std::is_same <
@@ -212,11 +257,11 @@ BOOST_AUTO_TEST_CASE (test_merge_types_reference) {
 }
 
 BOOST_AUTO_TEST_CASE (test_merge_types_full) {
-    using rime::detail::merge_types;
+    using rime::merge_types;
     using meta::vector;
-    typedef rime::detail::merge_two::reference <
-        rime::detail::merge_two::const_ <
-            merge_constant <rime::detail::merge_two::same<> > > > merge_two;
+    typedef rime::merge_policy::reference <
+        rime::merge_policy::const_ <
+            merge_constant <rime::merge_policy::same<> > > > merge_two;
 
     {
         BOOST_MPL_ASSERT ((std::is_same <

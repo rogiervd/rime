@@ -1,5 +1,5 @@
 /*
-Copyright 2011, 2012 Rogier van Dalen.
+Copyright 2011, 2012, 2014 Rogier van Dalen.
 
 This file is part of Rogier van Dalen's Rime library for C++.
 
@@ -21,16 +21,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 Merge duplicate types (according to a stack of criteria) in a type sequence.
 */
 
-#ifndef RIME_DETAIL_MERGE_TYPES_HPP_INCLUDED
-#define RIME_DETAIL_MERGE_TYPES_HPP_INCLUDED
+#ifndef RIME_MERGE_TYPES_HPP_INCLUDED
+#define RIME_MERGE_TYPES_HPP_INCLUDED
 
 #include <type_traits>
 
-#include <boost/mpl/assert.hpp>
 #include <boost/mpl/if.hpp>
+#include <boost/mpl/eval_if.hpp>
+#include <boost/mpl/not.hpp>
 #include <boost/mpl/has_xxx.hpp>
-#include <boost/mpl/apply.hpp>
-#include <boost/mpl/bool.hpp>
 #include <boost/mpl/pair.hpp>
 #include <boost/mpl/placeholders.hpp>
 
@@ -40,9 +39,7 @@ Merge duplicate types (according to a stack of criteria) in a type sequence.
 #include "meta/range.hpp"
 #include "meta/fold.hpp"
 
-namespace rime { namespace detail {
-
-namespace mpl = ::boost::mpl;
+namespace rime {
 
 /**
 This namespace contains a number of metafunction classes that merge two types.
@@ -55,7 +52,7 @@ metafunction.
 This recursion would allow us to surmise that, for example, const int & and
 boost::reference_wrapper<int> are the same type. (Not implemented.)
 */
-namespace merge_two {
+namespace merge_policy {
 
     // Does not have "type" member type.
     struct unimplemented {
@@ -71,7 +68,7 @@ namespace merge_two {
 
     template <class MetafunctionClass, class Type1, class Type2>
         struct is_unimplemented
-    : mpl::not_ <is_implemented <MetafunctionClass, Type1, Type2> > {};
+    : boost::mpl::not_ <is_implemented <MetafunctionClass, Type1, Type2> > {};
 
     template <class Base = unimplemented> struct same {
         template <class Type1, class Type2> struct apply
@@ -96,9 +93,15 @@ namespace merge_two {
     template <class MergeTwo, class Type1, class Type2,
         template <class T> class Transform>
     struct merge_transform
-    : mpl::if_ <is_implemented <MergeTwo, Type1, Type2>,
+    : boost::mpl::if_ <is_implemented <MergeTwo, Type1, Type2>,
         lazy <MergeTwo, Type1, Type2, Transform>, unimplemented>::type {};
 
+    /**
+    Merge policy that forwards two types to the base policy without
+    const-qualification.
+    If either of the types was const-qualified, then "const" is added onto the
+    type resulting from the base policy.
+    */
     template <class Base = same<>> struct const_ {
         template <class Type1, class Type2> struct apply
         : Base::template apply <Type1, Type2> {};
@@ -114,26 +117,51 @@ namespace merge_two {
         : merge_transform <Base, Type1, Type2, std::add_const> {};
     };
 
+    /**
+    Merge policy that forwards two types to the base policy first with, then
+    without reference-qualification.
+    */
     template <class Base = const_<> > struct reference {
+        // Try to use Base with Type1 and Type2 directly.
+        // If that doesn't work, use std::remove_reference on Type1 and Type2
+        // and try again.
         template <class Type1, class Type2> struct apply
-        : Base::template apply <Type1, Type2> {};
-
-        template <class Type1, class Type2> struct apply <Type1 &, Type2>
-        : apply <Type1, Type2> {};
-
-        template <class Type1, class Type2> struct apply <Type1, Type2 &>
-        : apply <Type1, Type2> {};
-
-        template <class Type1, class Type2> struct apply <Type1 &, Type2 &>
-        : apply <Type1, Type2> {};
-
-        template <class Type> struct apply <Type &, Type &>
-        { typedef Type & type; };
+        : boost::mpl::if_ <
+            is_implemented <Base, Type1, Type2>,
+            typename Base::template apply <Type1, Type2>,
+            typename Base::template apply <
+                typename std::remove_reference <Type1>::type,
+                typename std::remove_reference <Type2>::type>>::type {};
     };
 
-} // namespace merge_two
+    /**
+    Merge policy that forwards to the base policy, applying std::decay if the
+    base policy is not implemented for the two types themselves.
+    */
+    template <class Base = same<>> struct decay {
+        // Try to use Base with Type1 and Type2 directly.
+        // If that doesn't work, use std::decay on Type1 and Type2 and try
+        // again.
+        template <class Type1, class Type2> struct apply
+        : boost::mpl::if_ <
+            is_implemented <Base, Type1, Type2>,
+            typename Base::template apply <Type1, Type2>,
+            typename Base::template apply <
+                typename std::decay <Type1>::type,
+                typename std::decay <Type2>::type>>::type {};
+    };
 
-namespace merge {
+    /**
+    Merge policy that uses std::common_type to merge two types.
+    */
+    struct common_type {
+        template <class Type1, class Type2> struct apply
+        : std::common_type <Type1, Type2> {};
+    };
+
+} // namespace merge_policy
+
+namespace merge_detail {
 
     /*
     In pseudo-code:
@@ -158,7 +186,7 @@ namespace merge {
     // Trivial case
     template <typename MergeTwo, typename New>
         struct insert_impl <MergeTwo, New, meta::vector<> >
-    { typedef mpl::pair <New, meta::vector<>> type; };
+    { typedef boost::mpl::pair <New, meta::vector<>> type; };
 
     template <typename MergeTwo, typename New, typename First, typename Rest>
         struct do_merge_and_recurse
@@ -175,8 +203,8 @@ namespace merge {
             typename First, typename ... Rest, typename Else>
         struct merge_first_else <
             MergeTwo, New, meta::vector <First, Rest...>, Else>
-    : mpl::eval_if <
-        merge_two::is_implemented <MergeTwo, New, First>,
+    : boost::mpl::eval_if <
+        merge_policy::is_implemented <MergeTwo, New, First>,
         do_merge_and_recurse <MergeTwo, New, First, meta::vector <Rest...> >,
         Else>
     {};
@@ -195,7 +223,7 @@ namespace merge {
         typedef typename merge_first_else <
                 MergeTwo, merged_new,
                     typename meta::push <First, merged_rest>::type,
-                    mpl::pair <merged_new,
+                    boost::mpl::pair <merged_new,
                         typename meta::push <First, merged_rest>::type>
             >::type type;
     };
@@ -208,13 +236,13 @@ namespace merge {
         insert_skip_first <MergeTwo, New, meta::vector <First, Rest ...> > > {};
 
     template <typename MergeTwo, typename New, typename Types> struct insert {
-        // mpl::pair <LastType, meta::vector <Rest ...> >
+        // boost::mpl::pair <LastType, meta::vector <Rest ...> >
         typedef typename insert_impl <MergeTwo, New, Types>::type pair;
         typedef typename meta::push <
             typename pair::first, typename pair::second>::type type;
     };
 
-} // namespace merge
+} // namespace merge_detail
 
 /**
 Return a compile-time list of types, where all types that can be merged
@@ -222,10 +250,10 @@ by metafunction class MergeTwo are merged.
 */
 template <typename MergeTwo, typename Types>
     struct merge_types
-: meta::fold <meta::back, merge::insert <MergeTwo, mpl::_2, mpl::_1>,
+: meta::fold <meta::back,
+    merge_detail::insert <MergeTwo, boost::mpl::_2, boost::mpl::_1>,
     meta::vector<>, Types> {};
 
-}} // namespace rime::detail
+} // namespace rime
 
-#endif // RIME_DETAIL_MERGE_TYPES_HPP_INCLUDED
-
+#endif // RIME_MERGE_TYPES_HPP_INCLUDED
