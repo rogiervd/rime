@@ -1,5 +1,5 @@
 /*
-Copyright 2011, 2012 Rogier van Dalen.
+Copyright 2011, 2012, 2014 Rogier van Dalen.
 
 This file is part of Rogier van Dalen's Rime library for C++.
 
@@ -27,12 +27,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "meta/vector.hpp"
 
+#include "utility/returns.hpp"
+
 #include "core.hpp"
 #include "variant.hpp"
 
 namespace rime {
 
 namespace callable {
+
     /**
     Function that can is passed three parameters: the condition, the result
     if the condition is true, and the result if the condition is false.
@@ -40,8 +43,12 @@ namespace callable {
     returned with the appropriate type.
     If the condition is a run-time value, then the type of the result is the
     unified type of the two possible results.
+
+    \tparam MergePolicy (optional)
+        The type that is used to merge two types.
+        By default, merge constants and types that are exactly the same.
     */
-    struct if_ {
+    template <class MergePolicy = merge_policy::default_policy> struct if_ {
         // Condition known to be true at compile time.
         template <class Condition, class ResultIfTrue, class ResultIfFalse>
             typename boost::enable_if <boost::mpl::and_ <
@@ -63,11 +70,10 @@ namespace callable {
         { return std::forward <ResultIfFalse> (if_false); }
 
         // Run-time condition.
-        template <class Condition, class ResultIfTrue, class ResultIfFalse>
-            typename boost::enable_if <boost::mpl::not_ <
-                rime::is_constant <Condition>>,
-            make_variant_over <meta::vector <ResultIfTrue, ResultIfFalse>>
-            >::type::type
+        template <class Condition, class ResultIfTrue, class ResultIfFalse,
+            class Enable = typename boost::enable_if <
+                boost::mpl::not_ <rime::is_constant <Condition>>>::type>
+        typename MergePolicy::template apply <ResultIfTrue, ResultIfFalse>::type
         operator() (Condition && condition,
             ResultIfTrue && if_true, ResultIfFalse && if_false) const
         {
@@ -77,11 +83,24 @@ namespace callable {
                 return std::forward <ResultIfFalse> (if_false);
         }
     };
+
 } // namespace callable
 
-static const auto if_ = callable::if_();
+template <class Condition, class ResultIfTrue, class ResultIfFalse>
+inline auto if_ (Condition && condition,
+    ResultIfTrue && if_true, ResultIfFalse && if_false)
+RETURNS (callable::if_<>() (std::forward <Condition> (condition),
+    std::forward <ResultIfTrue> (if_true),
+    std::forward <ResultIfFalse> (if_false)));
+
+template <class MergePolicy,
+    class Condition, class ResultIfTrue, class ResultIfFalse>
+inline auto if_ (Condition && condition,
+    ResultIfTrue && if_true, ResultIfFalse && if_false)
+RETURNS (callable::if_ <MergePolicy>() (std::forward <Condition> (condition),
+    std::forward <ResultIfTrue> (if_true),
+    std::forward <ResultIfFalse> (if_false)));
 
 } // namespace rime
 
 #endif  // RIME_IF_HPP_INCLUDED
-

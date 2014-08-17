@@ -1,5 +1,5 @@
 /*
-Copyright 2011, 2012 Rogier van Dalen.
+Copyright 2011, 2012, 2014 Rogier van Dalen.
 
 This file is part of Rogier van Dalen's Rime library for C++.
 
@@ -83,5 +83,47 @@ BOOST_AUTO_TEST_CASE (test_rime_if) {
     BOOST_CHECK_EQUAL (rime::get <long> (vl), 3);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+template <class Base> struct merge_float {
+    template <class Type1, class Type2, class Dummy = void> struct apply
+    : Base::template apply <Type1, Type2> {};
 
+    template <class Dummy> struct apply <float, double, Dummy>
+    { typedef double type; };
+    template <class Dummy> struct apply <float, long double, Dummy>
+    { typedef long double type; };
+    template <class Dummy> struct apply <double, long double, Dummy>
+    { typedef long double type; };
+
+    template <class Dummy> struct apply <double, float, Dummy>
+    { typedef double type; };
+    template <class Dummy> struct apply <long double, float, Dummy>
+    { typedef long double type; };
+    template <class Dummy> struct apply <long double, double, Dummy>
+    { typedef long double type; };
+};
+
+BOOST_AUTO_TEST_CASE (test_rime_if_merge) {
+    namespace merge_policy = rime::merge_policy;
+    typedef merge_policy::decay <merge_float <merge_policy::same<>>> policy;
+
+    float four = 4;
+    long double const five = 5;
+    long double const six = 6;
+
+    auto && v1 = rime::if_ <policy> (true, four, 5.f);
+    BOOST_MPL_ASSERT ((std::is_same <decltype (v1), float &&>));
+
+    auto && v2 = rime::if_ <policy> (true, 4., 5.f);
+    BOOST_MPL_ASSERT ((std::is_same <decltype (v2), double &&>));
+
+    auto && v3 = rime::if_ <policy> (true, four, 5.);
+    BOOST_MPL_ASSERT ((std::is_same <decltype (v3), double &&>));
+
+    auto && v4 = rime::if_ <policy> (true, four, five);
+    BOOST_MPL_ASSERT ((std::is_same <decltype (v4), long double &&>));
+
+    auto && v5 = rime::if_ <policy> (true, six, five);
+    BOOST_MPL_ASSERT ((std::is_same <decltype (v5), long double const &>));
+}
+
+BOOST_AUTO_TEST_SUITE_END()
