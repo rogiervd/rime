@@ -148,7 +148,7 @@ BOOST_AUTO_TEST_CASE (test_rime_sign_convert) {
 }
 
 // Signed constants.
-typedef rime::int_ <unsigned (-1)/2 + 1> very_negative_int;
+typedef rime::int_ <int (unsigned (-1)/2 + 1)> very_negative_int;
 very_negative_int i1;
 boost::mpl::int_ <-4> i2;
 std::integral_constant <int, 0> i3;
