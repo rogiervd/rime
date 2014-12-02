@@ -311,9 +311,9 @@ private:
         typedef typename mpl::second <interpretation>::type type;
         typedef typename ::utility::storage::store <type>::type store_type;
 
-        static_assert (sizeof (store_type) <= sizeof (storage),
+        static_assert (sizeof (store_type) <= sizeof (storage_type),
             "Sanity check: there should be enough space to contain type");
-        static_assert (alignof (store_type) <= alignof (storage),
+        static_assert (alignof (store_type) <= alignof (storage_type),
             "Sanity check: the alignment should be great enough for type");
 
         // Set up index
