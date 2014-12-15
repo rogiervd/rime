@@ -1,7 +1,9 @@
 alias rime-detail : detail ;
+alias rime-check : check ;
 
 test-suite "rime" :
-    # Run all .cpp files in this directory as tests.
     rime-detail
+    rime-check
+    # Run all .cpp files in this directory as tests.
     [ run_glob *.cpp ]
     ;

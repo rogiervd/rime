@@ -1,0 +1,12 @@
+test-suite "rime-check" :
+    # Run all .cpp files in this directory as tests.
+    [ run_glob *.cpp ]
+
+    # The following should fail at run time:
+    [ run-fail fail/fail-check_equal-runtime.cpp ]
+    # The following should fail at compile time:
+    [ compile-fail fail/fail-check_equal-value-1.cpp ]
+    [ compile-fail fail/fail-check_equal-value-2.cpp ]
+    [ compile-fail fail/fail-check_equal-types.cpp ]
+    [ compile-fail fail/fail-check_equal-not_constant.cpp ]
+    ;
