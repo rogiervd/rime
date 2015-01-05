@@ -677,11 +677,11 @@ BOOST_AUTO_TEST_CASE (test_rime_variant_move_construct) {
         // Move construction
         variant moved (make_variant (&c));
         BOOST_CHECK_EQUAL (moved.which(), 7u);
-        BOOST_CHECK_EQUAL (rime::get <char *> (moved), &c);
+        BOOST_CHECK (rime::get <char *> (moved) == &c);
 
         variant moved_const (make_const_variant (&c));
         BOOST_CHECK_EQUAL (moved_const.which(), 7u);
-        BOOST_CHECK_EQUAL (rime::get <char *> (moved_const), &c);
+        BOOST_CHECK (rime::get <char *> (moved_const) == &c);
     }
 
     // 8 converted
@@ -949,11 +949,11 @@ BOOST_AUTO_TEST_CASE (test_rime_variant_copy_construct) {
         // float becomes float.
         variant copied (v);
         BOOST_CHECK_EQUAL (copied.which(), 7u);
-        BOOST_CHECK_EQUAL (rime::get <char *> (copied), &c);
+        BOOST_CHECK (rime::get <char *> (copied) == &c);
 
         variant copied_const (vc);
         BOOST_CHECK_EQUAL (copied_const.which(), 7u);
-        BOOST_CHECK_EQUAL (rime::get <char *> (copied_const), &c);
+        BOOST_CHECK (rime::get <char *> (copied_const) == &c);
     }
 
     // 8 converted
