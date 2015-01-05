@@ -461,8 +461,7 @@ private:
     template <typename Dummy> struct destruct <void, Dummy>
     { void operator() (void *) const {}; };
 
-public:
-    ~variant() {
+    void destruct_content() {
         /*
         This constructs an object of type destruct <Actual>,
         and calls it with this->memory().
@@ -471,6 +470,47 @@ public:
             specialisations;
         ::rime::detail::switch_ <void, specialisations> s;
         s (this->which(), this->memory());
+    }
+
+public:
+    ~variant() { destruct_content(); }
+
+private:
+    /**
+    On destruction, call \c construct_void on the variant passed in.
+    */
+    class construct_void_guard {
+        variant & v;
+        bool on_guard;
+    public:
+        construct_void_guard (variant & v) : v (v), on_guard (true) {}
+
+        void dismiss() { on_guard = false; }
+
+        ~construct_void_guard() {
+            if (on_guard)
+                v.construct_void();
+        }
+    };
+
+public:
+    /**
+    Replace the contents of this with the contents of \a that.
+    This requires that "void" is a possible content type, which will be used if
+    an exception is thrown during construction.
+    */
+    template <class ThatVariant>
+        typename boost::enable_if <is_variant <ThatVariant>>::type
+            replace (ThatVariant && that)
+    {
+        destruct_content();
+        // We are now at a dangerous time where the memory is uninitialised.
+        // Set a guard that calls construct_void if an exception is thrown.
+        construct_void_guard guard (*this);
+        construct_from_other_variant (std::forward <ThatVariant> (that));
+        // If we get here, no exception has been thrown, and we can dismiss the
+        // guard.
+        guard.dismiss();
     }
 
     /**
