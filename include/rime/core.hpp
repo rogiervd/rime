@@ -33,10 +33,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <boost/utility/enable_if.hpp>
 
 #include "utility/overload_order.hpp"
+#include "utility/disable_if_same.hpp"
 
 namespace rime {
 
 namespace mpl = boost::mpl;
+
+template <class Left, class Right> struct same_constant;
 
 struct constant_base { constant_base () {} };
 
@@ -51,8 +54,6 @@ Implementation of the Rime compile-time constant concept:
 \li value is a static const value_type equal to content;
 \li is_constant returns true for this class and derived classes.
 
-Rime constants adhere to the Boost MPL Integral Constant concept.
-
 Rime constants are very similar to MPL integral constants.
 The difference is their behaviour with operators.
 Operators are overloaded (in operators.hpp) to use compile-time knowledge in
@@ -61,6 +62,43 @@ For example, (rime::true_ || rime::true_) is known at compile time to be true,
 and it returns a compile-time constant.
 The behaviour of (boost::mpl::true_() || boost::mpl::true_()) is not changed.
 
+Rime constants adhere to the Boost MPL Integral Constant concept.
+Standard constants (std::integral_constant) and Boost MPL constants are
+convertible to Rime constants.
+This makes it possible to dispatch to different functions depending on
+compile-time properties.
+For example, the following adds to numbers, checking for overflow.
+For unsigned integers, overflow has defined behaviour, namely wrapping around,
+but for signed integers it does not.
+The following therefore provides two implementations, and switches between them
+based on \c std::is_signed <Type>().
+
+\code
+template <class Unsigned>
+    Unsigned add_check_overflow_impl (Unsigned i, Unsigned j, rime::false_type)
+{
+    Unsigned result = i + j;
+    if (result < i)
+        throw std::overflow_error ("Overflow in addition");
+    else
+        return result;
+}
+
+template <class Signed>
+    Signed add_check_overflow_impl (Signed i, Signed j, rime::true_type)
+{
+    if ((0 < j) && (std::numeric_limits <Signed>::max() - j < i))
+        throw std::overflow_error ("Overflow in signed addition");
+    if ((j < 0) && (i < std::numeric_limits <Signed>::min() - j))
+        throw std::overflow_error ("Overflow in signed addition");
+    return i + j;
+}
+
+template <class Type> Type add_check_overflow (Type i, Type j) {
+    return add_check_overflow_impl (i, j, std::is_signed <Type>());
+}
+\endcode
+
 \internal
 It is necessary to derive from constant_base so that is_decayed_constant can
 also pick up types derived from this.
@@ -68,6 +106,21 @@ also pick up types derived from this.
 template <class Type, Type content> class constant
 : public constant_base {
 public:
+    constexpr constant() noexcept {}
+
+    constexpr constant (constant const &) noexcept {}
+    constexpr constant (constant &&) noexcept {}
+
+    template <class OtherConstant,
+        class Enable1 = typename utility::disable_if_same_or_derived <
+            constant, OtherConstant>::type,
+        class Enable2 = typename
+            boost::enable_if <same_constant <constant, OtherConstant>>::type>
+    constexpr constant (OtherConstant const &) noexcept {}
+
+    constant & operator= (constant const &) noexcept { return *this; }
+    constant & operator= (constant &&) noexcept { return *this; }
+
     typedef mpl::integral_c_tag tag;
     typedef constant type;
     typedef typename std::decay <Type>::type value_type;
@@ -75,18 +128,69 @@ public:
     static constexpr value_type value = content;
 
     constexpr operator value_type() const { return content; }
+
+    constexpr operator std::integral_constant <Type, content>() const
+    { return std::integral_constant <Type, content>(); }
 };
 
 // Out-of-class definition is required to allow references to constant<>::value.
 template <class Type, Type content>
     constexpr typename std::decay <Type>::type constant <Type, content>::value;
 
-template <int content> struct int_ : constant <int, content> {};
+// int_.
+template <int content> struct int_ : constant <int, content> {
+    constexpr int_() noexcept {}
 
+    constexpr int_ (int_ const &) noexcept {}
+    constexpr int_ (int_ &&) noexcept {}
+
+    template <class OtherConstant,
+        class Enable1 = typename utility::disable_if_same_or_derived <
+            int_, OtherConstant>::type,
+        class Enable2 = typename
+            boost::enable_if <same_constant <int_, OtherConstant>>::type>
+    constexpr int_ (OtherConstant const &) noexcept {}
+
+    int_ & operator= (int_ const &) noexcept { return *this; }
+    int_ & operator= (int_ &&) noexcept { return *this; }
+};
+
+// size_t.
 template <std::size_t content> struct size_t
-: constant <std::size_t, content> {};
+: constant <std::size_t, content> {
+    constexpr size_t() noexcept {}
 
-template <bool content> struct bool_ : constant <bool, content> {};
+    constexpr size_t (size_t const &) noexcept {}
+    constexpr size_t (size_t &&) noexcept {}
+
+    template <class OtherConstant,
+        class Enable1 = typename utility::disable_if_same_or_derived <
+            size_t, OtherConstant>::type,
+        class Enable2 = typename
+            boost::enable_if <same_constant <size_t, OtherConstant>>::type>
+    constexpr size_t (OtherConstant const &) noexcept {}
+
+    size_t & operator= (size_t const &) noexcept { return *this; }
+    size_t & operator= (size_t &&) noexcept { return *this; }
+};
+
+// bool_.
+template <bool content> struct bool_ : constant <bool, content> {
+    constexpr bool_() noexcept {}
+
+    constexpr bool_ (bool_ const &) noexcept {}
+    constexpr bool_ (bool_ &&) noexcept {}
+
+    template <class OtherConstant,
+        class Enable1 = typename utility::disable_if_same_or_derived <
+            bool_, OtherConstant>::type,
+        class Enable2 = typename
+            boost::enable_if <same_constant <bool_, OtherConstant>>::type>
+    constexpr bool_ (OtherConstant const &) noexcept {}
+
+    bool_ & operator= (bool_ const &) noexcept { return *this; }
+    bool_ & operator= (bool_ &&) noexcept { return *this; }
+};
 
 typedef bool_<false> false_type;
 typedef bool_<true> true_type;
