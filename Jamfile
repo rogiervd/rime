@@ -1,6 +1,8 @@
-project /rime :
-    requirements
-    <library>/meta//meta
+project /rime
+    : requirements
+      <use>/boost//headers
+      <library>/meta//meta
+      <library>/utility//utility
     ;
 
 # Declare target /rime//rime as a header-only library.

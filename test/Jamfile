@@ -2,7 +2,7 @@ import testing ;
 
 project
     : requirements
-      <library>/boost/test//boost_unit_test_framework
+      <library>/boost//unit_test_framework
       <library>/rime//rime
       <warnings-as-errors>on
 
@@ -23,6 +23,5 @@ project
 
     ;
 
-# Run the tests in the subdirectories.
-alias "rime-tests" : rime ;
-
+# Always build the project in ./rime/
+build-project rime ;
