@@ -29,6 +29,8 @@ is too limited for general use.
 #ifndef RIME_DETAIL_SWITCH_HPP_INCLUDED
 #define RIME_DETAIL_SWITCH_HPP_INCLUDED
 
+#include <cassert>
+
 #include "meta/vector.hpp"
 #include "rime/core.hpp"
 
