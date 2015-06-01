@@ -17,12 +17,7 @@ limitations under the License.
 #ifndef RIME_CALL_IF_HPP_INCLUDED
 #define RIME_CALL_IF_HPP_INCLUDED
 
-#include <boost/mpl/and.hpp>
-#include <boost/mpl/not.hpp>
-
-#include <boost/utility/enable_if.hpp>
-
-#include "meta/vector.hpp"
+#include <type_traits>
 
 #include "utility/returns.hpp"
 
@@ -54,14 +49,10 @@ namespace callable {
     template <class MergePolicy = merge_policy::default_policy> struct call_if {
         // Condition known to be true at compile time.
         template <class Condition, class IfTrue, class IfFalse,
-                class ... Arguments>
-            typename boost::lazy_enable_if <boost::mpl::and_ <
-                    rime::is_constant <Condition>,
-                    typename std::decay <Condition>::type
-                >,
-                std::result_of <IfTrue (Arguments ...)>
-            >::type
-        operator() (Condition &&, IfTrue && if_true, IfFalse &&,
+            class ... Arguments,
+            class Enable = typename std::enable_if <Condition::value>::type>
+        decltype (std::declval <IfTrue>() (std::declval <Arguments>() ...))
+        operator() (Condition const &, IfTrue && if_true, IfFalse &&,
             Arguments && ... arguments) const
         {
             return std::forward <IfTrue> (if_true) (
@@ -70,35 +61,27 @@ namespace callable {
 
         // Condition known to be false at compile time.
         template <class Condition, class IfTrue, class IfFalse,
-                class ... Arguments>
-            typename boost::lazy_enable_if <boost::mpl::and_ <
-                    rime::is_constant <Condition>,
-                    boost::mpl::not_ <typename std::decay <Condition>::type>
-                >,
-                std::result_of <IfFalse (Arguments ...)>
-            >::type
-        operator() (Condition &&, IfTrue &&, IfFalse && if_false,
+            class ... Arguments,
+            class Enable = typename std::enable_if <!Condition::value>::type>
+        decltype (std::declval <IfFalse>() (std::declval <Arguments>() ...))
+        operator() (Condition const &, IfTrue &&, IfFalse && if_false,
             Arguments && ... arguments) const
         {
             return std::forward <IfFalse> (if_false) (
                 std::forward <Arguments> (arguments) ...);
         }
 
-        // This class is instantiated only if the condition is a run-time
-        // value.
-        template <class Function1, class Function2, class ... Arguments>
-            struct merged_result_type
-        : MergePolicy::template apply <
-            typename std::result_of <Function1 (Arguments ...)>::type,
-            typename std::result_of <Function2 (Arguments ...)>::type> {};
-
         // Run-time condition.
         template <class Condition, class IfTrue, class IfFalse,
-                class ... Arguments>
-            typename boost::lazy_enable_if <
-                boost::mpl::not_ <rime::is_constant <Condition>>,
-                merged_result_type <IfTrue, IfFalse, Arguments ...>
-            >::type
+            class ... Arguments, class Enable = typename
+                std::enable_if <!rime::is_constant <Condition>::value>::type>
+        // Compute return type of IfTrue and IfFalse and merge them with
+        // MergePolicy.
+        typename MergePolicy::template apply <
+            decltype (std::declval <IfTrue>() (
+                std::declval <Arguments>() ...)),
+            decltype (std::declval <IfFalse>() (
+                std::declval <Arguments>() ...))>::type
         operator() (Condition && condition,
             IfTrue && if_true, IfFalse && if_false, Arguments && ... arguments)
             const
@@ -111,6 +94,7 @@ namespace callable {
                     std::forward <Arguments> (arguments) ...);
         }
     };
+
 } // namespace callable
 
 // Without MergePolicy.
@@ -138,4 +122,4 @@ RETURNS (callable::call_if <MergePolicy>() (
 
 } // namespace rime
 
-#endif  // RIME_CALL_IF_HPP_INCLUDED
+#endif // RIME_CALL_IF_HPP_INCLUDED
