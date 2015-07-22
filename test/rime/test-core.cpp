@@ -457,6 +457,68 @@ BOOST_AUTO_TEST_CASE (test_rime_core_constant_assign) {
     }
 }
 
+BOOST_AUTO_TEST_CASE (test_rime_same_constant) {
+    static_assert (rime::same_constant <
+        rime::int_ <5>, rime::constant <int, 5>>::value, "");
+    static_assert (!rime::same_constant <
+        rime::int_ <5>, rime::constant <int, 4>>::value, "");
+    static_assert (!rime::same_constant <
+        rime::int_ <5>, rime::constant <long, 5>>::value, "");
+    static_assert (!rime::same_constant <
+        rime::int_ <5>, rime::constant <long, 4>>::value, "");
+
+    static_assert (!rime::same_constant <
+        int, rime::constant <int, 4>>::value, "");
+    static_assert (!rime::same_constant <
+        rime::int_ <5>, int>::value, "");
+    static_assert (!rime::same_constant <
+        int, int>::value, "");
+}
+
+BOOST_AUTO_TEST_CASE (test_rime_constant_equals) {
+    static_assert (rime::equal_constant <
+        rime::int_ <5>, rime::constant <int, 5>>::value, "");
+    static_assert (!rime::equal_constant <
+        rime::int_ <5>, rime::constant <int, 4>>::value, "");
+    static_assert (rime::equal_constant <
+        rime::int_ <5>, rime::constant <long, 5>>::value, "");
+    static_assert (!rime::equal_constant <
+        rime::int_ <5>, rime::constant <long, 4>>::value, "");
+
+    static_assert (!rime::equal_constant <
+        int, rime::constant <int, 4>>::value, "");
+    static_assert (!rime::equal_constant <
+        rime::int_ <5>, int>::value, "");
+    static_assert (!rime::equal_constant <
+        int, int>::value, "");
+}
+
+BOOST_AUTO_TEST_CASE (test_rime_is_constant_false) {
+    static_assert (rime::is_constant_false <rime::false_type>::value, "");
+    static_assert (!rime::is_constant_false <rime::true_type>::value, "");
+
+    static_assert (rime::is_constant_false <rime::int_ <0>>::value, "");
+    static_assert (!rime::is_constant_false <rime::int_<1>>::value, "");
+    static_assert (!rime::is_constant_false <rime::int_<-1>>::value, "");
+    static_assert (!rime::is_constant_false <rime::int_<5>>::value, "");
+
+    static_assert (!rime::is_constant_false <bool>::value, "");
+    static_assert (!rime::is_constant_false <int>::value, "");
+}
+
+BOOST_AUTO_TEST_CASE (test_rime_is_constant_true) {
+    static_assert (!rime::is_constant_true <rime::false_type>::value, "");
+    static_assert (rime::is_constant_true <rime::true_type>::value, "");
+
+    static_assert (!rime::is_constant_true <rime::int_ <0>>::value, "");
+    static_assert (rime::is_constant_true <rime::int_<1>>::value, "");
+    static_assert (rime::is_constant_true <rime::int_<-1>>::value, "");
+    static_assert (rime::is_constant_true <rime::int_<5>>::value, "");
+
+    static_assert (!rime::is_constant_true <bool>::value, "");
+    static_assert (!rime::is_constant_true <int>::value, "");
+}
+
 struct merge_same {
     template <class Type1, class Type2> struct apply {};
 

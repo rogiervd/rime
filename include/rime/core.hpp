@@ -298,6 +298,12 @@ namespace detail {
             typename constant_value <Right>::type>,
         constant_equals <Left, Right>, false_type>::type {};
 
+    template <class Constant> struct constant_false
+    : rime::constant <bool, !bool (Constant::value)> {};
+
+    template <class Constant> struct constant_true
+    : rime::constant <bool, bool (Constant::value)> {};
+
 } // namespace detail
 
 /**
@@ -318,6 +324,26 @@ but may yield compiler errors.
 template <class Left, class Right> struct equal_constant
 : as_rime_constant <boost::mpl::and_ <is_constant <Left>, is_constant <Right>,
     detail::constant_equals <Left, Right>>>::type {};
+
+/** \brief
+Evaluate to \c true iff \a Constant is a compile-time constant and it
+evaluates to \c false in a boolean context.
+
+E.g. when applied to \c int_<0>, this returns \c true.
+*/
+template <class Constant> struct is_constant_false
+: as_rime_constant <boost::mpl::and_ <is_constant <Constant>,
+    detail::constant_false <Constant>>>::type {};
+
+/** \brief
+Evaluate to \c true iff \a Constant is a compile-time constant and it
+evaluates to \c true in a boolean context.
+
+E.g. when applied to \c int_<5>, this returns \c true.
+*/
+template <class Constant> struct is_constant_true
+: as_rime_constant <boost::mpl::and_ <is_constant <Constant>,
+    detail::constant_true <Constant>>>::type {};
 
 namespace merge_policy {
 
