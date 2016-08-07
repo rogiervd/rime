@@ -1,5 +1,5 @@
 /*
-Copyright 2014 Rogier van Dalen.
+Copyright 2014, 2015 Rogier van Dalen.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -30,8 +30,8 @@ limitations under the License.
 
 BOOST_AUTO_TEST_SUITE(test_rime_variant_replace)
 
-typedef utility::throwing <utility::tracked <int>,
-true, true, true, true, true, true> throwing;
+typedef utility::throwing <utility::tracked <int>, utility::always_throw>
+    throwing;
 typedef rime::variant <int, throwing, void> variant;
 
 void check_replace (utility::thrower & thrower) {
