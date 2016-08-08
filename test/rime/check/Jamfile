@@ -1,6 +1,6 @@
 test-suite "rime-check" :
     # Run all .cpp files in this directory as tests.
-    [ run_glob *.cpp ]
+    [ run test-check_equal.cpp ]
 
     # The following should fail at run time:
     [ run-fail fail/fail-check_equal-runtime.cpp ]
