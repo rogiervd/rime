@@ -34,6 +34,12 @@ typedef utility::throwing <utility::tracked <int>, utility::always_throw>
     throwing;
 typedef rime::variant <int, throwing, void> variant;
 
+using utility::value_construct_count;
+using utility::copy_count;
+using utility::move_count;
+using utility::destruct_count;
+using utility::destruct_moved_count;
+
 void check_replace (utility::thrower & thrower) {
     // int is replaced by int.
     {
@@ -55,10 +61,14 @@ void check_replace (utility::thrower & thrower) {
         utility::tracked_registry r;
         {
             variant v1 (7);
+            auto before = r.counts();
             variant v2 (throwing (thrower, r, 10));
-            r.check_counts (1, 0, 1, 0, 0, 0, 0, 1);
+            BOOST_CHECK_EQUAL (r.since (before), value_construct_count (1)
+                + move_count (1) + destruct_moved_count (1));
+
+            before = r.counts();
             v1.replace (v2);
-            r.check_counts (1, 1, 1, 0, 0, 0, 0, 1);
+            BOOST_CHECK_EQUAL (r.since (before), copy_count (1));
             BOOST_CHECK (v1.contains <throwing>());
             BOOST_CHECK_EQUAL (
                 rime::get <throwing> (v1).content().content(), 10);
@@ -67,11 +77,16 @@ void check_replace (utility::thrower & thrower) {
     {
         utility::tracked_registry r;
         {
+            auto before = r.counts();
             variant v1 (7);
             variant v2 (throwing (thrower, r, 10));
-            r.check_counts (1, 0, 1, 0, 0, 0, 0, 1);
+            BOOST_CHECK_EQUAL (r.since (before), value_construct_count (1)
+                + move_count (1) + destruct_moved_count (1));
+
+            before = r.counts();
             v1.replace (std::move (v2));
-            r.check_counts (1, 0, 2, 0, 0, 0, 0, 1);
+            BOOST_CHECK_EQUAL (r.since (before), move_count (1));
+
             BOOST_CHECK (v1.contains <throwing>());
             BOOST_CHECK_EQUAL (
                 rime::get <throwing> (v1).content().content(), 10);
@@ -95,11 +110,16 @@ void check_replace (utility::thrower & thrower) {
     {
         utility::tracked_registry r;
         {
+            auto before = r.counts();
             variant v1 (throwing (thrower, r, 17));
             variant v2 (9);
-            r.check_counts (1, 0, 1, 0, 0, 0, 0, 1);
+            BOOST_CHECK_EQUAL (r.since (before), value_construct_count (1)
+                + move_count (1) + destruct_moved_count (1));
+
+            before = r.counts();
             v1.replace (v2);
-            r.check_counts (1, 0, 1, 0, 0, 0, 1, 1);
+            BOOST_CHECK_EQUAL (r.since (before), destruct_count (1));
+
             BOOST_CHECK (v1.contains <int>());
             BOOST_CHECK_EQUAL (rime::get <int> (v1), 9);
         }
@@ -107,11 +127,16 @@ void check_replace (utility::thrower & thrower) {
     {
         utility::tracked_registry r;
         {
+            auto before = r.counts();
             variant v1 (throwing (thrower, r, 17));
             variant v2 (9);
-            r.check_counts (1, 0, 1, 0, 0, 0, 0, 1);
+            BOOST_CHECK_EQUAL (r.since (before), value_construct_count (1)
+                + move_count (1) + destruct_moved_count (1));
+
+            before = r.counts();
             v1.replace (std::move (v2));
-            r.check_counts (1, 0, 1, 0, 0, 0, 1, 1);
+            BOOST_CHECK_EQUAL (r.since (before), destruct_count (1));
+
             BOOST_CHECK (v1.contains <int>());
             BOOST_CHECK_EQUAL (rime::get <int> (v1), 9);
         }
@@ -120,11 +145,17 @@ void check_replace (utility::thrower & thrower) {
     {
         utility::tracked_registry r;
         {
+            auto before = r.counts();
             variant v1 (throwing (thrower, r, 17));
             variant v2 (throwing (thrower, r, 25));
-            r.check_counts (2, 0, 2, 0, 0, 0, 0, 2);
+            BOOST_CHECK_EQUAL (r.since (before), value_construct_count (2)
+                + move_count (2) + destruct_moved_count (2));
+
+            before = r.counts();
             v1.replace (v2);
-            r.check_counts (2, 1, 2, 0, 0, 0, 1, 2);
+            BOOST_CHECK_EQUAL (r.since (before),
+                copy_count (1) + destruct_count (1));
+
             BOOST_CHECK (v1.contains <throwing>());
             BOOST_CHECK_EQUAL (
                 rime::get <throwing> (v1).content().content(), 25);
@@ -133,11 +164,17 @@ void check_replace (utility::thrower & thrower) {
     {
         utility::tracked_registry r;
         {
+            auto before = r.counts();
             variant v1 (throwing (thrower, r, 17));
             variant v2 (throwing (thrower, r, 25));
-            r.check_counts (2, 0, 2, 0, 0, 0, 0, 2);
+            BOOST_CHECK_EQUAL (r.since (before), value_construct_count (2)
+                + move_count (2) + destruct_moved_count (2));
+
+            before = r.counts();
             v1.replace (std::move (v2));
-            r.check_counts (2, 0, 3, 0, 0, 0, 1, 2);
+            BOOST_CHECK_EQUAL (r.since (before),
+                move_count (1) + destruct_count (1));
+
             BOOST_CHECK (v1.contains <throwing>());
             BOOST_CHECK_EQUAL (
                 rime::get <throwing> (v1).content().content(), 25);
@@ -147,22 +184,32 @@ void check_replace (utility::thrower & thrower) {
     {
         utility::tracked_registry r;
         {
+            auto before = r.counts();
             variant v1 (throwing (thrower, r, 17));
             variant v2;
-            r.check_counts (1, 0, 1, 0, 0, 0, 0, 1);
+            BOOST_CHECK_EQUAL (r.since (before), value_construct_count (1)
+                + move_count (1) + destruct_moved_count (1));
+
+            before = r.counts();
             v1.replace (v2);
-            r.check_counts (1, 0, 1, 0, 0, 0, 1, 1);
+            BOOST_CHECK_EQUAL (r.since (before), destruct_count (1));
+
             BOOST_CHECK (v1.contains <void>());
         }
     }
     {
         utility::tracked_registry r;
         {
+            auto before = r.counts();
             variant v1 (throwing (thrower, r, 17));
             variant v2;
-            r.check_counts (1, 0, 1, 0, 0, 0, 0, 1);
+            BOOST_CHECK_EQUAL (r.since (before), value_construct_count (1)
+                + move_count (1) + destruct_moved_count (1));
+
+            before = r.counts();
             v1.replace (std::move (v2));
-            r.check_counts (1, 0, 1, 0, 0, 0, 1, 1);
+            BOOST_CHECK_EQUAL (r.since (before), destruct_count (1));
+
             BOOST_CHECK (v1.contains <void>());
         }
     }

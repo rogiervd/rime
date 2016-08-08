@@ -1,5 +1,5 @@
 /*
-Copyright 2011, 2012, 2014 Rogier van Dalen.
+Copyright 2011, 2012, 2014, 2015 Rogier van Dalen.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -45,6 +45,14 @@ struct tracked_assignable {
     tracked_assignable & operator = (utility::tracked<> const &)
     { return *this; }
 };
+
+using utility::value_construct_count;
+using utility::copy_count;
+using utility::move_count;
+using utility::copy_assign_count;
+using utility::move_assign_count;
+using utility::destruct_count;
+using utility::destruct_moved_count;
 
 BOOST_AUTO_TEST_CASE (test_rime_variant_assign) {
     typedef rime::variant <int, float &, double> variant;
@@ -137,35 +145,36 @@ BOOST_AUTO_TEST_CASE (test_rime_variant_assign) {
                 tracked<> (registry);
 
             // Sanity
-            BOOST_CHECK_EQUAL (registry.value_construct_count(), 2);
-            BOOST_CHECK_EQUAL (registry.move_count(), 1);
-            BOOST_CHECK_EQUAL (registry.copy_assign_count(), 0);
-            BOOST_CHECK_EQUAL (registry.move_assign_count(), 0);
+            BOOST_CHECK_EQUAL (registry.counts(), value_construct_count (2)
+                + move_count (1) + destruct_moved_count (1));
 
             // Copy assignment
             tracked<> c2 (registry);
-            BOOST_CHECK_EQUAL (registry.value_construct_count(), 3);
+            auto before = registry.counts();
             v = c2;
-            BOOST_CHECK_EQUAL (registry.copy_assign_count(), 1);
-            BOOST_CHECK_EQUAL (registry.move_assign_count(), 0);
+            BOOST_CHECK_EQUAL (registry.since (before), copy_assign_count (1));
 
             // Move assignment
+            before = registry.counts();
             v = tracked<> (registry);
-            BOOST_CHECK_EQUAL (registry.value_construct_count(), 4);
-            BOOST_CHECK_EQUAL (registry.move_count(), 1);
-            BOOST_CHECK_EQUAL (registry.copy_assign_count(), 1);
-            BOOST_CHECK_EQUAL (registry.move_assign_count(), 1);
+            BOOST_CHECK_EQUAL (registry.since (before),
+                value_construct_count (1) + move_assign_count (1)
+                + destruct_moved_count (1));
 
             // From other variant type.
             // All possible content types for v2 must be convertible to
             // tracked.
+            before = registry.counts();
             rime::variant <tracked<>, tracked<> &> v2 = tracked<> (registry);
-            BOOST_CHECK_EQUAL (registry.value_construct_count(), 5);
-            BOOST_CHECK_EQUAL (registry.move_count(), 2);
+            BOOST_CHECK_EQUAL (registry.since (before),
+                value_construct_count (1) + move_count (1)
+                + destruct_moved_count (1));
+
+            before = registry.counts();
             v = v2;
-            BOOST_CHECK_EQUAL (registry.copy_assign_count(), 2);
+            BOOST_CHECK_EQUAL (registry.since (before), copy_assign_count (1));
         }
-        BOOST_CHECK (registry.consistent());
+        BOOST_CHECK (registry.finished());
     }
 }
 
