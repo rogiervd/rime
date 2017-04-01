@@ -1,5 +1,5 @@
 /*
-Copyright 2011, 2012, 2014, 2015 Rogier van Dalen.
+Copyright 2011, 2012, 2014, 2015, 2017 Rogier van Dalen.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -434,7 +434,7 @@ BOOST_AUTO_TEST_CASE (test_rime_variant) {
 
     // converted
     {
-        variant v (std::move (converted()));
+        variant v (static_cast <converted &&> (converted()));
         BOOST_CHECK_EQUAL (v.which(), 8u);
         BOOST_CHECK (v.contains <converted>());
     }
@@ -446,7 +446,7 @@ BOOST_AUTO_TEST_CASE (test_rime_variant) {
     }
     // convertee
     {
-        variant v (std::move (convertee()));
+        variant v (static_cast <convertee &&> (convertee()));
         BOOST_CHECK_EQUAL (v.which(), 8u);
         BOOST_CHECK (v.contains <converted>());
     }
