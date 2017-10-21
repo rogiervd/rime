@@ -98,15 +98,12 @@ BOOST_AUTO_TEST_CASE (test_rime_enable_if_constant_true) {
 
     BOOST_CHECK_EQUAL (is_constant_true_1 (constant_false), false);
     BOOST_CHECK_EQUAL (is_constant_true_1 (constant_true), true);
-    BOOST_CHECK_EQUAL (is_constant_true_1 (constant_zero), false);
-    BOOST_CHECK_EQUAL (is_constant_true_1 (constant_seven), true);
     BOOST_CHECK_EQUAL (is_constant_true_1 (runtime_false), false);
     BOOST_CHECK_EQUAL (is_constant_true_1 (runtime), false);
 
     BOOST_CHECK_EQUAL (is_constant_true_2 (constant_false, 5), false);
     BOOST_CHECK_EQUAL (is_constant_true_2 (constant_true, 5), true);
     BOOST_CHECK_EQUAL (is_constant_true_2 (constant_zero, 5), false);
-    BOOST_CHECK_EQUAL (is_constant_true_2 (constant_seven, 5), true);
     BOOST_CHECK_EQUAL (is_constant_true_2 (runtime_false, 5), false);
     BOOST_CHECK_EQUAL (is_constant_true_2 (runtime, 5), false);
 }

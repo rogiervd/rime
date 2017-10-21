@@ -22,6 +22,7 @@ limitations under the License.
 #include <type_traits>
 
 #include <boost/mpl/int.hpp>
+#include <boost/mpl/size_t.hpp>
 #include <boost/mpl/assert.hpp>
 
 #include "utility/is_assignable.hpp"
