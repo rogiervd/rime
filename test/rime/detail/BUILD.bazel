@@ -1,0 +1,18 @@
+load("@rules_cc//cc:defs.bzl", "cc_test")
+
+[
+    cc_test(
+        name = test_name,
+        size = "small",
+        srcs = [test_name + ".cpp"],
+        deps = [
+            "//:rime",
+            "@boost.test//:unit_test_main",
+        ],
+    )
+    for test_name in [
+        "test-generalise_type",
+        "test-switch",
+        "test-variant_dispatch",
+    ]
+]

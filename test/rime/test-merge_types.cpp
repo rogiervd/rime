@@ -15,7 +15,7 @@ limitations under the License.
 */
 
 #define BOOST_TEST_MODULE test_rime_detail_merge_types
-#include "utility/test/boost_unit_test.hpp"
+#include <boost/test/unit_test.hpp>
 
 #include <type_traits>
 

@@ -1,6 +1,0 @@
-test-suite "rime-detail" :
-    # Run all .cpp files in this directory as tests.
-    [ run test-generalise_type.cpp ]
-    [ run test-switch.cpp ]
-    [ run test-variant_dispatch.cpp ]
-    ;
