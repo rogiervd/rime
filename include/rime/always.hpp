@@ -32,10 +32,13 @@ namespace callable {
     \tparam Result The type of the return value.
     \param value The value.
     */
-    template <class Result, Result value>
-    struct always {
-        template <class ... Arguments>
-            Result operator() (Arguments const & ...) const { return value; }
+    template <class Result, Result value> struct always
+    {
+        template <class... Arguments>
+        Result operator()(Arguments const &...) const
+        {
+            return value;
+        }
     };
 
     /**
@@ -43,9 +46,13 @@ namespace callable {
     \a Result, whatever arguments it is called with.
     \tparam Result The type of the return value.
     */
-    template <class Result> struct always_default {
-        template <class ... Arguments>
-            Result operator() (Arguments const & ...) const { return Result(); }
+    template <class Result> struct always_default
+    {
+        template <class... Arguments>
+        Result operator()(Arguments const &...) const
+        {
+            return Result();
+        }
     };
 
     /**
@@ -53,23 +60,27 @@ namespace callable {
     arguments it is called with.
     \tparam Result The type of the return value.
     */
-    template <class Result>
-    struct always_value {
+    template <class Result> struct always_value
+    {
         Result value;
+
     public:
         /**
         Construct an object of this class.
         \param value The value that this should always return when it is called.
         */
-        template <class Argument>
-            always_value (Argument && value)
-        : value (std::forward <Argument> (value)) {}
+        template <class Argument> always_value(Argument && value)
+        : value(std::forward<Argument>(value))
+        {}
 
-        template <class ... Arguments>
-            Result operator() (Arguments const & ...) const { return value; }
+        template <class... Arguments>
+        Result operator()(Arguments const &...) const
+        {
+            return value;
+        }
     };
 
-} // namespace callable
+}  // namespace callable
 
 /**
 \return
@@ -77,9 +88,10 @@ namespace callable {
     \a Result, whatever arguments it is called with.
 \tparam Result The type returned by the function object.
 */
-template <class Result>
-    inline callable::always_default <Result> always()
-{ return callable::always_default <Result>(); }
+template <class Result> inline callable::always_default<Result> always()
+{
+    return callable::always_default<Result>();
+}
 
 /**
 \return
@@ -90,8 +102,10 @@ template <class Result>
 \tparam value The value returned by the function object.
 */
 template <class Result, Result value>
-    inline callable::always <Result, value> always()
-{ return callable::always <Result, value>(); }
+inline callable::always<Result, value> always()
+{
+    return callable::always<Result, value>();
+}
 
 /**
 \return
@@ -113,9 +127,11 @@ Because <c>int & const</c> is just <c>int &</c>, this works if \a Result is a
 reference type.
 */
 template <class Result>
-    inline callable::always_value <Result> always (Result const & value)
-{ return callable::always_value <Result> (value); }
+inline callable::always_value<Result> always(Result const & value)
+{
+    return callable::always_value<Result>(value);
+}
 
-} // namespace rime
+}  // namespace rime
 
-#endif // RIME_ALWAYS_HPP_INCLUDED
+#endif  // RIME_ALWAYS_HPP_INCLUDED

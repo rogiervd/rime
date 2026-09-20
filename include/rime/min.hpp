@@ -26,13 +26,15 @@ limitations under the License.
 namespace rime {
 
 namespace callable {
-    template <class MergePolicy = merge_policy::default_policy> struct min {
+    template <class MergePolicy = merge_policy::default_policy> struct min
+    {
         template <class Left, class Right>
-            auto operator() (Left && left, Right && right) const
-        RETURNS (rime::if_ <MergePolicy> (rime::less_sign_safe (left, right),
-            std::forward <Left> (left), std::forward <Right> (right)));
+        auto operator()(Left && left, Right && right) const RETURNS(
+            rime::if_<MergePolicy>(
+                rime::less_sign_safe(left, right), std::forward<Left>(left),
+                std::forward<Right>(right)));
     };
-} // namespace callable
+}  // namespace callable
 
 /**
 Return the minimum of two values, as a compile-time constant if possible.
@@ -46,11 +48,10 @@ occur when the overloads are resolved.
 Therefore, this has an underscore in the name.
 */
 template <class MergePolicy, class Left, class Right>
-    inline auto min_ (Left && left, Right && right)
-RETURNS (callable::min <MergePolicy>() (
-    std::forward <Left> (left), std::forward <Right> (right)));
+inline auto min_(Left && left, Right && right) RETURNS(
+    callable::min<MergePolicy>()(
+        std::forward<Left>(left), std::forward<Right>(right)));
 
-} // namespace rime
+}  // namespace rime
 
 #endif  // RIME_MIN_HPP_INCLUDED
-
