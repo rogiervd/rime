@@ -9,10 +9,8 @@ bazel_dep(name = "boost.test", version = "1.90.0.bcr.1")
 
 
 bazel_dep(name = "meta", version = "1.1.0")
-local_path_override(module_name = "meta", path= "../meta")
 
-bazel_dep(name = "utility", version = "1.1.0")
-local_path_override(module_name = "utility", path= "../utility")
+bazel_dep(name = "utility", version = "1.0.0")
 
 # IDEs as well as other tools can use a compile_commands.json databse to know
 # how files are compiled.
