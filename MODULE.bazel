@@ -6,10 +6,7 @@ module(
 bazel_dep(name = "rules_cc", version = "0.2.22")
 bazel_dep(name = "rules_build_error", version = "0.11.0")
 bazel_dep(name = "boost.test", version = "1.90.0.bcr.1")
-
-
 bazel_dep(name = "meta", version = "1.1.0")
-
 bazel_dep(name = "utility", version = "1.0.0")
 
 # IDEs as well as other tools can use a compile_commands.json databse to know
