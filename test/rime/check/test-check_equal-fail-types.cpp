@@ -21,9 +21,9 @@ limitations under the License.
 
 BOOST_AUTO_TEST_SUITE(fail_rime_check_equal)
 
-BOOST_AUTO_TEST_CASE (fail_rime_check_equal) {
-    RIME_CHECK_EQUAL (rime::int_ <7>(),
-        (std::integral_constant <short, 7>()));
+BOOST_AUTO_TEST_CASE(fail_rime_check_equal)
+{
+    RIME_CHECK_EQUAL(rime::int_<7>(), (std::integral_constant<short, 7>()));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

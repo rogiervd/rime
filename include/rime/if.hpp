@@ -45,59 +45,72 @@ namespace callable {
         The type that is used to merge two types.
         By default, merge constants and types that are exactly the same.
     */
-    template <class MergePolicy = merge_policy::default_policy> struct if_ {
+    template <class MergePolicy = merge_policy::default_policy> struct if_
+    {
         // Condition known to be true at compile time.
         template <class Condition, class ResultIfTrue, class ResultIfFalse>
-            typename boost::enable_if <boost::mpl::and_ <
-                rime::is_constant <Condition>,
-                typename std::decay <Condition>::type
-            >, ResultIfTrue>::type
-        operator() (Condition &&, ResultIfTrue && if_true, ResultIfFalse &&)
-            const
-        { return std::forward <ResultIfTrue> (if_true); }
+        typename boost::enable_if<
+            boost::mpl::and_<
+                rime::is_constant<Condition>,
+                typename std::decay<Condition>::type>,
+            ResultIfTrue>::type
+            operator()(
+                Condition &&, ResultIfTrue && if_true, ResultIfFalse &&) const
+        {
+            return std::forward<ResultIfTrue>(if_true);
+        }
 
         // Condition known to be false at compile time.
         template <class Condition, class ResultIfTrue, class ResultIfFalse>
-            typename boost::enable_if <boost::mpl::and_ <
-                rime::is_constant <Condition>,
-                boost::mpl::not_ <typename std::decay <Condition>::type>
-            >, ResultIfFalse>::type
-        operator() (Condition &&, ResultIfTrue &&, ResultIfFalse && if_false)
-            const
-        { return std::forward <ResultIfFalse> (if_false); }
+        typename boost::enable_if<
+            boost::mpl::and_<
+                rime::is_constant<Condition>,
+                boost::mpl::not_<typename std::decay<Condition>::type>>,
+            ResultIfFalse>::type
+            operator()(
+                Condition &&, ResultIfTrue &&, ResultIfFalse && if_false) const
+        {
+            return std::forward<ResultIfFalse>(if_false);
+        }
 
         // Run-time condition.
-        template <class Condition, class ResultIfTrue, class ResultIfFalse,
-            class Enable = typename boost::enable_if <
-                boost::mpl::not_ <rime::is_constant <Condition>>>::type>
-        typename MergePolicy::template apply <ResultIfTrue, ResultIfFalse>::type
-        operator() (Condition && condition,
-            ResultIfTrue && if_true, ResultIfFalse && if_false) const
+        template <
+            class Condition, class ResultIfTrue, class ResultIfFalse,
+            class Enable = typename boost::enable_if<
+                boost::mpl::not_<rime::is_constant<Condition>>>::type>
+        typename MergePolicy::template apply<ResultIfTrue, ResultIfFalse>::type
+            operator()(
+                Condition && condition, ResultIfTrue && if_true,
+                ResultIfFalse && if_false) const
         {
             if (condition)
-                return std::forward <ResultIfTrue> (if_true);
+                return std::forward<ResultIfTrue>(if_true);
             else
-                return std::forward <ResultIfFalse> (if_false);
+                return std::forward<ResultIfFalse>(if_false);
         }
     };
 
-} // namespace callable
+}  // namespace callable
 
 template <class Condition, class ResultIfTrue, class ResultIfFalse>
-inline auto if_ (Condition && condition,
-    ResultIfTrue && if_true, ResultIfFalse && if_false)
-RETURNS (callable::if_<>() (std::forward <Condition> (condition),
-    std::forward <ResultIfTrue> (if_true),
-    std::forward <ResultIfFalse> (if_false)));
+inline auto if_(
+    Condition && condition, ResultIfTrue && if_true, ResultIfFalse && if_false)
+    RETURNS(
+        callable::if_<>()(
+            std::forward<Condition>(condition),
+            std::forward<ResultIfTrue>(if_true),
+            std::forward<ResultIfFalse>(if_false)));
 
-template <class MergePolicy,
-    class Condition, class ResultIfTrue, class ResultIfFalse>
-inline auto if_ (Condition && condition,
-    ResultIfTrue && if_true, ResultIfFalse && if_false)
-RETURNS (callable::if_ <MergePolicy>() (std::forward <Condition> (condition),
-    std::forward <ResultIfTrue> (if_true),
-    std::forward <ResultIfFalse> (if_false)));
+template <
+    class MergePolicy, class Condition, class ResultIfTrue, class ResultIfFalse>
+inline auto if_(
+    Condition && condition, ResultIfTrue && if_true, ResultIfFalse && if_false)
+    RETURNS(
+        callable::if_<MergePolicy>()(
+            std::forward<Condition>(condition),
+            std::forward<ResultIfTrue>(if_true),
+            std::forward<ResultIfFalse>(if_false)));
 
-} // namespace rime
+}  // namespace rime
 
 #endif  // RIME_IF_HPP_INCLUDED

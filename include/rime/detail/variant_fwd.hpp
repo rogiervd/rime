@@ -21,12 +21,12 @@ limitations under the License.
 
 #include <boost/mpl/and.hpp>
 
-#include "utility/storage.hpp"
 #include "meta/contains.hpp"
+#include "utility/storage.hpp"
 
 namespace rime {
 
-template <typename ... Types> class variant;
+template <typename... Types> class variant;
 
 template <typename Type> struct is_variant;
 
@@ -36,21 +36,18 @@ namespace merge_policy {
 
     struct conservative;
 
-} // namespace merge_policy
+}  // namespace merge_policy
 
 template <typename Types, typename MergeTwo = merge_policy::conservative>
-    struct make_variant_over;
+struct make_variant_over;
 
-template <typename Actual, typename Variant>
-    inline typename boost::enable_if <
-        boost::mpl::and_ <
-            is_variant <Variant>,
-            meta::contains <Actual, typename variant_types <Variant>::type>>,
-        typename ::utility::storage::get <Actual, Variant &&>::type
-    >::type
-    get_unsafe (Variant && variant);
+template <typename Actual, typename Variant> inline typename boost::enable_if<
+    boost::mpl::and_<
+        is_variant<Variant>,
+        meta::contains<Actual, typename variant_types<Variant>::type>>,
+    typename ::utility::storage::get<Actual, Variant &&>::type>::type
+    get_unsafe(Variant && variant);
 
-} // namespace rime
+}  // namespace rime
 
 #endif  // RIME_VARIANT_FWD_HPP
-

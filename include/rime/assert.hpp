@@ -23,36 +23,38 @@ limitations under the License.
 
 namespace rime {
 
-    namespace detail {
+namespace detail {
 
-        template <class Condition, class Enable = void> struct assert_;
+    template <class Condition, class Enable = void> struct assert_;
 
-        template <class Condition>
-            struct assert_ <Condition, typename
-                boost::enable_if <rime::is_constant <Condition>>::type>
-        {
-            void operator() (Condition const &) const
-            { static_assert (Condition::value, "rime::assert_ failed"); }
-        };
-
-        template <class Condition>
-            struct assert_ <Condition, typename
-                boost::disable_if <rime::is_constant <Condition>>::type>
-        {
-            void operator() (Condition const & condition) const
-            { assert (condition); }
-        };
-
-    } // namespace detail
-
-    template <class Condition> inline
-        void assert_ (Condition const & condition)
+    template <class Condition> struct assert_<
+        Condition,
+        typename boost::enable_if<rime::is_constant<Condition>>::type>
     {
-        detail::assert_ <Condition> implementation;
-        implementation (condition);
-    }
+        void operator()(Condition const &) const
+        {
+            static_assert(Condition::value, "rime::assert_ failed");
+        }
+    };
 
-} // namespace rime
+    template <class Condition> struct assert_<
+        Condition,
+        typename boost::disable_if<rime::is_constant<Condition>>::type>
+    {
+        void operator()(Condition const & condition) const
+        {
+            assert(condition);
+        }
+    };
+
+}  // namespace detail
+
+template <class Condition> inline void assert_(Condition const & condition)
+{
+    detail::assert_<Condition> implementation;
+    implementation(condition);
+}
+
+}  // namespace rime
 
 #endif  // RIME_ASSERT_HPP_INCLUDED
-

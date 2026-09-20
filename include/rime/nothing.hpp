@@ -27,12 +27,14 @@ namespace callable {
     performs any action.
     This can be useful, for example, as argument to rime::call_if.
     */
-    struct nothing {
-        template <class ... Arguments>
-            void operator() (Arguments const & ...) const {}
+    struct nothing
+    {
+        template <class... Arguments>
+        void operator()(Arguments const &...) const
+        {}
     };
 
-} // namespace callable
+}  // namespace callable
 
 /**
 Do nothing.
@@ -43,6 +45,6 @@ This can be useful, for example, as argument to rime::call_if.
 */
 static const auto nothing = callable::nothing();
 
-} // namespace rime
+}  // namespace rime
 
-#endif // RIME_NOTHING_HPP_INCLUDED
+#endif  // RIME_NOTHING_HPP_INCLUDED
