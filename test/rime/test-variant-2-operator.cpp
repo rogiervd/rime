@@ -88,16 +88,16 @@ BOOST_AUTO_TEST_CASE (test_rime_variant_assign) {
         BOOST_CHECK_EQUAL (rime::get <double> (vd), 9.);
 
         /* Assignment from itself */
-        vi = vi;
+        vi = *&vi;
         BOOST_CHECK_EQUAL (vi.which(), 0u);
         BOOST_CHECK_EQUAL (rime::get <int> (vi), 7);
 
-        vfr = vfr;
+        vfr = *&vfr;
         BOOST_CHECK_EQUAL (vfr.which(), 1u);
         BOOST_CHECK_EQUAL (f, 8);
         BOOST_CHECK_EQUAL (&rime::get <float &> (vfr), &f);
 
-        vd = vd;
+        vd = *&vd;
         BOOST_CHECK_EQUAL (vd.which(), 2u);
         BOOST_CHECK_EQUAL (rime::get <double> (vd), 9.);
 

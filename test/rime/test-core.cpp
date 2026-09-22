@@ -419,10 +419,10 @@ BOOST_AUTO_TEST_CASE (test_rime_core_constant_assign) {
         f = rime::false_type();
 
         rime::int_ <3> three;
-        three = three;
+        three = *&three;
 
         rime::size_t <5> five;
-        five = five;
+        five = *&five;
 
         static_assert (utility::is_assignable <
             rime::true_type &, rime::true_type>::value, "");
