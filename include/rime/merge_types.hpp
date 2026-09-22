@@ -375,7 +375,6 @@ namespace merge_detail {
           Rest>
     {};
 
-
     template <typename MergeTwo, typename New, typename Current, typename Else>
     struct merge_first_else;
     template <

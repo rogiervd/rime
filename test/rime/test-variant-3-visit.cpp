@@ -158,7 +158,6 @@ BOOST_AUTO_TEST_CASE(test_rime_variant_visit)
         BOOST_CHECK_EQUAL(rime::get<float>(v), 6.5f);
     }
 
-
     {
         double d = 1.1;
         variant v(d);
