@@ -22,8 +22,6 @@ limitations under the License.
 BOOST_AUTO_TEST_SUITE(fail_rime_check_equal)
 
 BOOST_AUTO_TEST_CASE_EXPECTED_FAILURES(fail_rime_check_equal, 1)
-BOOST_AUTO_TEST_CASE (fail_rime_check_equal) {
-    RIME_CHECK_EQUAL (4, 5);
-}
+BOOST_AUTO_TEST_CASE(fail_rime_check_equal) { RIME_CHECK_EQUAL(4, 5); }
 
 BOOST_AUTO_TEST_SUITE_END()

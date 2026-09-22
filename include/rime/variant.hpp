@@ -22,53 +22,55 @@ Define a variant type, similar to boost::variant.
 #ifndef RIME_VARIANT_HPP_INCLUDED
 #define RIME_VARIANT_HPP_INCLUDED
 
-#include <utility>
 #include <stdexcept>
+#include <utility>
 
 #include <type_traits>
 
 #include <boost/utility/enable_if.hpp>
 
-#include <boost/mpl/int.hpp>
-#include <boost/mpl/sizeof.hpp>
+#include <boost/mpl/and.hpp>
+#include <boost/mpl/bind.hpp>
+#include <boost/mpl/empty.hpp>
 #include <boost/mpl/equal_to.hpp>
+#include <boost/mpl/eval_if.hpp>
 #include <boost/mpl/greater.hpp>
 #include <boost/mpl/greater_equal.hpp>
+#include <boost/mpl/int.hpp>
 #include <boost/mpl/less_equal.hpp>
-#include <boost/mpl/and.hpp>
 #include <boost/mpl/not.hpp>
-#include <boost/mpl/empty.hpp>
-#include <boost/mpl/size.hpp>
 #include <boost/mpl/placeholders.hpp>
-#include <boost/mpl/eval_if.hpp>
-#include <boost/mpl/bind.hpp>
+#include <boost/mpl/size.hpp>
+#include <boost/mpl/sizeof.hpp>
 
-#include "utility/storage.hpp"
 #include "utility/aligned_union.hpp"
+#include "utility/storage.hpp"
 
-#include "meta/transform.hpp"
-#include "meta/filter.hpp"
-#include "meta/vector.hpp"
-#include "meta/enumerate.hpp"
-#include "meta/flatten.hpp"
 #include "meta/contains.hpp"
+#include "meta/enumerate.hpp"
+#include "meta/filter.hpp"
+#include "meta/flatten.hpp"
 #include "meta/max_element.hpp"
-#include "rime/merge_types.hpp"
+#include "meta/transform.hpp"
+#include "meta/vector.hpp"
 #include "rime/core.hpp"
+#include "rime/merge_types.hpp"
 
 #include "rime/detail/switch.hpp"
 
+#include "rime/detail/variant_dispatch.hpp"
 #include "rime/detail/variant_fwd.hpp"
 #include "rime/detail/variant_helpers.hpp"
-#include "rime/detail/variant_dispatch.hpp"
 #include "rime/detail/variant_operator.hpp"
 
 namespace rime {
 
-struct bad_get : std::runtime_error {
+struct bad_get : std::runtime_error
+{
     bad_get()
-    : std::runtime_error (
-        "get (variant<...>) called with a type that was not contained") {}
+    : std::runtime_error(
+          "get (variant<...>) called with a type that was not contained")
+    {}
 };
 
 namespace variant_detail {
@@ -77,7 +79,7 @@ namespace variant_detail {
     Find the best match for the Actual type amongst the VariantTypes.
     */
     template <typename Actual, typename NumberedTypes>
-        struct find_interpretation;
+    struct find_interpretation;
 
     /**
     Find the best candidates for the Actual type amongst the NumberedCandidates.
@@ -85,11 +87,11 @@ namespace variant_detail {
     If multiple options are equally good, all of them are returned.
     If no candidate is found, then meta::vector<> is returned.
     */
-    template <typename Actual, typename NumberedTypes, typename ... Matches>
-        struct find_candidates;
+    template <typename Actual, typename NumberedTypes, typename... Matches>
+    struct find_candidates;
 
     template <typename Actual, typename Candidates>
-        struct assert_unambiguous_conversion;
+    struct assert_unambiguous_conversion;
 
     /**
     Metafunction that produces a variant <...> over the types in Types.
@@ -98,7 +100,7 @@ namespace variant_detail {
 
     template <typename Actual> struct get;
 
-} // namespace variant_detail
+}  // namespace variant_detail
 
 /**
 A variant type: it contains exactly one of the types from Types.
@@ -152,43 +154,47 @@ The following operators are not overloaded:
     operator&& and operator|| (short-circuiting would not be possible)
     operator, (makes no sense in the usual setting)
 */
-template <typename ... Types> class variant {
+template <typename... Types> class variant
+{
 public:
-    typedef meta::vector <Types...> types;
-    typedef typename meta::as_vector <typename meta::enumerate <types>::type
-        >::type numbered_types;
+    typedef meta::vector<Types...> types;
+    typedef
+        typename meta::as_vector<typename meta::enumerate<types>::type>::type
+            numbered_types;
 
 private:
-    template <typename Type> struct sanity_check {
+    template <typename Type> struct sanity_check
+    {
         typedef int dummy;
 
-        static_assert (!is_variant <Type>::value,
+        static_assert(
+            !is_variant<Type>::value,
             "variant<...> cannot contain a variant<..>.");
 
-        typedef typename meta::as_vector <meta::filter <
-                std::is_same <Type, boost::mpl::_>, types>>::type
+        typedef typename meta::as_vector<
+            meta::filter<std::is_same<Type, boost::mpl::_>, types>>::type
             duplicate_types;
 
-        static_assert (meta::size <duplicate_types>::value == 1,
+        static_assert(
+            meta::size<duplicate_types>::value == 1,
             "Type can only appear in the list of variant types once");
     };
 
-    typedef meta::vector <typename sanity_check <Types>::dummy ...>
+    typedef meta::vector<typename sanity_check<Types>::dummy...>
         trigger_sanity_check;
 
     std::size_t which_;
 
     // Set up storage size and alignment
-    typedef typename meta::filter <
-            mpl::not_ <std::is_same <boost::mpl::_, void> >, types
-        > types_without_void;
+    typedef typename meta::filter<
+        mpl::not_<std::is_same<boost::mpl::_, void>>, types>
+        types_without_void;
 
-    typedef typename meta::as_vector <meta::transform <
-            ::utility::storage::store <boost::mpl::_>, types_without_void
-        >>::type stored_types;
+    typedef typename meta::as_vector<meta::transform<
+        ::utility::storage::store<boost::mpl::_>, types_without_void>>::type
+        stored_types;
 
-    typedef typename utility::aligned_union <stored_types>::type
-        storage_type;
+    typedef typename utility::aligned_union<stored_types>::type storage_type;
     storage_type storage;
 
     template <typename Actual> friend struct variant_detail::get;
@@ -203,30 +209,34 @@ private:
     possible in the call stack to trigger that static assertion and one for
     an ambiguous conversion.
     */
-    template <typename Actual> struct conversion_for {
-
+    template <typename Actual> struct conversion_for
+    {
         // Match the second type of meta::vector <Index, Type>
-        typedef mpl::second <mpl::_> _;
+        typedef mpl::second<mpl::_> _;
 
-        typedef typename variant_detail::find_candidates <
+        typedef typename variant_detail::find_candidates<
             Actual, numbered_types,
             // Go through matches one by one:
             // Exact match
-            std::is_same <_, Actual>,
+            std::is_same<_, Actual>,
             // Remove reference from Actual
-            std::is_same <_, typename std::remove_reference <Actual>::type >,
+            std::is_same<_, typename std::remove_reference<Actual>::type>,
             // Remove reference from Actual and remove const-qualification
-            std::is_same <std::remove_const <_>, typename std::remove_const <
-                typename std::remove_reference <Actual>::type>::type >,
+            std::is_same<
+                std::remove_const<_>,
+                typename std::remove_const<
+                    typename std::remove_reference<Actual>::type>::type>,
             // Convertible in general?
-            boost::mpl::and_ <std::is_convertible <Actual, _>,
-                boost::mpl::not_ <std::is_reference <_> > >
-        >::type numbered_candidates;
+            boost::mpl::and_<
+                std::is_convertible<Actual, _>,
+                boost::mpl::not_<std::is_reference<_>>>>::type
+            numbered_candidates;
 
         static const bool conversion_possible =
-            (meta::size <numbered_candidates>::value >= 1);
+            (meta::size<numbered_candidates>::value >= 1);
 
-        static_assert (conversion_possible,
+        static_assert(
+            conversion_possible,
             "No conversion to variant <...> found. "
             "For details, see the type: "
             "rime::variant <...>::conversion_for <(type passed in)>.");
@@ -240,23 +250,25 @@ private:
         triggered, or the one above, so as to not clutter the compiler output
         even more.
         */
-        template <typename Candidates> struct assert_unambiguous_conversion {
+        template <typename Candidates> struct assert_unambiguous_conversion
+        {
             typedef int dummy;
-            static_assert (meta::size <Candidates>::value <= 1,
+            static_assert(
+                meta::size<Candidates>::value <= 1,
                 "The conversion to the variant type is ambiguous: "
                 "multiple types are equally good. "
                 "For details, see the type: "
                 "rime::variant <...>::conversion_for <(type passed in)>"
                 "::assert_unambiguous_conversion <"
-                "meta::vector <(possible candidates)>>."
-                );
+                "meta::vector <(possible candidates)>>.");
         };
 
         // For a clearer error message
-        typedef typename meta::as_vector <meta::transform <
-            mpl::second <mpl::_>, numbered_candidates>>::type candidates;
+        typedef typename meta::as_vector<
+            meta::transform<mpl::second<mpl::_>, numbered_candidates>>::type
+            candidates;
 
-        typedef assert_unambiguous_conversion <candidates> assert_unambiguous;
+        typedef assert_unambiguous_conversion<candidates> assert_unambiguous;
     };
 
     /**
@@ -266,20 +278,23 @@ private:
     Use dummy (a type that evaluates to int) as soon as possible in the call
     stack to trigger a compiler error.
     */
-    template <typename OtherVariant,
-        class ContainedTypes = typename variant_types <OtherVariant>::type>
+    template <
+        typename OtherVariant,
+        class ContainedTypes = typename variant_types<OtherVariant>::type>
     struct conversion_for_contained_types;
 
-    template <typename OtherVariant, typename ... ContainedTypes>
-        struct conversion_for_contained_types <
-            OtherVariant, meta::vector <ContainedTypes...>>
+    template <typename OtherVariant, typename... ContainedTypes>
+    struct conversion_for_contained_types<
+        OtherVariant, meta::vector<ContainedTypes...>>
     {
-        template <typename ... Arguments> struct int_ { typedef int type; };
+        template <typename... Arguments> struct int_
+        {
+            typedef int type;
+        };
 
-        typedef typename int_ <typename conversion_for <typename
-            ::utility::storage::get <
-            ContainedTypes, OtherVariant &&>::type>::
-            assert_unambiguous::dummy...>::type dummy;
+        typedef typename int_<typename conversion_for<
+            typename ::utility::storage::get<ContainedTypes, OtherVariant &&>::
+                type>::assert_unambiguous::dummy...>::type dummy;
     };
 
     /**
@@ -295,28 +310,32 @@ private:
     This is just, again, because of the jumbled compiler errors this would
     generate.
     */
-    template <typename Actual, typename NumberedCandidates
-        = typename conversion_for <Actual>::numbered_candidates>
-    void construct (Actual && actual, typename
-        boost::disable_if <meta::empty <NumberedCandidates>>::type * = 0)
+    template <
+        typename Actual,
+        typename NumberedCandidates =
+            typename conversion_for<Actual>::numbered_candidates>
+    void construct(
+        Actual && actual,
+        typename boost::disable_if<meta::empty<NumberedCandidates>>::type * = 0)
     {
-        typedef typename meta::first <NumberedCandidates>::type
-            interpretation;
+        typedef typename meta::first<NumberedCandidates>::type interpretation;
 
         static const std::size_t index =
-            mpl::first <interpretation>::type::value;
-        typedef typename mpl::second <interpretation>::type type;
-        typedef typename ::utility::storage::store <type>::type store_type;
+            mpl::first<interpretation>::type::value;
+        typedef typename mpl::second<interpretation>::type type;
+        typedef typename ::utility::storage::store<type>::type store_type;
 
-        static_assert (sizeof (store_type) <= sizeof (storage_type),
+        static_assert(
+            sizeof(store_type) <= sizeof(storage_type),
             "Sanity check: there should be enough space to contain type");
-        static_assert (alignof (store_type) <= alignof (storage_type),
+        static_assert(
+            alignof(store_type) <= alignof(storage_type),
             "Sanity check: the alignment should be great enough for type");
 
         // Set up index
         this->which_ = index;
         // Copy-construct or move-construct as type "store_type"
-        new (memory()) store_type (std::forward <Actual> (actual));
+        new (memory()) store_type(std::forward<Actual>(actual));
     }
 
     /**
@@ -324,19 +343,24 @@ private:
     Since this is impossible, this is not implemented.
     Therefore, it does not produce compiler errors, which reduces clutter.
     */
-    template <typename Actual, typename NumberedCandidates
-        = typename conversion_for <Actual>::numbered_candidates>
-    void construct (Actual && actual, typename
-        boost::enable_if <meta::empty <NumberedCandidates>>::type * = 0);
+    template <
+        typename Actual,
+        typename NumberedCandidates =
+            typename conversion_for<Actual>::numbered_candidates>
+    void construct(
+        Actual && actual,
+        typename boost::enable_if<meta::empty<NumberedCandidates>>::type * = 0);
 
-    void construct_void() {
-        static_assert (meta::contains <void, types>::value,
+    void construct_void()
+    {
+        static_assert(
+            meta::contains<void, types>::value,
             "Attempt to void-construct a variant "
             "that cannot contain a void value. "
             "This is caused by calling the nullary constructor "
             "or by copy-constructing from a variant that can contain void.");
 
-        this->which_ = index_of <void>::value;
+        this->which_ = index_of<void>::value;
         // Nothing needs to be stored.
     }
 
@@ -350,14 +374,16 @@ public:
 
     \todo Document exact conversion strategy.
     */
-    template <typename Actual>
-        variant (Actual && actual,
-            // Make sure that the copy constructor is picked up.
-            typename boost::disable_if <is_variant <Actual> >::type * = 0,
-            // Trigger assertion here already.
-            // This keeps the backtrace in the compiler error shortish.
-            int = typename conversion_for <Actual>::assert_unambiguous::dummy())
-    { construct (std::forward <Actual> (actual)); }
+    template <typename Actual> variant(
+        Actual && actual,
+        // Make sure that the copy constructor is picked up.
+        typename boost::disable_if<is_variant<Actual>>::type * = 0,
+        // Trigger assertion here already.
+        // This keeps the backtrace in the compiler error shortish.
+        int = typename conversion_for<Actual>::assert_unambiguous::dummy())
+    {
+        construct(std::forward<Actual>(actual));
+    }
 
     explicit variant() { construct_void(); }
 
@@ -368,7 +394,7 @@ private:
     object of type Actual.
     */
     template <typename Actual, typename Dummy = void>
-        struct construct_from_variant_containing
+    struct construct_from_variant_containing
     {
         template <class ThatVariant> void operator() (
             variant & this_variant, ThatVariant && that_variant/*,
@@ -377,39 +403,38 @@ private:
             int = conversion_for <Actual>::assert_unambiguous::dummy()*/)
             const
         {
-            this_variant.construct (get_unsafe <Actual> (
-                std::forward <ThatVariant> (that_variant)));
+            this_variant.construct(
+                get_unsafe<Actual>(std::forward<ThatVariant>(that_variant)));
         }
     };
     template <typename Dummy>
-        struct construct_from_variant_containing <void, Dummy>
+    struct construct_from_variant_containing<void, Dummy>
     {
-        template <class ThatVariant> void operator() (
+        template <class ThatVariant> void operator()(
             variant & this_variant, ThatVariant && that_variant) const
         {
             // Assert that that_variant contains void.
-            get_unsafe <void> (std::forward <ThatVariant> (that_variant));
+            get_unsafe<void>(std::forward<ThatVariant>(that_variant));
             this_variant.construct_void();
         }
     };
 
-    template <typename ThatVariant>
-        void construct_from_other_variant (ThatVariant && that,
-            // Trigger assertion here.
-            int = typename conversion_for_contained_types <ThatVariant>
-                ::dummy())
+    template <typename ThatVariant> void construct_from_other_variant(
+        ThatVariant && that,
+        // Trigger assertion here.
+        int = typename conversion_for_contained_types<ThatVariant>::dummy())
     {
         /*
         This constructs an object of type
             construct_from_variant_containing <Actual>,
         and calls it with (*this, that).
         */
-        typedef meta::transform <
-                construct_from_variant_containing <boost::mpl::_>,
-                typename variant_types <ThatVariant>::type
-            > specialisations;
-        ::rime::detail::switch_ <void, specialisations> s;
-        s (that.which(), *this, std::forward <ThatVariant> (that));
+        typedef meta::transform<
+            construct_from_variant_containing<boost::mpl::_>,
+            typename variant_types<ThatVariant>::type>
+            specialisations;
+        ::rime::detail::switch_<void, specialisations> s;
+        s(that.which(), *this, std::forward<ThatVariant>(that));
     }
 
 public:
@@ -417,27 +442,31 @@ public:
     // ambiguity.
 
     /// Copy constructor
-    variant (variant const & that)
-    { construct_from_other_variant (that); }
+    variant(variant const & that) { construct_from_other_variant(that); }
 
     /// Generalised copy constructor
-    template <typename ThatVariant>
-        variant (ThatVariant const & that,
-            typename boost::enable_if <is_variant <ThatVariant> >::type * = 0)
-    { construct_from_other_variant (that); }
+    template <typename ThatVariant> variant(
+        ThatVariant const & that,
+        typename boost::enable_if<is_variant<ThatVariant>>::type * = 0)
+    {
+        construct_from_other_variant(that);
+    }
 
     /// Move constructor
-    variant (variant && that)
-    { construct_from_other_variant (std::forward <variant> (that)); }
+    variant(variant && that)
+    {
+        construct_from_other_variant(std::forward<variant>(that));
+    }
 
     /// Generalised move constructor
-    template <typename ThatVariant>
-        variant (ThatVariant && that,
-            typename boost::enable_if <boost::mpl::and_ <
-                is_variant <ThatVariant>,
-                boost::mpl::not_ <std::is_reference <ThatVariant> >
-            > >::type * = 0)
-    { construct_from_other_variant (std::forward <ThatVariant> (that)); }
+    template <typename ThatVariant> variant(
+        ThatVariant && that,
+        typename boost::enable_if<boost::mpl::and_<
+            is_variant<ThatVariant>,
+            boost::mpl::not_<std::is_reference<ThatVariant>>>>::type * = 0)
+    {
+        construct_from_other_variant(std::forward<ThatVariant>(that));
+    }
 
     /* Destruction */
 private:
@@ -446,27 +475,30 @@ private:
     This is called when it turns out, at run time, that "this" contains an
     object of type Actual.
     */
-    template <typename Actual, typename Dummy = void> struct destruct {
-        void operator() (void * memory) const
+    template <typename Actual, typename Dummy = void> struct destruct
+    {
+        void operator()(void * memory) const
         {
-            typedef typename ::utility::storage::store <Actual>::type
-                stored_type;
-            static_cast <stored_type *> (memory)->~stored_type();
+            typedef
+                typename ::utility::storage::store<Actual>::type stored_type;
+            static_cast<stored_type *>(memory)->~stored_type();
         }
     };
     // void is not stored and does not need to be destructed.
-    template <typename Dummy> struct destruct <void, Dummy>
-    { void operator() (void *) const {}; };
+    template <typename Dummy> struct destruct<void, Dummy>
+    {
+        void operator()(void *) const {};
+    };
 
-    void destruct_content() {
+    void destruct_content()
+    {
         /*
         This constructs an object of type destruct <Actual>,
         and calls it with this->memory().
         */
-        typedef meta::transform <destruct <boost::mpl::_>, types>
-            specialisations;
-        ::rime::detail::switch_ <void, specialisations> s;
-        s (this->which(), this->memory());
+        typedef meta::transform<destruct<boost::mpl::_>, types> specialisations;
+        ::rime::detail::switch_<void, specialisations> s;
+        s(this->which(), this->memory());
     }
 
 public:
@@ -476,15 +508,18 @@ private:
     /**
     On destruction, call \c construct_void on the variant passed in.
     */
-    class construct_void_guard {
+    class construct_void_guard
+    {
         variant & v;
         bool on_guard;
+
     public:
-        construct_void_guard (variant & v) : v (v), on_guard (true) {}
+        construct_void_guard(variant & v) : v(v), on_guard(true) {}
 
         void dismiss() { on_guard = false; }
 
-        ~construct_void_guard() {
+        ~construct_void_guard()
+        {
             if (on_guard)
                 v.construct_void();
         }
@@ -497,14 +532,14 @@ public:
     an exception is thrown during construction.
     */
     template <class ThatVariant>
-        typename boost::enable_if <is_variant <ThatVariant>>::type
-            replace (ThatVariant && that)
+    typename boost::enable_if<is_variant<ThatVariant>>::type replace(
+        ThatVariant && that)
     {
         destruct_content();
         // We are now at a dangerous time where the memory is uninitialised.
         // Set a guard that calls construct_void if an exception is thrown.
-        construct_void_guard guard (*this);
-        construct_from_other_variant (std::forward <ThatVariant> (that));
+        construct_void_guard guard(*this);
+        construct_from_other_variant(std::forward<ThatVariant>(that));
         // If we get here, no exception has been thrown, and we can dismiss the
         // guard.
         guard.dismiss();
@@ -518,45 +553,50 @@ public:
     /**
     Find the index of type Actual amongst the possible types of this variant.
     */
-    template <typename Actual> struct index_of {
-        typedef meta::filter <std::is_same <mpl::second <mpl::_>, Actual>,
-            numbered_types> candidates;
+    template <typename Actual> struct index_of
+    {
+        typedef meta::filter<
+            std::is_same<mpl::second<mpl::_>, Actual>, numbered_types>
+            candidates;
 
-        typedef typename meta::first <candidates>::type index_and_type;
+        typedef typename meta::first<candidates>::type index_and_type;
 
-        static_assert (std::is_same <
-            typename mpl::second <index_and_type>::type, Actual>::value,
+        static_assert(
+            std::is_same<
+                typename mpl::second<index_and_type>::type, Actual>::value,
             "Sanity check: should have found Actual");
 
-        static const std::size_t value
-            = mpl::first <index_and_type>::type::value;
+        static const std::size_t value =
+            mpl::first<index_and_type>::type::value;
     };
 
     /**
     \return true iff type Actual is contained.
     */
     template <typename Actual>
-        typename boost::enable_if <meta::contains <Actual, types>, bool>::type
-    contains() const
-    { return (this->which() == index_of <Actual>::value); }
+    typename boost::enable_if<meta::contains<Actual, types>, bool>::type
+        contains() const
+    {
+        return (this->which() == index_of<Actual>::value);
+    }
 
 private:
     /**
     Return a pointer to the storage used for \a Actual.
     */
-    template <typename Actual> typename
-        utility::storage::store <Actual>::type * memory_for()
+    template <typename Actual>
+    typename utility::storage::store<Actual>::type * memory_for()
     {
-        assert (this->contains <Actual>());
-        return static_cast <typename utility::storage::store <Actual>::type *> (
+        assert(this->contains<Actual>());
+        return static_cast<typename utility::storage::store<Actual>::type *>(
             this->memory());
     }
-    template <typename Actual> typename
-        utility::storage::store <Actual>::type const * memory_for() const
+    template <typename Actual>
+    typename utility::storage::store<Actual>::type const * memory_for() const
     {
-        assert (this->contains <Actual>());
-        return static_cast <
-            typename utility::storage::store <Actual>::type const *> (
+        assert(this->contains<Actual>());
+        return static_cast<
+            typename utility::storage::store<Actual>::type const *>(
             this->memory());
     }
 
@@ -565,10 +605,13 @@ private:
     /**
     Perform assignment on the object that "this" contains.
     */
-    struct assign {
+    struct assign
+    {
         template <typename ThisActual, typename That>
-            void operator() (ThisActual && this_actual, That && that) const
-        { this_actual = std::forward <That> (that); }
+        void operator()(ThisActual && this_actual, That && that) const
+        {
+            this_actual = std::forward<That>(that);
+        }
     };
 
 public:
@@ -584,24 +627,29 @@ public:
     \return *this (not the merged return types of all separate assignment
         operators).
     */
-    template <class That> variant & operator = (That && that) {
+    template <class That> variant & operator=(That && that)
+    {
         // Forward to assign.
-        visit (assign()) (*this, std::forward <That> (that));
+        visit(assign())(*this, std::forward<That>(that));
         return *this;
     }
 
-#define RIME_VARIANT_DEFINE_COMPOUND_ASSIGNMENT(name, operation) \
-private: \
-    struct name { \
-        template <typename ThisActual, typename That> \
-            void operator() (ThisActual && this_actual, That && that) const \
-        { this_actual operation std::forward <That> (that); } \
-    }; \
-    \
-public: \
-    template <class That> variant & operator operation (That && that) { \
-        visit (name()) (*this, std::forward <That> (that)); \
-        return *this; \
+#define RIME_VARIANT_DEFINE_COMPOUND_ASSIGNMENT(name, operation)       \
+private:                                                               \
+    struct name                                                        \
+    {                                                                  \
+        template <typename ThisActual, typename That>                  \
+        void operator()(ThisActual && this_actual, That && that) const \
+        {                                                              \
+            this_actual operation std::forward<That>(that);            \
+        }                                                              \
+    };                                                                 \
+                                                                       \
+public:                                                                \
+    template <class That> variant & operator operation(That && that)   \
+    {                                                                  \
+        visit(name())(*this, std::forward<That>(that));                \
+        return *this;                                                  \
     }
 
     RIME_VARIANT_DEFINE_COMPOUND_ASSIGNMENT(plus_assign, +=)
@@ -625,43 +673,45 @@ private:
     object of type Actual.
     The class Variant is passed in so it can be const-qualified.
     */
-    template <typename Variant, typename Actual, typename ... Arguments>
-        struct call_variant_containing
+    template <typename Variant, typename Actual, typename... Arguments>
+    struct call_variant_containing
     {
-        typedef decltype (get_unsafe <Actual> (std::declval <Variant>()) (
-            std::declval <Arguments>() ...)) result_type;
+        typedef decltype(get_unsafe<Actual>(std::declval<Variant>())(
+            std::declval<Arguments>()...)) result_type;
 
-        result_type operator() (
-            Variant && variant, Arguments && ... arguments) const
+        result_type operator()(
+            Variant && variant, Arguments &&... arguments) const
         {
-            return get_unsafe <Actual> (
-                std::forward <Variant> (variant)) (arguments ...);
+            return get_unsafe<Actual>(std::forward<Variant>(variant))(
+                arguments...);
         }
     };
 
-    template <typename ... Callers> struct call_variant_specialisations_impl {
-        typedef meta::vector <Callers ...> callers;
-        typedef meta::vector <typename Callers::result_type ...> result_types;
-        typedef typename make_variant_over <result_types>::type result_type;
+    template <typename... Callers> struct call_variant_specialisations_impl
+    {
+        typedef meta::vector<Callers...> callers;
+        typedef meta::vector<typename Callers::result_type...> result_types;
+        typedef typename make_variant_over<result_types>::type result_type;
     };
 
-    template <typename Variant, typename ... Arguments>
-        struct call_variant_specialisations
-    : call_variant_specialisations_impl <
-        // Compute a call_variant_containing for each possible actual type.
-        call_variant_containing <Variant, Types, Arguments ...> ...> {};
+    template <typename Variant, typename... Arguments>
+    struct call_variant_specialisations
+    : call_variant_specialisations_impl<
+          // Compute a call_variant_containing for each possible actual type.
+          call_variant_containing<Variant, Types, Arguments...>...>
+    {};
 
-    template <typename Variant, typename ... Arguments>
-    static typename call_variant_specialisations <Variant, Arguments...>
-        ::result_type
-        call_with (Variant variant, Arguments && ... arguments)
+    template <typename Variant, typename... Arguments> static
+        typename call_variant_specialisations<
+            Variant, Arguments...>::result_type
+        call_with(Variant variant, Arguments &&... arguments)
     {
         /*
         This constructs an object of type
             call_variant_containing <Variant, Actual, Arguments...>,
         and calls it with *this, arguments... .
         */
-        typedef call_variant_specialisations <Variant, Arguments ...>
+        typedef call_variant_specialisations<Variant, Arguments...>
             compute_specialisations;
         // Specialisations with different result types.
         // These could be used directly if "void" wasn't a possible return type.
@@ -669,14 +719,15 @@ private:
         // Unified result type.
         typedef typename compute_specialisations::result_type result_type;
         // Specialisations with the result type converted to result_type.
-        typedef meta::transform <
-            variant_detail::convert_result <result_type, boost::mpl::_>,
-            specialisations> coerced_specialisations;
+        typedef meta::transform<
+            variant_detail::convert_result<result_type, boost::mpl::_>,
+            specialisations>
+            coerced_specialisations;
 
-        static rime::detail::switch_ <result_type, coerced_specialisations> s;
-        return s (variant.which(),
-            std::forward <Variant> (variant),
-            std::forward <Arguments> (arguments) ...);
+        static rime::detail::switch_<result_type, coerced_specialisations> s;
+        return s(
+            variant.which(), std::forward<Variant>(variant),
+            std::forward<Arguments>(arguments)...);
     }
 
 public:
@@ -684,13 +735,12 @@ public:
     Call the function contained in the variant with arguments.
     Each of the possible contained types must be callable with these arguments.
     */
-    template <typename ... Arguments>
-        typename call_variant_specialisations <variant &, Arguments...
-            >::result_type
-        operator() (Arguments && ... arguments)
+    template <typename... Arguments>
+    typename call_variant_specialisations<variant &, Arguments...>::result_type
+        operator()(Arguments &&... arguments)
     {
-        return call_with <variant &> (
-            *this, std::forward <Arguments> (arguments) ...);
+        return call_with<variant &>(
+            *this, std::forward<Arguments>(arguments)...);
     }
 
     /**
@@ -698,34 +748,38 @@ public:
     Each of the possible contained types must be callable with these arguments.
     This is for const variant, so the function will also be const-qualified.
     */
-    template <typename ... Arguments>
-        typename call_variant_specialisations <variant const &, Arguments...
-            >::result_type
-        operator() (Arguments && ... arguments) const
+    template <typename... Arguments> typename call_variant_specialisations<
+        variant const &, Arguments...>::result_type
+        operator()(Arguments &&... arguments) const
     {
-        return call_with <variant const &> (
-            *this, std::forward <Arguments> (arguments) ...);
+        return call_with<variant const &>(
+            *this, std::forward<Arguments>(arguments)...);
     }
 
     /* operator[] */
 private:
-    struct subscript {
+    struct subscript
+    {
         template <typename Actual, typename Argument>
-        decltype (std::declval <Actual &&>() [std::declval <Argument &&>()])
-            operator() (Actual && actual, Argument && argument) const
-        { return std::forward <Actual> (actual) [
-            std::forward <Argument> (argument)]; }
+        decltype(std::declval<Actual &&>()[std::declval<Argument &&>()])
+            operator()(Actual && actual, Argument && argument) const
+        {
+            return std::forward<Actual>(
+                actual)[std::forward<Argument>(argument)];
+        }
     };
 
     // This class is necessary to wrap decltype() in GCC 4.6.
-    template <typename Variant, typename Argument> struct subscript_with {
-        typedef decltype (visit (subscript()) (
-            std::declval <Variant &>(), std::declval <Argument &&>()))
-            result_type;
+    template <typename Variant, typename Argument> struct subscript_with
+    {
+        typedef decltype(visit(subscript())(
+            std::declval<Variant &>(),
+            std::declval<Argument &&>())) result_type;
 
-        result_type operator() (Variant & variant, Argument && argument) const {
-            return visit (subscript()) (
-                variant, std::forward <Argument> (argument));
+        result_type operator()(Variant & variant, Argument && argument) const
+        {
+            return visit(subscript())(
+                variant, std::forward<Argument>(argument));
         }
     };
 
@@ -733,20 +787,20 @@ public:
     /**
     Forward to the contained type's operator[].
     */
-    template <class Argument> typename
-        subscript_with <variant, Argument>::result_type
-        operator [] (Argument && argument)
+    template <class Argument>
+    typename subscript_with<variant, Argument>::result_type operator[](
+        Argument && argument)
     {
-        subscript_with <variant, Argument> implementation;
-        return implementation (*this, std::forward <Argument> (argument));
+        subscript_with<variant, Argument> implementation;
+        return implementation(*this, std::forward<Argument>(argument));
     }
 
-    template <class Argument> typename
-        subscript_with <variant const, Argument>::result_type
-        operator [] (Argument && argument) const
+    template <class Argument>
+    typename subscript_with<variant const, Argument>::result_type operator[](
+        Argument && argument) const
     {
-        subscript_with <variant const, Argument> implementation;
-        return implementation (*this, std::forward <Argument> (argument));
+        subscript_with<variant const, Argument> implementation;
+        return implementation(*this, std::forward<Argument>(argument));
     }
 };
 
@@ -757,84 +811,86 @@ namespace variant_detail {
     This is a struct and not a function, so that it is possible to specialise it
     for get <void>.
     */
-    template <typename Actual> struct get {
+    template <typename Actual> struct get
+    {
         template <class Variant>
-            typename ::utility::storage::get <Actual, Variant &&>::type
-            operator() (Variant && variant) const
+        typename ::utility::storage::get<Actual, Variant &&>::type operator()(
+            Variant && variant) const
         {
-            ::utility::storage::get <Actual, Variant &&> extract;
-            return extract (*variant.template memory_for <Actual>());
+            ::utility::storage::get<Actual, Variant &&> extract;
+            return extract(*variant.template memory_for<Actual>());
         }
 
         template <class Variant>
-            typename ::utility::storage::get_pointer <Actual, Variant>::type
-            operator() (Variant * variant) const
-        { return & (*this) (*variant); }
+        typename ::utility::storage::get_pointer<Actual, Variant>::type
+            operator()(Variant * variant) const
+        {
+            return &(*this)(*variant);
+        }
     };
 
     // Specialise for void.
-    template <> struct get <void> {
-        template <class Variant> void operator() (Variant && variant) const
-        { assert (variant.template contains <void>()); }
+    template <> struct get<void>
+    {
+        template <class Variant> void operator()(Variant && variant) const
+        {
+            assert(variant.template contains<void>());
+        }
 
         // It is not clear that it makes sense to return a void * with a
         // meaningless value, but it makes it easier to write generic code.
-        template <class Variant> void * operator() (Variant * variant) const {
-            assert (variant->template contains <void>());
+        template <class Variant> void * operator()(Variant * variant) const
+        {
+            assert(variant->template contains<void>());
             return nullptr;
         }
 
         template <class Variant>
-            void const * operator() (Variant const * variant) const
+        void const * operator()(Variant const * variant) const
         {
-            assert (variant->template contains <void>());
+            assert(variant->template contains<void>());
             return nullptr;
         }
     };
 
-} // namespace variant_detail
+}  // namespace variant_detail
 
-template <typename Actual, typename Variant>
-    inline typename boost::enable_if <
-        boost::mpl::and_ <
-            is_variant <Variant>,
-            meta::contains <Actual, typename variant_types <Variant>::type>>,
-        typename ::utility::storage::get <Actual, Variant &&>::type
-    >::type
-    get_unsafe (Variant && variant)
+template <typename Actual, typename Variant> inline typename boost::enable_if<
+    boost::mpl::and_<
+        is_variant<Variant>,
+        meta::contains<Actual, typename variant_types<Variant>::type>>,
+    typename ::utility::storage::get<Actual, Variant &&>::type>::type
+    get_unsafe(Variant && variant)
 {
-    variant_detail::get <Actual> implementation;
-    return implementation (std::forward <Variant> (variant));
+    variant_detail::get<Actual> implementation;
+    return implementation(std::forward<Variant>(variant));
 }
 
-template <typename Actual, typename Variant>
-    inline typename boost::enable_if <
-        boost::mpl::and_ <
-            is_variant <Variant>,
-            meta::contains <Actual, typename variant_types <Variant>::type>>,
-        typename ::utility::storage::get <Actual, Variant &&>::type
-    >::type
-    get (Variant && variant)
+template <typename Actual, typename Variant> inline typename boost::enable_if<
+    boost::mpl::and_<
+        is_variant<Variant>,
+        meta::contains<Actual, typename variant_types<Variant>::type>>,
+    typename ::utility::storage::get<Actual, Variant &&>::type>::type
+    get(Variant && variant)
 {
-    if (!variant.template contains <Actual>())
+    if (!variant.template contains<Actual>())
         throw bad_get();
-    return get_unsafe <Actual, Variant> (std::forward <Variant> (variant));
+    return get_unsafe<Actual, Variant>(std::forward<Variant>(variant));
 }
 
-template <typename Actual, typename Variant, class Enable = typename
-    boost::enable_if <
-        boost::mpl::and_ <
-            is_variant <Variant>,
-            meta::contains <Actual, typename variant_types <Variant>::type>>
-    >::type>
-inline auto get (Variant * variant)
--> decltype (variant_detail::get <Actual>() (variant))
+template <
+    typename Actual, typename Variant,
+    class Enable = typename boost::enable_if<boost::mpl::and_<
+        is_variant<Variant>,
+        meta::contains<Actual, typename variant_types<Variant>::type>>>::type>
+inline auto get(Variant * variant)
+    -> decltype(variant_detail::get<Actual>()(variant))
 {
-    if (!variant->template contains <Actual>())
+    if (!variant->template contains<Actual>())
         return 0;
 
-    variant_detail::get <Actual> implementation;
-    return implementation (variant);
+    variant_detail::get<Actual> implementation;
+    return implementation(variant);
 }
 
 /**
@@ -846,67 +902,64 @@ template <typename Types, typename MergeTwo> struct make_variant_over
 {
 private:
     // E.g. vector <int, variant <int, float>, double>
-    typedef typename meta::as_vector <Types>::type input_types;
+    typedef typename meta::as_vector<Types>::type input_types;
 
     // E.g. vector <vector <int>, vector <int, float>, vector <double> >
-    typedef typename meta::as_vector <typename meta::transform <
-            variant_types <boost::mpl::_>, input_types
-        >::type>::type type_sequences;
+    typedef typename meta::as_vector<typename meta::transform<
+        variant_types<boost::mpl::_>, input_types>::type>::type type_sequences;
 
     // E.g. vector <int, int, float, double>
-    typedef typename meta::flatten <type_sequences>::type type_sequence;
+    typedef typename meta::flatten<type_sequences>::type type_sequence;
 
     // E.g. mpl::set <int, float, double>
-    typedef typename rime::merge_types <MergeTwo, type_sequence>::type types;
+    typedef typename rime::merge_types<MergeTwo, type_sequence>::type types;
 
 public:
-    typedef typename boost::mpl::eval_if <
-        boost::mpl::greater <boost::mpl::size <types>, boost::mpl::int_ <1> >,
-        variant_detail::make_variant <types>,
-        meta::first <types>
-    >::type type;
+    typedef typename boost::mpl::eval_if<
+        boost::mpl::greater<boost::mpl::size<types>, boost::mpl::int_<1>>,
+        variant_detail::make_variant<types>, meta::first<types>>::type type;
 };
 
 namespace variant_detail {
 
     namespace mpl = boost::mpl;
 
-    template <typename Actual, typename NumberedTypes, typename ... Matches>
-        struct find_candidates;
+    template <typename Actual, typename NumberedTypes, typename... Matches>
+    struct find_candidates;
 
     // No matches found
     template <typename Actual, typename NumberedTypes>
-        struct find_candidates <Actual, NumberedTypes>
-    { typedef meta::vector<> type; };
-
-    template <typename Actual, typename NumberedTypes,
-        typename FirstMatch, typename ... OtherMatches>
-    struct find_candidates <
-        Actual, NumberedTypes, FirstMatch, OtherMatches ...>
+    struct find_candidates<Actual, NumberedTypes>
     {
-        typedef typename meta::as_vector <meta::filter <
-                FirstMatch,
-                NumberedTypes
-            >>::type numbered_candidates;
-
-        typedef typename mpl::eval_if <
-            mpl::greater_equal <mpl::size <numbered_candidates>, mpl::int_ <1>>,
-            // One or more candidates found.
-            mpl::identity <numbered_candidates>,
-            // No matches found; continue trying.
-            find_candidates <Actual, NumberedTypes, OtherMatches ...>
-        >::type type;
+        typedef meta::vector<> type;
     };
 
-    template <typename Types>
-        struct make_variant
-    : make_variant <typename meta::as_vector <Types>::type> {};
+    template <
+        typename Actual, typename NumberedTypes, typename FirstMatch,
+        typename... OtherMatches>
+    struct find_candidates<Actual, NumberedTypes, FirstMatch, OtherMatches...>
+    {
+        typedef typename meta::as_vector<
+            meta::filter<FirstMatch, NumberedTypes>>::type numbered_candidates;
 
-    template <typename ... Types>
-        struct make_variant <meta::vector <Types ...> >
-    { typedef variant <Types ...> type; };
+        typedef typename mpl::eval_if<
+            mpl::greater_equal<mpl::size<numbered_candidates>, mpl::int_<1>>,
+            // One or more candidates found.
+            mpl::identity<numbered_candidates>,
+            // No matches found; continue trying.
+            find_candidates<Actual, NumberedTypes, OtherMatches...>>::type type;
+    };
 
-} // namespace variant_detail
+    template <typename Types> struct make_variant
+    : make_variant<typename meta::as_vector<Types>::type>
+    {};
+
+    template <typename... Types> struct make_variant<meta::vector<Types...>>
+    {
+        typedef variant<Types...> type;
+    };
+
+}  // namespace variant_detail
 
 namespace merge_policy {
 
@@ -914,7 +967,8 @@ namespace merge_policy {
     Merge policy that merges constants and types that are the same, but nothing
     else.
     */
-    struct conservative : constant <same<> > {};
+    struct conservative : constant<same<>>
+    {};
 
     /**
     Merge policy, a metafunction, that takes any number of types and merges
@@ -923,16 +977,18 @@ namespace merge_policy {
     If one type is left, it is returned.
     If multiple types are left, a variant is built from all of them.
     */
-    template <class MergeTwo> struct to_variant {
-        template <class ... Types> struct apply
-        : make_variant_over <meta::vector <Types ...>, MergeTwo> {};
+    template <class MergeTwo> struct to_variant
+    {
+        template <class... Types> struct apply
+        : make_variant_over<meta::vector<Types...>, MergeTwo>
+        {};
     };
 
-    struct default_policy : to_variant <conservative> {};
+    struct default_policy : to_variant<conservative>
+    {};
 
-} // namespace merge_policy
+}  // namespace merge_policy
 
-} // namespace rime
+}  // namespace rime
 
 #endif  // RIME_VARIANT_HPP_INCLUDED
-

@@ -21,8 +21,9 @@ limitations under the License.
 
 BOOST_AUTO_TEST_SUITE(fail_rime_check_equal)
 
-BOOST_AUTO_TEST_CASE (fail_rime_check_equal) {
-    RIME_CHECK_EQUAL (rime::true_, rime::false_);
+BOOST_AUTO_TEST_CASE(fail_rime_check_equal)
+{
+    RIME_CHECK_EQUAL(rime::true_, rime::false_);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

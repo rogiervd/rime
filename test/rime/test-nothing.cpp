@@ -19,30 +19,31 @@ limitations under the License.
 
 #include "rime/nothing.hpp"
 
-#include <type_traits>
 #include <string>
+#include <type_traits>
 
 #include <boost/mpl/assert.hpp>
 
 BOOST_AUTO_TEST_SUITE(test_rime_nothing)
 
-BOOST_AUTO_TEST_CASE (test_rime_nothing) {
+BOOST_AUTO_TEST_CASE(test_rime_nothing)
+{
     // Call "rime::nothing" with various arguments.
-    BOOST_MPL_ASSERT ((std::is_same <void, decltype (rime::nothing())>));
+    BOOST_MPL_ASSERT((std::is_same<void, decltype(rime::nothing())>) );
     rime::nothing();
 
-    BOOST_MPL_ASSERT ((std::is_same <void, decltype (rime::nothing (5))>));
-    rime::nothing (5);
+    BOOST_MPL_ASSERT((std::is_same<void, decltype(rime::nothing(5))>) );
+    rime::nothing(5);
 
-    std::string hello ("hello");
+    std::string hello("hello");
 
-    BOOST_MPL_ASSERT ((std::is_same <void,
-        decltype (rime::nothing (5, hello, 6.5))>));
-    rime::nothing (5, hello, 6.5);
+    BOOST_MPL_ASSERT(
+        (std::is_same<void, decltype(rime::nothing(5, hello, 6.5))>) );
+    rime::nothing(5, hello, 6.5);
 
     // Make our own "nothing".
     rime::callable::nothing nothing;
-    nothing (5, hello, 6.5);
+    nothing(5, hello, 6.5);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -51,91 +51,97 @@ namespace callable {
         The type that is used to merge two return types. types.
         By default, merge constants and types that are exactly the same.
     */
-    template <class MergePolicy = merge_policy::default_policy> struct call_if {
+    template <class MergePolicy = merge_policy::default_policy> struct call_if
+    {
         // Condition known to be true at compile time.
-        template <class Condition, class IfTrue, class IfFalse,
-                class ... Arguments>
-            typename boost::lazy_enable_if <boost::mpl::and_ <
-                    rime::is_constant <Condition>,
-                    typename std::decay <Condition>::type
-                >,
-                std::result_of <IfTrue (Arguments ...)>
-            >::type
-        operator() (Condition &&, IfTrue && if_true, IfFalse &&,
-            Arguments && ... arguments) const
+        template <
+            class Condition, class IfTrue, class IfFalse, class... Arguments>
+        typename boost::lazy_enable_if<
+            boost::mpl::and_<
+                rime::is_constant<Condition>,
+                typename std::decay<Condition>::type>,
+            std::result_of<IfTrue(Arguments...)>>::type
+            operator()(
+                Condition &&, IfTrue && if_true, IfFalse &&,
+                Arguments &&... arguments) const
         {
-            return std::forward <IfTrue> (if_true) (
-                std::forward <Arguments> (arguments) ...);
+            return std::forward<IfTrue>(if_true)(
+                std::forward<Arguments>(arguments)...);
         }
 
         // Condition known to be false at compile time.
-        template <class Condition, class IfTrue, class IfFalse,
-                class ... Arguments>
-            typename boost::lazy_enable_if <boost::mpl::and_ <
-                    rime::is_constant <Condition>,
-                    boost::mpl::not_ <typename std::decay <Condition>::type>
-                >,
-                std::result_of <IfFalse (Arguments ...)>
-            >::type
-        operator() (Condition &&, IfTrue &&, IfFalse && if_false,
-            Arguments && ... arguments) const
+        template <
+            class Condition, class IfTrue, class IfFalse, class... Arguments>
+        typename boost::lazy_enable_if<
+            boost::mpl::and_<
+                rime::is_constant<Condition>,
+                boost::mpl::not_<typename std::decay<Condition>::type>>,
+            std::result_of<IfFalse(Arguments...)>>::type
+            operator()(
+                Condition &&, IfTrue &&, IfFalse && if_false,
+                Arguments &&... arguments) const
         {
-            return std::forward <IfFalse> (if_false) (
-                std::forward <Arguments> (arguments) ...);
+            return std::forward<IfFalse>(if_false)(
+                std::forward<Arguments>(arguments)...);
         }
 
         // This class is instantiated only if the condition is a run-time
         // value.
-        template <class Function1, class Function2, class ... Arguments>
-            struct merged_result_type
-        : MergePolicy::template apply <
-            typename std::result_of <Function1 (Arguments ...)>::type,
-            typename std::result_of <Function2 (Arguments ...)>::type> {};
+        template <class Function1, class Function2, class... Arguments>
+        struct merged_result_type
+        : MergePolicy::template apply<
+              typename std::result_of<Function1(Arguments...)>::type,
+              typename std::result_of<Function2(Arguments...)>::type>
+        {};
 
         // Run-time condition.
-        template <class Condition, class IfTrue, class IfFalse,
-                class ... Arguments>
-            typename boost::lazy_enable_if <
-                boost::mpl::not_ <rime::is_constant <Condition>>,
-                merged_result_type <IfTrue, IfFalse, Arguments ...>
-            >::type
-        operator() (Condition && condition,
-            IfTrue && if_true, IfFalse && if_false, Arguments && ... arguments)
-            const
+        template <
+            class Condition, class IfTrue, class IfFalse, class... Arguments>
+        typename boost::lazy_enable_if<
+            boost::mpl::not_<rime::is_constant<Condition>>,
+            merged_result_type<IfTrue, IfFalse, Arguments...>>::type
+            operator()(
+                Condition && condition, IfTrue && if_true, IfFalse && if_false,
+                Arguments &&... arguments) const
         {
             if (condition)
-                return std::forward <IfTrue> (if_true) (
-                    std::forward <Arguments> (arguments) ...);
+                return std::forward<IfTrue>(if_true)(
+                    std::forward<Arguments>(arguments)...);
             else
-                return std::forward <IfFalse> (if_false) (
-                    std::forward <Arguments> (arguments) ...);
+                return std::forward<IfFalse>(if_false)(
+                    std::forward<Arguments>(arguments)...);
         }
     };
-} // namespace callable
+}  // namespace callable
 
 // Without MergePolicy.
-template <class Condition, class FunctionIfTrue, class FunctionIfFalse,
-    class ... Arguments>
-inline auto call_if (Condition && condition,
-    FunctionIfTrue && if_true, FunctionIfFalse && if_false,
-    Arguments && ... arguments)
-RETURNS (callable::call_if <>() (std::forward <Condition> (condition),
-    std::forward <FunctionIfTrue> (if_true),
-    std::forward <FunctionIfFalse> (if_false),
-    std::forward <Arguments> (arguments) ...));
+template <
+    class Condition, class FunctionIfTrue, class FunctionIfFalse,
+    class... Arguments>
+inline auto call_if(
+    Condition && condition, FunctionIfTrue && if_true,
+    FunctionIfFalse && if_false, Arguments &&... arguments)
+    RETURNS(
+        callable::call_if<>()(
+            std::forward<Condition>(condition),
+            std::forward<FunctionIfTrue>(if_true),
+            std::forward<FunctionIfFalse>(if_false),
+            std::forward<Arguments>(arguments)...));
 
 // With MergePolicy.
-template <class MergePolicy, class Condition,
-    class FunctionIfTrue, class FunctionIfFalse, class ... Arguments>
-inline auto call_if (Condition && condition,
-    FunctionIfTrue && if_true, FunctionIfFalse && if_false,
-    Arguments && ... arguments)
-RETURNS (callable::call_if <MergePolicy>() (
-    std::forward <Condition> (condition),
-    std::forward <FunctionIfTrue> (if_true),
-    std::forward <FunctionIfFalse> (if_false),
-    std::forward <Arguments> (arguments) ...));
+template <
+    class MergePolicy, class Condition, class FunctionIfTrue,
+    class FunctionIfFalse, class... Arguments>
+inline auto call_if(
+    Condition && condition, FunctionIfTrue && if_true,
+    FunctionIfFalse && if_false, Arguments &&... arguments)
+    RETURNS(
+        callable::call_if<MergePolicy>()(
+            std::forward<Condition>(condition),
+            std::forward<FunctionIfTrue>(if_true),
+            std::forward<FunctionIfFalse>(if_false),
+            std::forward<Arguments>(arguments)...));
 
-} // namespace rime
+}  // namespace rime
 
 #endif  // RIME_CALL_IF_HPP_INCLUDED
