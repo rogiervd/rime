@@ -1,0 +1,35 @@
+# Define the tests.
+
+# To run all test in all packages:
+#   bazel test //test/...
+
+load("@rules_cc//cc:defs.bzl", "cc_test")
+
+[
+    cc_test(
+        name = test_name,
+        size = "small",
+        srcs = [test_name + ".cpp"],
+        deps = [
+            "//:rime",
+            "@boost.test//:unit_test_main",
+        ],
+    )
+    for test_name in [
+        "test-always",
+        "test-call_if",
+        "test-cast",
+        "test-core_operators",
+        "test-core",
+        "test-enable_if_constant",
+        "test-if",
+        "test-merge_types",
+        "test-min_max",
+        "test-nothing",
+        "test-sign",
+        "test-variant-1-construct",
+        "test-variant-2-operator",
+        "test-variant-3-visit",
+        "test-variant-4-replace",
+    ]
+]

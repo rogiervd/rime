@@ -1,0 +1,39 @@
+load("@rules_build_error//lang/cc:defs.bzl", "cc_build_error")
+load("@rules_build_error//matcher:defs.bzl", "matcher")
+load("@rules_cc//cc:defs.bzl", "cc_test")
+
+[
+    cc_test(
+        name = test_name,
+        size = "small",
+        srcs = [test_name + ".cpp"],
+        deps = [
+            "//:rime",
+            "@boost.test//:unit_test_main",
+        ],
+    )
+    for test_name in [
+        "test-check_equal",
+        "test-check_equal-runtime",
+    ]
+]
+
+# Check that these tests fail to compile.
+# These do not show up as errors in the Bazel output.
+[
+    cc_build_error(
+        name = test_name,
+        src = test_name + ".cpp",
+        compile_stderr = matcher.has_substr("Values must either be the same run-time type, or both compile-time constants with the same value."),
+        deps = [
+            "//:rime",
+            "@boost.test//:unit_test_main",
+        ],
+    )
+    for test_name in [
+        "test-check_equal-fail-not_constant",
+        "test-check_equal-fail-types",
+        "test-check_equal-fail-value-1",
+        "test-check_equal-fail-value-2",
+    ]
+]
