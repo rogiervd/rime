@@ -249,7 +249,6 @@ namespace callable {
 
 }  // namespace callable
 
-
 // If any one of the parameters is "overrideValue" (true or false), then the
 // whole expression equals "overrideValue".
 // If all parameters are "defaultValue" (or if there are zero parameters), then

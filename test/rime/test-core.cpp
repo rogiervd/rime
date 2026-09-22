@@ -455,7 +455,6 @@ BOOST_AUTO_TEST_CASE(test_rime_core_constant_assign)
         rime::size_t<5> five;
         five = std::integral_constant<size_t, 5>();
 
-
         static_assert(
             utility::is_assignable<rime::true_type &, std::true_type>::value,
             "");
