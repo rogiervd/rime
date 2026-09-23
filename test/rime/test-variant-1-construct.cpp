@@ -512,7 +512,8 @@ BOOST_AUTO_TEST_CASE(test_rime_variant_move_construct)
         BOOST_CHECK_EQUAL(moved.which(), 0u);
         BOOST_CHECK_EQUAL(rime::get<int>(moved), 7);
 
-        variant moved_const(make_const_variant(13));
+        variant const const_source = make_const_variant(13);
+        variant moved_const(std::move(const_source));
         BOOST_CHECK_EQUAL(moved_const.which(), 3u);
         BOOST_CHECK_EQUAL(rime::get<int const>(moved_const), 13);
     }
