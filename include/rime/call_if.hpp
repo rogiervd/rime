@@ -17,6 +17,8 @@ limitations under the License.
 #ifndef RIME_CALL_IF_HPP_INCLUDED
 #define RIME_CALL_IF_HPP_INCLUDED
 
+#include <type_traits>
+
 #include <boost/mpl/and.hpp>
 #include <boost/mpl/not.hpp>
 
@@ -60,7 +62,7 @@ namespace callable {
             boost::mpl::and_<
                 rime::is_constant<Condition>,
                 typename std::decay<Condition>::type>,
-            std::result_of<IfTrue(Arguments...)>>::type
+            std::invoke_result<IfTrue, Arguments...>>::type
             operator()(
                 Condition &&, IfTrue && if_true, IfFalse &&,
                 Arguments &&... arguments) const
@@ -76,7 +78,7 @@ namespace callable {
             boost::mpl::and_<
                 rime::is_constant<Condition>,
                 boost::mpl::not_<typename std::decay<Condition>::type>>,
-            std::result_of<IfFalse(Arguments...)>>::type
+            std::invoke_result<IfFalse, Arguments...>>::type
             operator()(
                 Condition &&, IfTrue &&, IfFalse && if_false,
                 Arguments &&... arguments) const
@@ -90,8 +92,8 @@ namespace callable {
         template <class Function1, class Function2, class... Arguments>
         struct merged_result_type
         : MergePolicy::template apply<
-              typename std::result_of<Function1(Arguments...)>::type,
-              typename std::result_of<Function2(Arguments...)>::type>
+              typename std::invoke_result<Function1, Arguments...>::type,
+              typename std::invoke_result<Function2, Arguments...>::type>
         {};
 
         // Run-time condition.
