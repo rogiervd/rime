@@ -25,6 +25,7 @@ operator() and operator[] must be defined inside the class.
 #include <boost/mpl/or.hpp>
 
 #include "variant_fwd.hpp"
+#include "variant_dispatch.hpp"
 
 namespace rime {
 
