@@ -19,6 +19,7 @@ limitations under the License.
 
 #include <type_traits>
 
+#include <boost/mpl/apply.hpp>
 #include <boost/mpl/if.hpp>
 
 #include "meta/range.hpp"
