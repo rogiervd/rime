@@ -14,12 +14,14 @@ build --cxxopt=-std=c++17
 build --cxxopt=-Werror
 build --cxxopt=-Wall
 
-# GCC Configuration
+# Compiler selection.
+# These use the C++ toolchain that rules_cc auto-configures from the compiler
+# found on the system.
+#   bazel ... --config=gcc
+#   bazel ... --config=clang
 build:gcc --repo_env=CC=gcc
 
-# Clang Configuration
 build:clang --repo_env=CC=clang
-build:clang --repo_env=CXX=clang++
 
 # Configuration for builds with address sanitiser.
 # This can be selected with
