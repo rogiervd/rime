@@ -34,6 +34,11 @@ build:windows --features=external_include_paths
 # matches, so exclude both the path (external/...) and the label
 # (@@<repository>+//...) of files in dependencies.
 build:windows --per_file_copt=.*,-^external/,-[+]//@/W4,/WX
+# Bazel runs some actions, e.g. those of cc_build_error, through MSYS Bash.
+# When that runs the compiler, MSYS converts arguments that look like paths
+# from Unix to Windows style, which mangles options like /I.
+# Switch this conversion off.
+build:windows --action_env=MSYS2_ARG_CONV_EXCL=*
 
 # Compiler selection.
 # These use the C++ toolchain that rules_cc auto-configures from the compiler

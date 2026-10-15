@@ -18,13 +18,28 @@ load("@rules_cc//cc:defs.bzl", "cc_test")
     ]
 ]
 
+_CHECK_EQUAL_MESSAGE = matcher.has_substr("Values must either be the same run-time type, or both compile-time constants with the same value.")
+
 # Check that these tests fail to compile.
 # These do not show up as errors in the Bazel output.
 [
     cc_build_error(
         name = test_name,
         src = test_name + ".cpp",
-        compile_stderr = matcher.has_substr("Values must either be the same run-time type, or both compile-time constants with the same value."),
+        # MSVC writes diagnostics to stdout; other compilers write them to
+        # stderr.
+        compile_stderr = select({
+            "@rules_cc//cc/compiler:msvc-cl": "",
+            "//conditions:default": _CHECK_EQUAL_MESSAGE,
+        }),
+        compile_stdout = select({
+            "@rules_cc//cc/compiler:msvc-cl": _CHECK_EQUAL_MESSAGE,
+            "//conditions:default": "",
+        }),
+        # On Windows, the compiler is run from a Bash script, and
+        # MSYS2_ARG_CONV_EXCL (set in .bazelrc) must reach it so that MSYS does
+        # not turn compiler options like /I into paths.
+        use_default_shell_env = True,
         deps = [
             "//:rime",
             "@boost.test//:unit_test_main",
