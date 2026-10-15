@@ -220,8 +220,7 @@ void check_less_sign_safe_right_constant(Left const & left, Right const & right)
         rime::less_sign_safe(Left::value, Right::value), reference);
 }
 
-struct not_an_int
-{};
+struct not_an_int {};
 
 bool operator<(not_an_int, not_an_int) { return false; }
 

@@ -39,7 +39,7 @@ namespace callable {
 /**
 Return the minimum of two values, as a compile-time constant if possible.
 */
-static const auto min = callable::min<>();
+static auto const min = callable::min<>();
 
 /**
 Return the minimum of two values, as a compile-time constant if possible.

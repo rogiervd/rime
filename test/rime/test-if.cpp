@@ -86,8 +86,7 @@ BOOST_AUTO_TEST_CASE(test_rime_if)
 template <class Base> struct merge_float
 {
     template <class Type1, class Type2, class Dummy = void> struct apply
-    : Base::template apply<Type1, Type2>
-    {};
+    : Base::template apply<Type1, Type2> {};
 
     template <class Dummy> struct apply<float, double, Dummy>
     {

@@ -225,14 +225,12 @@ namespace variant_detail {
     */
     template <typename MergedResultType, class DispatchRecipient>
     struct convert_result
-    : convert_result_impl<MergedResultType, DispatchRecipient>
-    {};
+    : convert_result_impl<MergedResultType, DispatchRecipient> {};
 
     template <
         typename MergedResultType, class DispatchRecipient,
         typename RecipientResultType>
-    struct convert_result_impl : DispatchRecipient
-    {};
+    struct convert_result_impl : DispatchRecipient {};
 
     // Specialise for void -> variant <..., void, ...>.
     template <typename MergedResultType, class DispatchRecipient>
@@ -251,8 +249,7 @@ namespace variant_detail {
     // return an expression that is void itself.
     template <class DispatchRecipient>
     struct convert_result_impl<void, DispatchRecipient, void>
-    : DispatchRecipient
-    {};
+    : DispatchRecipient {};
 
     /**
     3. List all possible combinations of actual types.
@@ -296,13 +293,13 @@ namespace variant_detail {
             which(Type &&)
         {
             return 0;
-        };
+        }
         template <typename Type> static
             typename boost::enable_if<is_variant<Type>, std::size_t>::type
             which(Type && variant)
         {
             return variant.which();
-        };
+        }
 
         /**
         Compute actual types for one first actual type.
@@ -314,8 +311,7 @@ namespace variant_detail {
         template <typename FirstChoice> struct types_starting_with
         : meta::as_vector<meta::transform<
               meta::push<meta::front, FirstChoice, boost::mpl::_>,
-              types_rest>>::type
-        {};
+              types_rest>>::type {};
 
     public:
         /**
@@ -512,11 +508,11 @@ namespace variant_detail {
     class dispatch_recipient_remove_void
 #if (BOOST_CLANG && __clang_major__ == 3 && __clang_minor__ == 0)
     : public dispatch_recipient_remove_void_slow<
-          Arguments, Actual, meta::vector<>, meta::vector<>>
-    {};
+          Arguments, Actual, meta::vector<>, meta::vector<>> {
+    };
 #else
-    : public dispatch_recipient_remove_void_fast<Arguments, Actual>
-    {};
+    : public dispatch_recipient_remove_void_fast<Arguments, Actual> {
+    };
 #endif
 
     /**
@@ -628,16 +624,14 @@ namespace variant_detail {
     template <class SeenArguments, class SeenActual>
     class dispatch_recipient_remove_void_slow<
         meta::vector<>, meta::vector<>, SeenArguments, SeenActual>
-    : public dispatch_recipient_no_void<SeenArguments, SeenActual>
-    {};
+    : public dispatch_recipient_no_void<SeenArguments, SeenActual> {};
 
     template <typename Arguments, typename ActualArguments>
     struct dispatch_recipient
     : boost::mpl::if_<
           meta::contains<void, ActualArguments>,
           dispatch_recipient_remove_void<Arguments, ActualArguments>,
-          dispatch_recipient_no_void<Arguments, ActualArguments>>::type
-    {};
+          dispatch_recipient_no_void<Arguments, ActualArguments>>::type {};
 
 }  // namespace variant_detail
 

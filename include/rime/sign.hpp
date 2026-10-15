@@ -43,22 +43,18 @@ namespace types {
     */
     template <class Type> struct std_is_signed
     : boost::mpl::eval_if<
-          std::is_integral<Type>, std::is_signed<Type>, std::false_type>
-    {};
+          std::is_integral<Type>, std::is_signed<Type>, std::false_type> {};
     template <class Type> struct std_is_unsigned
     : boost::mpl::eval_if<
-          std::is_integral<Type>, std::is_unsigned<Type>, std::false_type>
-    {};
+          std::is_integral<Type>, std::is_unsigned<Type>, std::false_type> {};
 
     template <class Type> struct is_signed
     : rime::as_rime_constant<typename std_is_signed<typename rime::value<
-          typename std::remove_cv<Type>::type>::type>::type>::type
-    {};
+          typename std::remove_cv<Type>::type>::type>::type>::type {};
 
     template <class Type> struct is_unsigned
     : rime::as_rime_constant<typename std_is_unsigned<typename rime::value<
-          typename std::remove_cv<Type>::type>::type>::type>::type
-    {};
+          typename std::remove_cv<Type>::type>::type>::type>::type {};
 
     namespace detail {
 
@@ -81,18 +77,16 @@ namespace types {
         : boost::mpl::eval_if<
               rime::is_constant<Type>, convert_constant<Convert, Type>,
               boost::mpl::eval_if<
-                  std::is_integral<Type>, Convert<Type>, mpl::identity<Type>>>
-        {};
+                  std::is_integral<Type>, Convert<Type>, mpl::identity<Type>>> {
+        };
 
     }  // namespace detail
 
     template <class Type> struct make_signed
-    : detail::convert_integral_value<std::make_signed, Type>
-    {};
+    : detail::convert_integral_value<std::make_signed, Type> {};
 
     template <class Type> struct make_unsigned
-    : detail::convert_integral_value<std::make_unsigned, Type>
-    {};
+    : detail::convert_integral_value<std::make_unsigned, Type> {};
 
     template <class Type> struct make_zero
     {
@@ -110,8 +104,7 @@ namespace callable {
     template <template <class> class Convert> struct convert_integral_value
     {
         template <class Type> struct result
-        : rime::types::detail::convert_integral_value<Convert, Type>
-        {};
+        : rime::types::detail::convert_integral_value<Convert, Type> {};
 
         // Constant: default-initialise.
         template <class Type> typename boost::enable_if<
@@ -130,10 +123,8 @@ namespace callable {
         }
     };
 
-    struct make_signed : convert_integral_value<std::make_signed>
-    {};
-    struct make_unsigned : convert_integral_value<std::make_unsigned>
-    {};
+    struct make_signed : convert_integral_value<std::make_signed> {};
+    struct make_unsigned : convert_integral_value<std::make_unsigned> {};
 
     struct make_zero
     {

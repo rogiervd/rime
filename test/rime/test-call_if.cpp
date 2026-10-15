@@ -27,8 +27,7 @@ limitations under the License.
 BOOST_AUTO_TEST_SUITE(test_rime_if)
 
 // Has no call operator.
-struct fail
-{};
+struct fail {};
 
 struct return_as_double
 {
@@ -63,8 +62,7 @@ BOOST_AUTO_TEST_CASE(test_rime_call_if)
 template <class Base> struct merge_float
 {
     template <class Type1, class Type2, class Dummy = void> struct apply
-    : Base::template apply<Type1, Type2>
-    {};
+    : Base::template apply<Type1, Type2> {};
 
     template <class Dummy> struct apply<float, double, Dummy>
     {

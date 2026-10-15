@@ -216,26 +216,22 @@ namespace callable {
         template <typename Constant, typename... Arguments>
         struct any_equal_constant;
         template <typename Constant> struct any_equal_constant<Constant>
-        : mpl::false_
-        {};
+        : mpl::false_ {};
         template <typename Constant, typename Head, typename... Tail>
         struct any_equal_constant<Constant, Head, Tail...>
         : mpl::or_<
               equal_constant<Constant, Head>,
-              any_equal_constant<Constant, Tail...>>
-        {};
+              any_equal_constant<Constant, Tail...>> {};
 
         template <typename Constant, typename... Arguments>
         struct all_equal_constant;
         template <typename Constant> struct all_equal_constant<Constant>
-        : mpl::true_
-        {};
+        : mpl::true_ {};
         template <typename Constant, typename Head, typename... Tail>
         struct all_equal_constant<Constant, Head, Tail...>
         : mpl::and_<
               equal_constant<Constant, Head>,
-              all_equal_constant<Constant, Tail...>>
-        {};
+              all_equal_constant<Constant, Tail...>> {};
     }  // namespace detail
 
     template <typename Type> struct return_
@@ -298,8 +294,8 @@ namespace callable {
                       detail::all_equal_constant<                              \
                           bool_<defaultValue>, Arguments...>,                  \
                       return_<bool_<defaultValue>>,                            \
-                      detail::name##runtime<void, Arguments...>>::type>::type  \
-            {};                                                                \
+                      detail::name##runtime<void, Arguments...>>::type>::      \
+                  type {};                                                     \
                                                                                \
         public:                                                                \
             template <typename... Arguments>                                   \

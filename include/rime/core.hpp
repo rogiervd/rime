@@ -207,22 +207,20 @@ template <bool content> struct bool_ : constant<bool, content>
 typedef bool_<false> false_type;
 typedef bool_<true> true_type;
 
-static const auto false_ = false_type();
-static const auto true_ = true_type();
+static auto const false_ = false_type();
+static auto const true_ = true_type();
 
 /**
 Specialise this for Rime constants that don't derive from constant_base.
 */
 template <class Type> struct is_decayed_rime_constant
-: std::is_base_of<constant_base, Type>
-{};
+: std::is_base_of<constant_base, Type> {};
 
 /**
 True iff Type is a Rime constant.
 */
 template <class Type> struct is_rime_constant
-: is_decayed_rime_constant<typename std::decay<Type>::type>
-{};
+: is_decayed_rime_constant<typename std::decay<Type>::type> {};
 
 namespace is_constant_detail {
 
@@ -234,8 +232,7 @@ namespace is_constant_detail {
     };
 
     template <class Type> struct is_std_integral_constant
-    : std::is_convertible<Type, take_std_integral_constant>
-    {};
+    : std::is_convertible<Type, take_std_integral_constant> {};
 
     struct take_mpl_integral_constant
     {
@@ -246,8 +243,7 @@ namespace is_constant_detail {
     };
 
     template <class Type> struct is_mpl_integral_constant
-    : std::is_convertible<Type, take_mpl_integral_constant>
-    {};
+    : std::is_convertible<Type, take_mpl_integral_constant> {};
 
 }  // namespace is_constant_detail
 
@@ -260,8 +256,7 @@ template <class Type> struct is_constant
 : mpl::or_<
       is_rime_constant<Type>,
       is_constant_detail::is_mpl_integral_constant<Type>,
-      is_constant_detail::is_std_integral_constant<Type>>
-{};
+      is_constant_detail::is_std_integral_constant<Type>> {};
 
 /**
 Convert any constant into a rime::constant<>.
@@ -294,8 +289,8 @@ Return the type of a compile-time constant or normal type.
 Compile-time function.
 */
 template <class Type> struct value
-: mpl::if_<is_constant<Type>, constant_value<Type>, runtime_value<Type>>::type
-{};
+: mpl::if_<is_constant<Type>, constant_value<Type>, runtime_value<Type>>::type {
+};
 
 /**
 Return the value of a compile-time constant of normal type.
@@ -319,24 +314,21 @@ namespace detail {
 
     // Left and Right must be constants
     template <class Left, class Right> struct constant_equals
-    : bool_<(std::decay<Left>::type::value == std::decay<Right>::type::value)>
-    {};
+    : bool_<(std::decay<Left>::type::value == std::decay<Right>::type::value)> {
+    };
 
     template <class Left, class Right> struct constant_same
     : mpl::if_<
           std::is_same<
               typename constant_value<Left>::type,
               typename constant_value<Right>::type>,
-          constant_equals<Left, Right>, false_type>::type
-    {};
+          constant_equals<Left, Right>, false_type>::type {};
 
     template <class Constant> struct constant_false
-    : rime::constant<bool, !bool(Constant::value)>
-    {};
+    : rime::constant<bool, !bool(Constant::value)> {};
 
     template <class Constant> struct constant_true
-    : rime::constant<bool, bool(Constant::value)>
-    {};
+    : rime::constant<bool, bool(Constant::value)> {};
 
 }  // namespace detail
 
@@ -347,8 +339,7 @@ value types are the same, and their values compare equal.
 template <class Left, class Right> struct same_constant
 : as_rime_constant<boost::mpl::and_<
       is_constant<Left>, is_constant<Right>,
-      detail::constant_same<Left, Right>>>::type
-{};
+      detail::constant_same<Left, Right>>>::type {};
 
 /**
 Returns true iff both Left and Right are compile-time constants, and their
@@ -360,8 +351,7 @@ but may yield compiler errors.
 template <class Left, class Right> struct equal_constant
 : as_rime_constant<boost::mpl::and_<
       is_constant<Left>, is_constant<Right>,
-      detail::constant_equals<Left, Right>>>::type
-{};
+      detail::constant_equals<Left, Right>>>::type {};
 
 /** \brief
 Evaluate to \c true iff \a Constant is a compile-time constant and it
@@ -371,8 +361,7 @@ E.g. when applied to \c int_<0>, this returns \c true.
 */
 template <class Constant> struct is_constant_false
 : as_rime_constant<boost::mpl::and_<
-      is_constant<Constant>, detail::constant_false<Constant>>>::type
-{};
+      is_constant<Constant>, detail::constant_false<Constant>>>::type {};
 
 /** \brief
 Evaluate to \c true iff \a Constant is a compile-time constant and it
@@ -382,8 +371,7 @@ E.g. when applied to \c int_<5>, this returns \c true.
 */
 template <class Constant> struct is_constant_true
 : as_rime_constant<boost::mpl::and_<
-      is_constant<Constant>, detail::constant_true<Constant>>>::type
-{};
+      is_constant<Constant>, detail::constant_true<Constant>>>::type {};
 
 namespace merge_policy {
 
@@ -399,15 +387,12 @@ namespace merge_policy {
         template <class Type1, class Type2> struct merge_value_type
         : Base::template apply<
               typename rime::value<Type1>::type,
-              typename rime::value<Type2>::type>
-        {};
+              typename rime::value<Type2>::type> {};
 
         template <class Type> struct has_type_implementation
         {
-            template <class Contained> struct yes : true_type
-            {};
-            struct no : false_type
-            {};
+            template <class Contained> struct yes : true_type {};
+            struct no : false_type {};
 
             template <class TypeAgain>
             static yes<typename TypeAgain::type> check_has_type(
@@ -425,8 +410,7 @@ namespace merge_policy {
         member \c type.
         */
         template <class Type> struct has_type
-        : has_type_implementation<Type>::answer
-        {};
+        : has_type_implementation<Type>::answer {};
 
         /**
         Merge two constants.
@@ -438,8 +422,8 @@ namespace merge_policy {
         template <class Type1, class Type2> struct merge_constant
         {
             typedef typename merge_value_type<Type1, Type2>::type value_type;
-            static const value_type value1 = std::decay<Type1>::type::value;
-            static const value_type value2 = std::decay<Type2>::type::value;
+            static value_type const value1 = std::decay<Type1>::type::value;
+            static value_type const value2 = std::decay<Type2>::type::value;
             typedef typename std::conditional<
                 (value1 == value2), rime::constant<value_type, value1>,
                 value_type>::type type;
@@ -454,8 +438,7 @@ namespace merge_policy {
 
     public:
         template <class Type1, class Type2, class Enable = void> struct apply
-        : merge_value_type<Type1, Type2>
-        {};
+        : merge_value_type<Type1, Type2> {};
 
         // Specialisation only for when both are constants and the value types
         // can be merged.
@@ -465,8 +448,7 @@ namespace merge_policy {
             typename boost::enable_if<mpl::and_<
                 is_constant<Type1>, is_constant<Type2>,
                 has_type<merge_value_type<Type1, Type2>>>>::type>
-        : merge_constant<Type1, Type2>
-        {};
+        : merge_constant<Type1, Type2> {};
     };
 
 }  // namespace merge_policy

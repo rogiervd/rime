@@ -232,7 +232,7 @@ private:
                 boost::mpl::not_<std::is_reference<_>>>>::type
             numbered_candidates;
 
-        static const bool conversion_possible =
+        static bool const conversion_possible =
             (meta::size<numbered_candidates>::value >= 1);
 
         static_assert(
@@ -320,7 +320,7 @@ private:
     {
         typedef typename meta::first<NumberedCandidates>::type interpretation;
 
-        static const std::size_t index =
+        static std::size_t const index =
             mpl::first<interpretation>::type::value;
         typedef typename mpl::second<interpretation>::type type;
         typedef typename ::utility::storage::store<type>::type store_type;
@@ -487,7 +487,7 @@ private:
     // void is not stored and does not need to be destructed.
     template <typename Dummy> struct destruct<void, Dummy>
     {
-        void operator()(void *) const {};
+        void operator()(void *) const {}
     };
 
     void destruct_content()
@@ -520,8 +520,9 @@ private:
 
         ~construct_void_guard()
         {
-            if (on_guard)
+            if (on_guard) {
                 v.construct_void();
+            }
         }
     };
 
@@ -566,7 +567,7 @@ public:
                 typename mpl::second<index_and_type>::type, Actual>::value,
             "Sanity check: should have found Actual");
 
-        static const std::size_t value =
+        static std::size_t const value =
             mpl::first<index_and_type>::type::value;
     };
 
@@ -698,8 +699,7 @@ private:
     struct call_variant_specialisations
     : call_variant_specialisations_impl<
           // Compute a call_variant_containing for each possible actual type.
-          call_variant_containing<Variant, Types, Arguments...>...>
-    {};
+          call_variant_containing<Variant, Types, Arguments...>...> {};
 
     template <typename Variant, typename... Arguments> static
         typename call_variant_specialisations<
@@ -873,8 +873,9 @@ template <typename Actual, typename Variant> inline typename boost::enable_if<
     typename ::utility::storage::get<Actual, Variant &&>::type>::type
     get(Variant && variant)
 {
-    if (!variant.template contains<Actual>())
+    if (!variant.template contains<Actual>()) {
         throw bad_get();
+    }
     return get_unsafe<Actual, Variant>(std::forward<Variant>(variant));
 }
 
@@ -886,8 +887,9 @@ template <
 inline auto get(Variant * variant)
     -> decltype(variant_detail::get<Actual>()(variant))
 {
-    if (!variant->template contains<Actual>())
+    if (!variant->template contains<Actual>()) {
         return 0;
+    }
 
     variant_detail::get<Actual> implementation;
     return implementation(variant);
@@ -951,8 +953,7 @@ namespace variant_detail {
     };
 
     template <typename Types> struct make_variant
-    : make_variant<typename meta::as_vector<Types>::type>
-    {};
+    : make_variant<typename meta::as_vector<Types>::type> {};
 
     template <typename... Types> struct make_variant<meta::vector<Types...>>
     {
@@ -967,8 +968,7 @@ namespace merge_policy {
     Merge policy that merges constants and types that are the same, but nothing
     else.
     */
-    struct conservative : constant<same<>>
-    {};
+    struct conservative : constant<same<>> {};
 
     /**
     Merge policy, a metafunction, that takes any number of types and merges
@@ -980,12 +980,10 @@ namespace merge_policy {
     template <class MergeTwo> struct to_variant
     {
         template <class... Types> struct apply
-        : make_variant_over<meta::vector<Types...>, MergeTwo>
-        {};
+        : make_variant_over<meta::vector<Types...>, MergeTwo> {};
     };
 
-    struct default_policy : to_variant<conservative>
-    {};
+    struct default_policy : to_variant<conservative> {};
 
 }  // namespace merge_policy
 
