@@ -62,7 +62,7 @@ namespace rime { namespace detail {
 
         typedef Result (*function_pointer)(Arguments &&...);
 
-        static const std::size_t choice_num =
+        static std::size_t const choice_num =
             meta::size<meta::vector<Choices...>>::value;
         function_pointer functions[choice_num];
 
@@ -70,7 +70,7 @@ namespace rime { namespace detail {
         template <class Choice> function_pointer get_function() const
         {
             return &call_object<Choice, Result, Arguments...>;
-        };
+        }
 
         template <class FirstPointer, class... OtherPointers>
         static void set_pointers(
@@ -97,8 +97,7 @@ namespace rime { namespace detail {
     Should this be replaced by a big telescoping switch statement?
     */
     template <typename ResultType, class Choices> struct switch_
-    : switch_<ResultType, typename meta::as_vector<Choices>::type>
-    {};
+    : switch_<ResultType, typename meta::as_vector<Choices>::type> {};
 
     template <typename ResultType, typename... Choices>
     struct switch_<ResultType, meta::vector<Choices...>>

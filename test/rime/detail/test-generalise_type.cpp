@@ -58,16 +58,16 @@ BOOST_AUTO_TEST_CASE(test_rime_detail_generalise_type)
                       meta::vector<int>>) );
 
     BOOST_MPL_ASSERT((meta::equal<
-                      rime::detail::generalise_type<const int, degenerate>,
-                      meta::vector<const int, int>>) );
+                      rime::detail::generalise_type<int const, degenerate>,
+                      meta::vector<int const, int>>) );
 
     BOOST_MPL_ASSERT((meta::equal<
-                      rime::detail::generalise_type<const int &, degenerate>,
-                      meta::vector<const int &, const int, int>>) );
+                      rime::detail::generalise_type<int const &, degenerate>,
+                      meta::vector<int const &, int const, int>>) );
 
     BOOST_MPL_ASSERT((meta::equal<
                       rime::detail::generalise_type<int_<4>, degenerate>,
-                      meta::vector<int_<4>, const int, int>>) );
+                      meta::vector<int_<4>, int const, int>>) );
 }
 
 BOOST_AUTO_TEST_SUITE_END()

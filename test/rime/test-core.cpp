@@ -27,10 +27,8 @@ limitations under the License.
 
 #include "utility/is_assignable.hpp"
 
-struct base
-{};
-struct derived : base
-{};
+struct base {};
+struct derived : base {};
 
 BOOST_AUTO_TEST_SUITE(test_rime)
 
@@ -356,19 +354,22 @@ template <class Unsigned>
 Unsigned add_check_overflow_impl(Unsigned i, Unsigned j, rime::false_type)
 {
     Unsigned result = i + j;
-    if (result < i)
+    if (result < i) {
         throw std::overflow_error("Overflow in addition");
-    else
+    } else {
         return result;
+    }
 }
 
 template <class Signed>
 Signed add_check_overflow_impl(Signed i, Signed j, rime::true_type)
 {
-    if ((0 < j) && (std::numeric_limits<Signed>::max() - j < i))
+    if ((0 < j) && (std::numeric_limits<Signed>::max() - j < i)) {
         throw std::overflow_error("Overflow in signed addition");
-    if ((j < 0) && (i < std::numeric_limits<Signed>::min() - j))
+    }
+    if ((j < 0) && (i < std::numeric_limits<Signed>::min() - j)) {
         throw std::overflow_error("Overflow in signed addition");
+    }
     return i + j;
 }
 
@@ -540,8 +541,7 @@ BOOST_AUTO_TEST_CASE(test_rime_is_constant_true)
 
 struct merge_same
 {
-    template <class Type1, class Type2> struct apply
-    {};
+    template <class Type1, class Type2> struct apply {};
 
     template <class Type> struct apply<Type, Type>
     {

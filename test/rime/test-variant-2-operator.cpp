@@ -268,13 +268,13 @@ BOOST_AUTO_TEST_CASE(test_rime_make_variant_over)
         (std::is_same<make_variant_over<meta::vector<int, int>>::type, int>) );
 
     BOOST_MPL_ASSERT((std::is_same<
-                      make_variant_over<meta::vector<const int, int>>::type,
-                      variant<const int, int>>) );
+                      make_variant_over<meta::vector<int const, int>>::type,
+                      variant<int const, int>>) );
 
     BOOST_MPL_ASSERT(
         (std::is_same<
-            make_variant_over<meta::vector<double, int, const int, int>>::type,
-            variant<double, int, const int>>) );
+            make_variant_over<meta::vector<double, int, int const, int>>::type,
+            variant<double, int, int const>>) );
 
     BOOST_MPL_ASSERT(
         (std::is_same<

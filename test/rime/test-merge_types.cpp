@@ -25,10 +25,8 @@ limitations under the License.
 
 BOOST_AUTO_TEST_SUITE(test_rime_detail_merge_types)
 
-struct base
-{};
-struct derived : base
-{};
+struct base {};
+struct derived : base {};
 
 // Simple constant class to check merging
 template <class Type, Type N> struct constant
@@ -39,23 +37,19 @@ template <class Type, Type N> struct constant
 template <class Base> struct merge_constant
 {
     template <class Type1, class Type2> struct apply
-    : Base::template apply<Type1, Type2>
-    {};
+    : Base::template apply<Type1, Type2> {};
 
     template <class Type1, Type1 N1, class Type2>
     struct apply<constant<Type1, N1>, Type2>
-    : Base::template apply<Type1, Type2>
-    {};
+    : Base::template apply<Type1, Type2> {};
 
     template <class Type1, class Type2, Type2 N2>
     struct apply<Type1, constant<Type2, N2>>
-    : Base::template apply<Type1, Type2>
-    {};
+    : Base::template apply<Type1, Type2> {};
 
     template <class Type1, Type1 N1, class Type2, Type2 N2>
     struct apply<constant<Type1, N1>, constant<Type2, N2>>
-    : Base::template apply<Type1, Type2>
-    {};
+    : Base::template apply<Type1, Type2> {};
 };
 
 BOOST_AUTO_TEST_CASE(test_merge_types_merge_policy)

@@ -43,7 +43,7 @@ This is a function object that can be called with anything, and it will never
 perform any action, and will always return void.
 This can be useful, for example, as argument to rime::call_if.
 */
-static const auto nothing = callable::nothing();
+static auto const nothing = callable::nothing();
 
 }  // namespace rime
 

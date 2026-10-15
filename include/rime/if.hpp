@@ -83,10 +83,11 @@ namespace callable {
                 Condition && condition, ResultIfTrue && if_true,
                 ResultIfFalse && if_false) const
         {
-            if (condition)
+            if (condition) {
                 return std::forward<ResultIfTrue>(if_true);
-            else
+            } else {
                 return std::forward<ResultIfFalse>(if_false);
+            }
         }
     };
 

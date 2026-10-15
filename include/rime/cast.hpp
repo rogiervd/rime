@@ -39,12 +39,10 @@ namespace types {
     template <class Target, class Type> struct cast
     : boost::mpl::eval_if<
           rime::is_constant<Type>, detail::cast_constant<Target, Type>,
-          mpl::identity<Target>>
-    {};
+          mpl::identity<Target>> {};
 
     template <class Target, class Type> struct cast_value
-    : cast<typename rime::value<Target>::type, Type>
-    {};
+    : cast<typename rime::value<Target>::type, Type> {};
 
 }  // namespace types
 
@@ -69,8 +67,7 @@ namespace callable {
     };
 
     template <class Target> struct cast_value
-    : cast<typename rime::value<Target>::type>
-    {};
+    : cast<typename rime::value<Target>::type> {};
 
 }  // namespace callable
 

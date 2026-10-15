@@ -93,8 +93,7 @@ namespace callable {
         struct merged_result_type
         : MergePolicy::template apply<
               typename std::invoke_result<Function1, Arguments...>::type,
-              typename std::invoke_result<Function2, Arguments...>::type>
-        {};
+              typename std::invoke_result<Function2, Arguments...>::type> {};
 
         // Run-time condition.
         template <
@@ -106,12 +105,13 @@ namespace callable {
                 Condition && condition, IfTrue && if_true, IfFalse && if_false,
                 Arguments &&... arguments) const
         {
-            if (condition)
+            if (condition) {
                 return std::forward<IfTrue>(if_true)(
                     std::forward<Arguments>(arguments)...);
-            else
+            } else {
                 return std::forward<IfFalse>(if_false)(
                     std::forward<Arguments>(arguments)...);
+            }
         }
     };
 }  // namespace callable

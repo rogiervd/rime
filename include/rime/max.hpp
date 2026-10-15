@@ -39,7 +39,7 @@ namespace callable {
 /**
 Return the maximum of two values, as a compile-time constant if possible.
 */
-static const auto max = callable::max<>();
+static auto const max = callable::max<>();
 
 /**
 Return the maximum of two values, as a compile-time constant if possible.

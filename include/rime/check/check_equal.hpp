@@ -36,13 +36,11 @@ template <class Left, class Right> struct exactly_equal_implementation
               && std::is_same<
                   typename rime::value<Left>::type,
                   typename rime::value<Right>::type>::value
-              && rime::equal_constant<Left, Right>::value)>
-{};
+              && rime::equal_constant<Left, Right>::value)> {};
 
 template <class Left, class Right> struct exactly_equal
 : exactly_equal_implementation<
-      typename std::decay<Left>::type, typename std::decay<Right>::type>
-{};
+      typename std::decay<Left>::type, typename std::decay<Right>::type> {};
 
 template <class Left, class Right> void static_assert_exactly_equal()
 {

@@ -55,27 +55,23 @@ namespace merge_policy {
     struct unimplemented
     {
         // Does not have "type" member type.
-        template <class Type1, class Type2> struct apply
-        {};
+        template <class Type1, class Type2> struct apply {};
     };
 
     BOOST_MPL_HAS_XXX_TRAIT_DEF(type)
 
     template <class MetafunctionClass, class Type1, class Type2>
     struct is_implemented
-    : has_type<typename MetafunctionClass::template apply<Type1, Type2>>
-    {};
+    : has_type<typename MetafunctionClass::template apply<Type1, Type2>> {};
 
     template <class MetafunctionClass, class Type1, class Type2>
     struct is_unimplemented
-    : boost::mpl::not_<is_implemented<MetafunctionClass, Type1, Type2>>
-    {};
+    : boost::mpl::not_<is_implemented<MetafunctionClass, Type1, Type2>> {};
 
     template <class Base = unimplemented> struct same
     {
         template <class Type1, class Type2> struct apply
-        : Base::template apply<Type1, Type2>
-        {};
+        : Base::template apply<Type1, Type2> {};
 
         template <class Type> struct apply<Type, Type>
         {
@@ -119,8 +115,7 @@ namespace merge_policy {
     struct merge_transform
     : boost::mpl::if_<
           is_implemented<MergeTwo, Type1, Type2>,
-          lazy<MergeTwo, Type1, Type2, Transforms...>, unimplemented>::type
-    {};
+          lazy<MergeTwo, Type1, Type2, Transforms...>, unimplemented>::type {};
 
     /**
     Merge policy that forwards two types to the base policy without
@@ -131,21 +126,17 @@ namespace merge_policy {
     template <class Base = same<>> struct const_
     {
         template <class Type1, class Type2> struct apply
-        : Base::template apply<Type1, Type2>
-        {};
+        : Base::template apply<Type1, Type2> {};
 
         template <class Type1, class Type2> struct apply<Type1 const, Type2>
-        : merge_transform<Base, Type1, Type2, std::add_const>
-        {};
+        : merge_transform<Base, Type1, Type2, std::add_const> {};
 
         template <class Type1, class Type2> struct apply<Type1, Type2 const>
-        : merge_transform<Base, Type1, Type2, std::add_const>
-        {};
+        : merge_transform<Base, Type1, Type2, std::add_const> {};
 
         template <class Type1, class Type2>
         struct apply<Type1 const, Type2 const>
-        : merge_transform<Base, Type1, Type2, std::add_const>
-        {};
+        : merge_transform<Base, Type1, Type2, std::add_const> {};
     };
 
     /**
@@ -163,8 +154,7 @@ namespace merge_policy {
               typename Base::template apply<Type1, Type2>,
               typename Base::template apply<
                   typename std::remove_reference<Type1>::type,
-                  typename std::remove_reference<Type2>::type>>::type
-        {};
+                  typename std::remove_reference<Type2>::type>>::type {};
     };
 
     /**
@@ -182,14 +172,13 @@ namespace merge_policy {
               typename Base::template apply<Type1, Type2>,
               typename Base::template apply<
                   typename std::decay<Type1>::type,
-                  typename std::decay<Type2>::type>>::type
-        {};
+                  typename std::decay<Type2>::type>>::type {};
     };
 
     struct base_class_implementation
     {
-        template <class Type1, class Type2, class Enable1 = void> struct apply
-        {};
+        template <class Type1, class Type2, class Enable1 = void> struct apply {
+        };
 
         template <class Type1, class Type2> struct apply<
             Type1, Type2,
@@ -212,8 +201,7 @@ namespace merge_policy {
     If the types are the same, then that type is returned.
     This is unimplemented for classes that are derived from a common base.
     */
-    struct base_class : same<base_class_implementation>
-    {};
+    struct base_class : same<base_class_implementation> {};
 
     /**
     Merge policy that collapses types, but does not convert anything.
@@ -224,104 +212,84 @@ namespace merge_policy {
     struct collapse
     {
         template <class Type1, class Type2, class Enable = void> struct apply
-        : const_<same<>>::template apply<Type1, Type2>
-        {};
+        : const_<same<>>::template apply<Type1, Type2> {};
 
         // Pointers.
         template <class Type1, class Type2> struct apply<Type1 *, Type2 *>
-        : merge_transform<const_<base_class>, Type1, Type2, std::add_pointer>
-        {};
+        : merge_transform<const_<base_class>, Type1, Type2, std::add_pointer> {
+        };
 
         // One non-reference: convert to a non-reference.
         template <class Type1, class Type2> struct apply<Type1, Type2 &>
-        : same<>::template apply<Type1, Type2>
-        {};
+        : same<>::template apply<Type1, Type2> {};
         template <class Type1, class Type2> struct apply<Type1, Type2 const &>
-        : same<>::template apply<Type1, Type2>
-        {};
+        : same<>::template apply<Type1, Type2> {};
         template <class Type1, class Type2> struct apply<Type1, Type2 &&>
-        : same<>::template apply<Type1, Type2>
-        {};
+        : same<>::template apply<Type1, Type2> {};
 
         template <class Type1, class Type2> struct apply<Type1 const, Type2 &>
-        : merge_transform<same<>, Type1, Type2, std::add_const>
-        {};
+        : merge_transform<same<>, Type1, Type2, std::add_const> {};
         template <class Type1, class Type2>
         struct apply<Type1 const, Type2 const &>
-        : merge_transform<same<>, Type1, Type2, std::add_const>
-        {};
+        : merge_transform<same<>, Type1, Type2, std::add_const> {};
         template <class Type1, class Type2> struct apply<Type1 const, Type2 &&>
-        : merge_transform<same<>, Type1, Type2, std::add_const>
-        {};
+        : merge_transform<same<>, Type1, Type2, std::add_const> {};
 
         template <class Type1, class Type2> struct apply<Type1 &, Type2>
-        : same<>::template apply<Type1, Type2>
-        {};
+        : same<>::template apply<Type1, Type2> {};
         template <class Type1, class Type2> struct apply<Type1 const &, Type2>
-        : same<>::template apply<Type1, Type2>
-        {};
+        : same<>::template apply<Type1, Type2> {};
         template <class Type1, class Type2> struct apply<Type1 &&, Type2>
-        : same<>::template apply<Type1, Type2>
-        {};
+        : same<>::template apply<Type1, Type2> {};
 
         template <class Type1, class Type2> struct apply<Type1 &, Type2 const>
-        : merge_transform<same<>, Type1, Type2, std::add_const>
-        {};
+        : merge_transform<same<>, Type1, Type2, std::add_const> {};
         template <class Type1, class Type2>
         struct apply<Type1 const &, Type2 const>
-        : merge_transform<same<>, Type1, Type2, std::add_const>
-        {};
+        : merge_transform<same<>, Type1, Type2, std::add_const> {};
         template <class Type1, class Type2> struct apply<Type1 &&, Type2 const>
-        : merge_transform<same<>, Type1, Type2, std::add_const>
-        {};
+        : merge_transform<same<>, Type1, Type2, std::add_const> {};
 
         // All combinations of references: convert to const &
         template <class Type1, class Type2> struct apply<Type1 &, Type2 &>
-        : merge_transform<base_class, Type1, Type2, std::add_lvalue_reference>
-        {};
+        : merge_transform<base_class, Type1, Type2, std::add_lvalue_reference> {
+        };
         template <class Type1, class Type2> struct apply<Type1 &, Type2 const &>
         : merge_transform<
               base_class, Type1, Type2, std::add_const,
-              std::add_lvalue_reference>
-        {};
+              std::add_lvalue_reference> {};
         template <class Type1, class Type2> struct apply<Type1 &, Type2 &&>
         : merge_transform<
               base_class, Type1, Type2, std::add_const,
-              std::add_lvalue_reference>
-        {};
+              std::add_lvalue_reference> {};
 
         template <class Type1, class Type2> struct apply<Type1 const &, Type2 &>
         : merge_transform<
               base_class, Type1, Type2, std::add_const,
-              std::add_lvalue_reference>
-        {};
+              std::add_lvalue_reference> {};
         template <class Type1, class Type2>
         struct apply<Type1 const &, Type2 const &>
         : merge_transform<
               base_class, Type1, Type2, std::add_const,
-              std::add_lvalue_reference>
-        {};
+              std::add_lvalue_reference> {};
         template <class Type1, class Type2>
         struct apply<Type1 const &, Type2 &&>
         : merge_transform<
               base_class, Type1, Type2, std::add_const,
-              std::add_lvalue_reference>
-        {};
+              std::add_lvalue_reference> {};
 
         template <class Type1, class Type2> struct apply<Type1 &&, Type2 &>
         : merge_transform<
               base_class, Type1, Type2, std::add_const,
-              std::add_lvalue_reference>
-        {};
+              std::add_lvalue_reference> {};
         template <class Type1, class Type2>
         struct apply<Type1 &&, Type2 const &>
         : merge_transform<
               base_class, Type1, Type2, std::add_const,
-              std::add_lvalue_reference>
-        {};
+              std::add_lvalue_reference> {};
         template <class Type1, class Type2> struct apply<Type1 &&, Type2 &&>
-        : merge_transform<base_class, Type1, Type2, std::add_rvalue_reference>
-        {};
+        : merge_transform<base_class, Type1, Type2, std::add_rvalue_reference> {
+        };
     };
 
     /**
@@ -330,8 +298,7 @@ namespace merge_policy {
     struct common_type
     {
         template <class Type1, class Type2> struct apply
-        : std::common_type<Type1, Type2>
-        {};
+        : std::common_type<Type1, Type2> {};
     };
 
 }  // namespace merge_policy
@@ -372,8 +339,7 @@ namespace merge_detail {
           // New =
           typename MergeTwo::template apply<New, First>::type,
           // Current =
-          Rest>
-    {};
+          Rest> {};
 
     template <typename MergeTwo, typename New, typename Current, typename Else>
     struct merge_first_else;
@@ -384,8 +350,7 @@ namespace merge_detail {
     : boost::mpl::eval_if<
           merge_policy::is_implemented<MergeTwo, New, First>,
           do_merge_and_recurse<MergeTwo, New, First, meta::vector<Rest...>>,
-          Else>
-    {};
+          Else> {};
 
     template <typename MergeTwo, typename New, typename Current>
     struct insert_skip_first;
@@ -408,8 +373,7 @@ namespace merge_detail {
     : merge_first_else<
           MergeTwo, New, meta::vector<First, Rest...>,
           // Else =
-          insert_skip_first<MergeTwo, New, meta::vector<First, Rest...>>>
-    {};
+          insert_skip_first<MergeTwo, New, meta::vector<First, Rest...>>> {};
 
     template <typename MergeTwo, typename New, typename Types> struct insert
     {
@@ -429,8 +393,7 @@ template <typename MergeTwo, typename Types> struct merge_types
 : meta::fold<
       meta::back,
       merge_detail::insert<MergeTwo, boost::mpl::_2, boost::mpl::_1>,
-      meta::vector<>, Types>
-{};
+      meta::vector<>, Types> {};
 
 }  // namespace rime
 

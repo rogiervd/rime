@@ -61,12 +61,11 @@ namespace operation {
 
         template <typename Type, typename Degenerate>
         struct apply<::rime::detail::generalise_type<Type, Degenerate>>
-        : mpl::false_
-        {};
+        : mpl::false_ {};
 
         template <typename Void>
-        struct apply<::rime::detail::empty_generalise_type, Void> : mpl::true_
-        {};
+        struct apply<::rime::detail::empty_generalise_type, Void> : mpl::true_ {
+        };
     };
 
     template <> struct first<rime::detail::generalise_type_tag, meta::front>

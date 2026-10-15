@@ -37,8 +37,7 @@ limitations under the License.
 #include <array>
 #include <iostream>
 
-struct convertee
-{};
+struct convertee {};
 struct converted
 {
     converted() {}
@@ -274,12 +273,12 @@ BOOST_AUTO_TEST_CASE(test_rime_variant)
         BOOST_CHECK_EQUAL(rime::get_unsafe<int>(variant(6)), 6);
     }
     {
-        rime::variant<float, const int> v(6);
+        rime::variant<float, int const> v(6);
         BOOST_CHECK_EQUAL(v.which(), 1u);
-        BOOST_CHECK(v.contains<const int>());
+        BOOST_CHECK(v.contains<int const>());
     }
     {
-        rime::variant<float, const int &> v(6);
+        rime::variant<float, int const &> v(6);
         // Can't be converted into const int &
         BOOST_CHECK_EQUAL(v.which(), 0u);
         BOOST_CHECK(v.contains<float>());
@@ -306,7 +305,7 @@ BOOST_AUTO_TEST_CASE(test_rime_variant)
         BOOST_CHECK_EQUAL(v.which(), 1u);
     }
     {
-        rime::variant<float, const int &> v(get_int_const());
+        rime::variant<float, int const &> v(get_int_const());
         BOOST_CHECK_EQUAL(v.which(), 0u);
     }
 
@@ -332,17 +331,17 @@ BOOST_AUTO_TEST_CASE(test_rime_variant)
         BOOST_CHECK_EQUAL(rime::get_unsafe<int &>(v), 4);
     }
     {
-        rime::variant<float, int, const int> v(i);
+        rime::variant<float, int, int const> v(i);
         BOOST_CHECK_EQUAL(v.which(), 1u);
         BOOST_CHECK(v.contains<int>());
     }
     {
-        rime::variant<float, const int> v(i);
+        rime::variant<float, int const> v(i);
         BOOST_CHECK_EQUAL(v.which(), 1u);
-        BOOST_CHECK(v.contains<const int>());
+        BOOST_CHECK(v.contains<int const>());
     }
     {
-        rime::variant<float, const int &> v(i);
+        rime::variant<float, int const &> v(i);
         // Can't be converted into const int &
         BOOST_CHECK_EQUAL(v.which(), 0u);
         BOOST_CHECK(v.contains<float>());
@@ -363,9 +362,9 @@ BOOST_AUTO_TEST_CASE(test_rime_variant)
         BOOST_CHECK_THROW(rime::get<int &>(v), rime::bad_get);
     }
     {
-        rime::variant<float, int, const int> v(ic);
+        rime::variant<float, int, int const> v(ic);
         BOOST_CHECK_EQUAL(v.which(), 2u);
-        BOOST_CHECK(v.contains<const int>());
+        BOOST_CHECK(v.contains<int const>());
         BOOST_CHECK(!v.contains<int>());
     }
     {

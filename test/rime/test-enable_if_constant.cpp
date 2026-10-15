@@ -23,8 +23,7 @@ limitations under the License.
 
 #include <rime/core.hpp>
 
-struct runtime_type
-{};
+struct runtime_type {};
 
 BOOST_AUTO_TEST_SUITE(test_rime_enable_if_constant)
 
