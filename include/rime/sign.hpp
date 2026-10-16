@@ -118,14 +118,14 @@ namespace callable {
     {
         template <class Type>
         typename boost::disable_if<rime::is_constant<Type>, Type>::type
-            operator()(Type const & n) const
+            operator()(Type const &) const
         {
             return Type();
         }
 
         template <class Type> typename boost::lazy_enable_if<
             rime::is_constant<Type>, rime::types::make_zero<Type>>::type
-            operator()(Type const & n) const
+            operator()(Type const &) const
         {
             return typename rime::types::make_zero<Type>::type();
         }

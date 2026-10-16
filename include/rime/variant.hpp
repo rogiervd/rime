@@ -285,6 +285,14 @@ private:
                 type>::assert_unambiguous::dummy...>::type dummy;
     };
 
+#if defined(_MSC_VER)
+#    pragma warning(push)
+// The variant converts the argument to the type it chooses, e.g. from int to
+// float, on purpose. MSVC warns about such conversions (C4244), so switch the
+// warning off.
+#    pragma warning(disable : 4244)
+#endif
+
     /**
     Construct from another type.
     The other type should not be a variant, but instead a type extracted from
@@ -326,6 +334,10 @@ private:
         new (memory()) store_type(std::forward<Actual>(actual));
     }
 
+#if defined(_MSC_VER)
+#    pragma warning(pop)
+#endif
+
     /**
     Construct from a type when this is impossible.
     Since this is impossible, this is not implemented.
@@ -365,11 +377,18 @@ public:
     template <typename Actual> variant(
         Actual && actual,
         // Make sure that the copy constructor is picked up.
-        typename boost::disable_if<is_variant<Actual>>::type * = 0,
+        typename boost::disable_if<is_variant<Actual>>::type * = 0)
+    {
         // Trigger assertion here already.
         // This keeps the backtrace in the compiler error shortish.
-        int = typename conversion_for<Actual>::assert_unambiguous::dummy())
-    {
+        // This is not done in a default argument, because MSVC instantiates
+        // that while checking whether the implicit copy assignment operator
+        // is viable, for example for "variant = 5", even though the templated
+        // operator= is the better match.
+        typedef typename conversion_for<Actual>::assert_unambiguous::dummy
+            check_conversion;
+        static_assert(
+            std::is_same<check_conversion, int>::value, "Sanity check.");
         construct(std::forward<Actual>(actual));
     }
 
@@ -820,21 +839,23 @@ namespace variant_detail {
     // Specialise for void.
     template <> struct get<void>
     {
-        template <class Variant> void operator()(Variant && variant) const
+        template <class Variant>
+        void operator()([[maybe_unused]] Variant && variant) const
         {
             assert(variant.template contains<void>());
         }
 
         // It is not clear that it makes sense to return a void * with a
         // meaningless value, but it makes it easier to write generic code.
-        template <class Variant> void * operator()(Variant * variant) const
+        template <class Variant>
+        void * operator()([[maybe_unused]] Variant * variant) const
         {
             assert(variant->template contains<void>());
             return nullptr;
         }
 
         template <class Variant>
-        void const * operator()(Variant const * variant) const
+        void const * operator()([[maybe_unused]] Variant const * variant) const
         {
             assert(variant->template contains<void>());
             return nullptr;

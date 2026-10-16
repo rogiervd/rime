@@ -29,7 +29,7 @@ namespace detail {
         Condition,
         typename boost::disable_if<rime::is_constant<Condition>>::type>
     {
-        void operator()(Condition const & condition) const
+        void operator()([[maybe_unused]] Condition const & condition) const
         {
             assert(condition);
         }

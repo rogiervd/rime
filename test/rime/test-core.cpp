@@ -243,9 +243,9 @@ BOOST_AUTO_TEST_CASE(test_rime_constant_convert)
 // predicate.
 
 int return_int(int i, rime::constant<bool, true>) { return i; }
-int return_int(int i, rime::constant<bool, false>) { return -1; }
+int return_int(int, rime::constant<bool, false>) { return -1; }
 int return_int_2(int i, rime::true_type) { return i; }
-int return_int_2(int i, rime::false_type) { return -1; }
+int return_int_2(int, rime::false_type) { return -1; }
 
 BOOST_AUTO_TEST_CASE(test_rime_constant_convert_bool)
 {
@@ -275,9 +275,9 @@ BOOST_AUTO_TEST_CASE(test_rime_constant_convert_bool)
 }
 
 int return_int_3(int i, rime::constant<int, -7>) { return i; }
-int return_int_3(int i, rime::constant<int, 81>) { return -1; }
+int return_int_3(int, rime::constant<int, 81>) { return -1; }
 int return_int_4(int i, rime::int_<-7>) { return i; }
-int return_int_4(int i, rime::int_<81>) { return -1; }
+int return_int_4(int, rime::int_<81>) { return -1; }
 
 BOOST_AUTO_TEST_CASE(test_rime_constant_convert_int)
 {
@@ -303,9 +303,9 @@ BOOST_AUTO_TEST_CASE(test_rime_constant_convert_int)
 }
 
 int return_int_5(int i, rime::constant<std::size_t, 43>) { return i; }
-int return_int_5(int i, rime::constant<std::size_t, 83>) { return -1; }
+int return_int_5(int, rime::constant<std::size_t, 83>) { return -1; }
 int return_int_6(int i, rime::size_t<43>) { return i; }
-int return_int_6(int i, rime::size_t<83>) { return -1; }
+int return_int_6(int, rime::size_t<83>) { return -1; }
 
 BOOST_AUTO_TEST_CASE(test_rime_constant_convert_size_t)
 {
@@ -380,27 +380,29 @@ BOOST_AUTO_TEST_CASE(test_rime_constant_convert_example)
     BOOST_CHECK_THROW(
         add_check_overflow(uint8_t(0xFF), uint8_t(0xFF)), std::exception);
 
-    // Unsigned.
+    // Signed.
+    // Values from 0x80 upwards do not fit in an int8_t, so write them as the
+    // negative values they represent (two's complement).
     BOOST_CHECK_EQUAL(add_check_overflow(int8_t(3), int8_t(3)), int8_t(6));
     BOOST_CHECK_EQUAL(
         add_check_overflow(int8_t(0x7F), int8_t(0x00)), int8_t(0x7F));
     BOOST_CHECK_EQUAL(
         add_check_overflow(int8_t(0x3F), int8_t(0x40)), int8_t(0x7F));
     BOOST_CHECK_EQUAL(
-        add_check_overflow(int8_t(0xA0), int8_t(0xE0)), int8_t(0x80));
+        add_check_overflow(int8_t(-0x60), int8_t(-0x20)), int8_t(-0x80));
     BOOST_CHECK_EQUAL(
-        add_check_overflow(int8_t(0x80), int8_t(0x00)), int8_t(0x80));
+        add_check_overflow(int8_t(-0x80), int8_t(0x00)), int8_t(-0x80));
     BOOST_CHECK_EQUAL(
-        add_check_overflow(int8_t(0x80), int8_t(0x05)), int8_t(0x85));
+        add_check_overflow(int8_t(-0x80), int8_t(0x05)), int8_t(-0x7B));
 
     BOOST_CHECK_THROW(
         add_check_overflow(int8_t(0x7F), int8_t(1)), std::exception);
     BOOST_CHECK_THROW(
-        add_check_overflow(int8_t(0x80), int8_t(-1)), std::exception);
+        add_check_overflow(int8_t(-0x80), int8_t(-1)), std::exception);
     BOOST_CHECK_THROW(
         add_check_overflow(int8_t(0x7F), int8_t(0x7F)), std::exception);
     BOOST_CHECK_THROW(
-        add_check_overflow(int8_t(0x80), int8_t(0x80)), std::exception);
+        add_check_overflow(int8_t(-0x80), int8_t(-0x80)), std::exception);
 }
 
 BOOST_AUTO_TEST_CASE(test_rime_core_constant_assign)

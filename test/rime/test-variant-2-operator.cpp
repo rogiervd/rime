@@ -17,8 +17,20 @@
 // However, all we require here is for the behaviour to be the same between
 // the variant and non-variant versions.
 // (This includes warnings, but that is hard to test for.)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wsign-compare"
+// MSVC does not know these pragmas (and warns about them).
+#if defined(__GNUC__) || defined(__clang__)
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wsign-compare"
+#endif
+
+// The same goes for MSVC's warnings about signed/unsigned comparisons (C4018,
+// C4389), about narrowing in assignments like "short += int" (C4244), and
+// about negating a variant that contains an unsigned value (C4146).
+// These are disabled before the header is included, because MSVC uses the
+// warning state where the templates are defined.
+#if defined(_MSC_VER)
+#    pragma warning(disable : 4018 4146 4244 4389)
+#endif
 
 #include "rime/variant.hpp"
 
@@ -354,7 +366,9 @@ BOOST_AUTO_TEST_CASE(test_variant_operator_unary)
         check_contains(vi, i);
         check_contains(vl, l);
 
-        check_same_type_equal(-vu, -u);
+        // -u would be the same, but MSVC warns about applying unary minus to
+        // an unsigned value.
+        check_same_type_equal(-vu, 0u - u);
         check_same_type_equal(-vi, -i);
         check_same_type_equal(-vl, -l);
 

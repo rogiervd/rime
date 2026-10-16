@@ -17,8 +17,11 @@
 // However, all we require here is for the behaviour to be the same between
 // the variant and non-variant versions.
 // (This includes warnings, but that is hard to test for.)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wsign-compare"
+// MSVC does not know these pragmas (and warns about them).
+#if defined(__GNUC__) || defined(__clang__)
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wsign-compare"
+#endif
 
 #include "rime/variant.hpp"
 
@@ -367,7 +370,7 @@ BOOST_AUTO_TEST_CASE(test_rime_variant)
     }
 
     // float
-    float f = 3.8;
+    float f = 3.8f;
     {
         variant v(4.5f);
         BOOST_CHECK_EQUAL(v.which(), 1u);
@@ -408,10 +411,10 @@ BOOST_AUTO_TEST_CASE(test_rime_variant)
         BOOST_CHECK(v.contains<std::string>());
     }
 
-    char c[3] = {'a', 'c', 'q'};
+    char ca[3] = {'a', 'c', 'q'};
     // char *
     {
-        char * p = &c[0];
+        char * p = &ca[0];
         variant v(p);
         BOOST_CHECK_EQUAL(v.which(), 7u);
         BOOST_CHECK(v.contains<char *>());
@@ -422,7 +425,7 @@ BOOST_AUTO_TEST_CASE(test_rime_variant)
 
     // void *
     {
-        void * p = &c[1];
+        void * p = &ca[1];
         variant v(p);
         BOOST_CHECK_EQUAL(v.which(), 6u);
         BOOST_CHECK(v.contains<void *>());
