@@ -411,10 +411,10 @@ BOOST_AUTO_TEST_CASE(test_rime_variant)
         BOOST_CHECK(v.contains<std::string>());
     }
 
-    char c[3] = {'a', 'c', 'q'};
+    char ca[3] = {'a', 'c', 'q'};
     // char *
     {
-        char * p = &c[0];
+        char * p = &ca[0];
         variant v(p);
         BOOST_CHECK_EQUAL(v.which(), 7u);
         BOOST_CHECK(v.contains<char *>());
@@ -425,7 +425,7 @@ BOOST_AUTO_TEST_CASE(test_rime_variant)
 
     // void *
     {
-        void * p = &c[1];
+        void * p = &ca[1];
         variant v(p);
         BOOST_CHECK_EQUAL(v.which(), 6u);
         BOOST_CHECK(v.contains<void *>());
