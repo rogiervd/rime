@@ -243,9 +243,9 @@ BOOST_AUTO_TEST_CASE(test_rime_constant_convert)
 // predicate.
 
 int return_int(int i, rime::constant<bool, true>) { return i; }
-int return_int(int i, rime::constant<bool, false>) { return -1; }
+int return_int(int, rime::constant<bool, false>) { return -1; }
 int return_int_2(int i, rime::true_type) { return i; }
-int return_int_2(int i, rime::false_type) { return -1; }
+int return_int_2(int, rime::false_type) { return -1; }
 
 BOOST_AUTO_TEST_CASE(test_rime_constant_convert_bool)
 {
@@ -275,9 +275,9 @@ BOOST_AUTO_TEST_CASE(test_rime_constant_convert_bool)
 }
 
 int return_int_3(int i, rime::constant<int, -7>) { return i; }
-int return_int_3(int i, rime::constant<int, 81>) { return -1; }
+int return_int_3(int, rime::constant<int, 81>) { return -1; }
 int return_int_4(int i, rime::int_<-7>) { return i; }
-int return_int_4(int i, rime::int_<81>) { return -1; }
+int return_int_4(int, rime::int_<81>) { return -1; }
 
 BOOST_AUTO_TEST_CASE(test_rime_constant_convert_int)
 {
@@ -303,9 +303,9 @@ BOOST_AUTO_TEST_CASE(test_rime_constant_convert_int)
 }
 
 int return_int_5(int i, rime::constant<std::size_t, 43>) { return i; }
-int return_int_5(int i, rime::constant<std::size_t, 83>) { return -1; }
+int return_int_5(int, rime::constant<std::size_t, 83>) { return -1; }
 int return_int_6(int i, rime::size_t<43>) { return i; }
-int return_int_6(int i, rime::size_t<83>) { return -1; }
+int return_int_6(int, rime::size_t<83>) { return -1; }
 
 BOOST_AUTO_TEST_CASE(test_rime_constant_convert_size_t)
 {

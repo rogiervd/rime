@@ -820,21 +820,23 @@ namespace variant_detail {
     // Specialise for void.
     template <> struct get<void>
     {
-        template <class Variant> void operator()(Variant && variant) const
+        template <class Variant>
+        void operator()([[maybe_unused]] Variant && variant) const
         {
             assert(variant.template contains<void>());
         }
 
         // It is not clear that it makes sense to return a void * with a
         // meaningless value, but it makes it easier to write generic code.
-        template <class Variant> void * operator()(Variant * variant) const
+        template <class Variant>
+        void * operator()([[maybe_unused]] Variant * variant) const
         {
             assert(variant->template contains<void>());
             return nullptr;
         }
 
         template <class Variant>
-        void const * operator()(Variant const * variant) const
+        void const * operator()([[maybe_unused]] Variant const * variant) const
         {
             assert(variant->template contains<void>());
             return nullptr;
