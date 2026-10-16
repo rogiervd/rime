@@ -124,7 +124,11 @@ BOOST_AUTO_TEST_CASE(test_rime_if_merge)
     auto && v4 = rime::if_<policy>(true, four, five);
     BOOST_MPL_ASSERT((std::is_same<decltype(v4), long double &&>) );
 
-    auto && v5 = rime::if_<policy>(true, six, five);
+    // The result refers to six or five, not to a temporary.
+    // Pass a named condition: GCC's -Wdangling-reference warns if the
+    // condition is a temporary.
+    bool condition = true;
+    auto && v5 = rime::if_<policy>(condition, six, five);
     BOOST_MPL_ASSERT((std::is_same<decltype(v5), long double const &>) );
 }
 
