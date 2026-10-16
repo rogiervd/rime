@@ -13,7 +13,7 @@ BOOST_AUTO_TEST_SUITE(test_rime_detail_switch)
 
 struct struct_default
 {
-    float operator()(float f) const { return -1.0; }
+    float operator()(float) const { return -1.0; }
 };
 
 struct struct_times_5

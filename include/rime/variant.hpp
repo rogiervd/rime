@@ -823,6 +823,8 @@ namespace variant_detail {
         template <class Variant> void operator()(Variant && variant) const
         {
             assert(variant.template contains<void>());
+            // Avoid a warning about an unused parameter if NDEBUG is defined.
+            (void) variant;
         }
 
         // It is not clear that it makes sense to return a void * with a
@@ -830,6 +832,7 @@ namespace variant_detail {
         template <class Variant> void * operator()(Variant * variant) const
         {
             assert(variant->template contains<void>());
+            (void) variant;
             return nullptr;
         }
 
@@ -837,6 +840,7 @@ namespace variant_detail {
         void const * operator()(Variant const * variant) const
         {
             assert(variant->template contains<void>());
+            (void) variant;
             return nullptr;
         }
     };
