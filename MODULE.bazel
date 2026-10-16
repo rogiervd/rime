@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: Copyright 2026 Rogier van Dalen
+#
+# SPDX-License-Identifier: Apache-2.0
+
 module(
     name = "rime",
     version = "1.1.1",
@@ -18,7 +22,7 @@ use_repo(cc_configure, "local_config_cc")
 bazel_dep(name = "rules_build_error", version = "0.11.0")
 bazel_dep(name = "boost.test", version = "1.90.0.bcr.1")
 bazel_dep(name = "meta", version = "1.1.2")
-bazel_dep(name = "utility", version = "1.0.0")
+bazel_dep(name = "utility", version = "2.0.0")
 
 # IDEs as well as other tools can use a compile_commands.json databse to know
 # how files are compiled.

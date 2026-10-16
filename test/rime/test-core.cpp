@@ -1,18 +1,6 @@
-/*
-Copyright 2011, 2012, 2014, 2015 Rogier van Dalen.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+// SPDX-FileCopyrightText: Copyright 2011, 2012, 2014, 2015 Rogier van Dalen
+//
+// SPDX-License-Identifier: Apache-2.0
 
 #define BOOST_TEST_MODULE test_rime
 #include <boost/test/unit_test.hpp>
@@ -24,8 +12,6 @@ limitations under the License.
 #include <boost/mpl/assert.hpp>
 #include <boost/mpl/int.hpp>
 #include <boost/mpl/size_t.hpp>
-
-#include "utility/is_assignable.hpp"
 
 struct base {};
 struct derived : base {};
@@ -433,15 +419,14 @@ BOOST_AUTO_TEST_CASE(test_rime_core_constant_assign)
         five = *&five;
 
         static_assert(
-            utility::is_assignable<rime::true_type &, rime::true_type>::value,
+            std::is_assignable<rime::true_type &, rime::true_type>::value, "");
+        static_assert(
+            !std::is_assignable<rime::true_type &, rime::false_type>::value,
             "");
         static_assert(
-            !utility::is_assignable<rime::true_type &, rime::false_type>::value,
-            "");
+            std::is_assignable<rime::int_<5> &, rime::int_<5>>::value, "");
         static_assert(
-            utility::is_assignable<rime::int_<5> &, rime::int_<5>>::value, "");
-        static_assert(
-            !utility::is_assignable<rime::int_<5> &, rime::int_<7>>::value, "");
+            !std::is_assignable<rime::int_<5> &, rime::int_<7>>::value, "");
     }
     // It should be possible to assign other constants to rime::constant.
     {
@@ -457,17 +442,15 @@ BOOST_AUTO_TEST_CASE(test_rime_core_constant_assign)
         five = std::integral_constant<size_t, 5>();
 
         static_assert(
-            utility::is_assignable<rime::true_type &, std::true_type>::value,
+            std::is_assignable<rime::true_type &, std::true_type>::value, "");
+        static_assert(
+            !std::is_assignable<rime::true_type &, boost::mpl::false_>::value,
             "");
         static_assert(
-            !utility::is_assignable<
-                rime::true_type &, boost::mpl::false_>::value,
+            std::is_assignable<rime::int_<5> &, boost::mpl::int_<5>>::value,
             "");
         static_assert(
-            utility::is_assignable<rime::int_<5> &, boost::mpl::int_<5>>::value,
-            "");
-        static_assert(
-            !utility::is_assignable<
+            !std::is_assignable<
                 rime::int_<5> &, std::integral_constant<int, 7>>::value,
             "");
     }
