@@ -32,6 +32,8 @@ namespace detail {
         void operator()(Condition const & condition) const
         {
             assert(condition);
+            // Avoid a warning about an unused parameter if NDEBUG is defined.
+            (void) condition;
         }
     };
 
