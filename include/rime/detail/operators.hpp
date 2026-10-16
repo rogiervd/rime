@@ -31,7 +31,7 @@ namespace callable
     struct plus
     {
         template <class Left, class Right>
-            auto operator() (Left const & left, Right const & right) const
+            auto operator() (Left const &, Right const &) const
         -> typename boost::enable_if <
             mpl::and_ <is_constant <Left>, is_constant <Right> >,
             constant <
@@ -61,7 +61,7 @@ namespace callable
 static const callable::plus plus = {};
 
 template <class Left, class Right>
-    auto operator + (Left const & left, Right const & right)
+    auto operator + (Left const &, Right const &)
 -> typename boost::enable_if <
     mpl::and_ <is_constant <Left>, is_rime_<Right>,
         mpl::or_ <is_rime_constant <Left>, is_rime_constant <Right> > >,
@@ -81,7 +81,7 @@ template <class Left, class Right>
         struct name                                                          \
         {                                                                    \
             template <class Left, class Right>                               \
-            auto operator()(Left const & left, Right const & right) const -> \
+            auto operator()(Left const &, Right const &) const ->            \
                 typename boost::enable_if<                                   \
                     mpl::and_<is_constant<Left>, is_constant<Right>>,        \
                     constant<                                                \
@@ -110,7 +110,7 @@ template <class Left, class Right>
     static const callable::name name = callable::name();                     \
                                                                              \
     template <class Left, class Right>                                       \
-    auto operator operation(Left const & left, Right const & right)          \
+    auto operator operation(Left const &, Right const &)                     \
         ->typename boost::enable_if<                                         \
             mpl::and_<                                                       \
                 is_constant<Left>, is_constant<Right>,                       \
@@ -150,9 +150,8 @@ RIME_DEFINE_BINARY_OPERATOR(greater_equal, >=)
     namespace callable {                                                       \
         struct name                                                            \
         {                                                                      \
-            template <class Argument>                                          \
-            auto operator()(Argument const & argument) const ->                \
-                typename boost::enable_if<                                     \
+            template <class Argument> auto operator()(Argument const &) const  \
+                -> typename boost::enable_if<                                  \
                     is_constant<Argument>,                                     \
                     constant<                                                  \
                         typename std::decay<                                   \
@@ -177,8 +176,7 @@ RIME_DEFINE_BINARY_OPERATOR(greater_equal, >=)
                                                                                \
     static const callable::name name = {};                                     \
                                                                                \
-    template <class Argument>                                                  \
-    auto operator operation(Argument const & argument)                         \
+    template <class Argument> auto operator operation(Argument const &)        \
         ->typename boost::enable_if<                                           \
             is_constant<Argument>,                                             \
             constant<                                                          \
@@ -298,7 +296,7 @@ namespace callable {
     static const callable::name name = {};                                     \
                                                                                \
     template <class Left, class Right>                                         \
-    auto operator operation(Left const & left, Right const & right)            \
+    auto operator operation(Left const &, Right const &)                       \
         ->typename boost::enable_if<                                           \
             mpl::and_<                                                         \
                 is_constant<Left>, is_constant<Right>,                         \
