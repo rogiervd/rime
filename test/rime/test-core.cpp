@@ -25,8 +25,6 @@ limitations under the License.
 #include <boost/mpl/int.hpp>
 #include <boost/mpl/size_t.hpp>
 
-#include "utility/is_assignable.hpp"
-
 struct base {};
 struct derived : base {};
 
@@ -433,15 +431,14 @@ BOOST_AUTO_TEST_CASE(test_rime_core_constant_assign)
         five = *&five;
 
         static_assert(
-            utility::is_assignable<rime::true_type &, rime::true_type>::value,
+            std::is_assignable<rime::true_type &, rime::true_type>::value, "");
+        static_assert(
+            !std::is_assignable<rime::true_type &, rime::false_type>::value,
             "");
         static_assert(
-            !utility::is_assignable<rime::true_type &, rime::false_type>::value,
-            "");
+            std::is_assignable<rime::int_<5> &, rime::int_<5>>::value, "");
         static_assert(
-            utility::is_assignable<rime::int_<5> &, rime::int_<5>>::value, "");
-        static_assert(
-            !utility::is_assignable<rime::int_<5> &, rime::int_<7>>::value, "");
+            !std::is_assignable<rime::int_<5> &, rime::int_<7>>::value, "");
     }
     // It should be possible to assign other constants to rime::constant.
     {
@@ -457,17 +454,15 @@ BOOST_AUTO_TEST_CASE(test_rime_core_constant_assign)
         five = std::integral_constant<size_t, 5>();
 
         static_assert(
-            utility::is_assignable<rime::true_type &, std::true_type>::value,
+            std::is_assignable<rime::true_type &, std::true_type>::value, "");
+        static_assert(
+            !std::is_assignable<rime::true_type &, boost::mpl::false_>::value,
             "");
         static_assert(
-            !utility::is_assignable<
-                rime::true_type &, boost::mpl::false_>::value,
+            std::is_assignable<rime::int_<5> &, boost::mpl::int_<5>>::value,
             "");
         static_assert(
-            utility::is_assignable<rime::int_<5> &, boost::mpl::int_<5>>::value,
-            "");
-        static_assert(
-            !utility::is_assignable<
+            !std::is_assignable<
                 rime::int_<5> &, std::integral_constant<int, 7>>::value,
             "");
     }
