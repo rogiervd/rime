@@ -370,7 +370,7 @@ BOOST_AUTO_TEST_CASE(test_rime_variant)
     }
 
     // float
-    float f = 3.8;
+    float f = 3.8f;
     {
         variant v(4.5f);
         BOOST_CHECK_EQUAL(v.which(), 1u);
