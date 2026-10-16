@@ -357,7 +357,9 @@ BOOST_AUTO_TEST_CASE(test_variant_operator_unary)
         check_contains(vi, i);
         check_contains(vl, l);
 
-        check_same_type_equal(-vu, -u);
+        // -u would be the same, but MSVC warns about applying unary minus to
+        // an unsigned value.
+        check_same_type_equal(-vu, 0u - u);
         check_same_type_equal(-vi, -i);
         check_same_type_equal(-vl, -l);
 
