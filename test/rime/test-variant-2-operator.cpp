@@ -20,6 +20,14 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wsign-compare"
 
+// The same goes for MSVC's warnings about signed/unsigned comparisons (C4018,
+// C4389) and about narrowing in assignments like "short += int" (C4244).
+// These are disabled before the header is included, because MSVC uses the
+// warning state where the templates are defined.
+#if defined(_MSC_VER)
+#    pragma warning(disable : 4018 4244 4389)
+#endif
+
 #include "rime/variant.hpp"
 
 #include <array>
