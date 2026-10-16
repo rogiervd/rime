@@ -23,3 +23,7 @@ jobs:
       - name: Show clang-format version
         run: clang-format-21 --version
       - uses: pre-commit/action@v3.0.1
+      # Run the hooks that only run when asked for.
+      - uses: pre-commit/action@v3.0.1
+        with:
+          extra_args: reuse --hook-stage manual --all-files
