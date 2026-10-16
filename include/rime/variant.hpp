@@ -377,11 +377,18 @@ public:
     template <typename Actual> variant(
         Actual && actual,
         // Make sure that the copy constructor is picked up.
-        typename boost::disable_if<is_variant<Actual>>::type * = 0,
+        typename boost::disable_if<is_variant<Actual>>::type * = 0)
+    {
         // Trigger assertion here already.
         // This keeps the backtrace in the compiler error shortish.
-        int = typename conversion_for<Actual>::assert_unambiguous::dummy())
-    {
+        // This is not done in a default argument, because MSVC instantiates
+        // that while checking whether the implicit copy assignment operator
+        // is viable, for example for "variant = 5", even though the templated
+        // operator= is the better match.
+        typedef typename conversion_for<Actual>::assert_unambiguous::dummy
+            check_conversion;
+        static_assert(
+            std::is_same<check_conversion, int>::value, "Sanity check.");
         construct(std::forward<Actual>(actual));
     }
 
