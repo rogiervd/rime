@@ -365,11 +365,15 @@ public:
     template <typename Actual> variant(
         Actual && actual,
         // Make sure that the copy constructor is picked up.
-        typename boost::disable_if<is_variant<Actual>>::type * = 0,
-        // Trigger assertion here already.
-        // This keeps the backtrace in the compiler error shortish.
-        int = typename conversion_for<Actual>::assert_unambiguous::dummy())
+        typename boost::disable_if<is_variant<Actual>>::type * = 0)
     {
+        // Trigger the assertion here already.
+        // This keeps the backtrace in the compiler error shortish.
+        typedef typename conversion_for<Actual>::assert_unambiguous::dummy
+            check_conversion;
+        // Actually use this type to trigger the check.
+        static_assert(std::is_same<check_conversion, int>::value);
+
         construct(std::forward<Actual>(actual));
     }
 
