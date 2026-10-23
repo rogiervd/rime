@@ -33,9 +33,10 @@ BOOST_AUTO_TEST_CASE(test_rime_detail_switch)
     switch_<
         double, meta::vector<struct_default, struct_times_5, struct_times_7>>
         s;
-    BOOST_CHECK_EQUAL(s(0, 7), -1.);
-    BOOST_CHECK_EQUAL(s(1, 10), 50.);
-    BOOST_CHECK_EQUAL(s(2, 11), 77.);
+    // The functions take a float, so pass a float.
+    BOOST_CHECK_EQUAL(s(0, 7.f), -1.);
+    BOOST_CHECK_EQUAL(s(1, 10.f), 50.);
+    BOOST_CHECK_EQUAL(s(2, 11.f), 77.);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
