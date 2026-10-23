@@ -176,8 +176,8 @@ template <bool content> struct bool_ : constant<bool, content>
 {
     constexpr bool_() noexcept {}
 
-    constexpr bool_(bool_ const &) noexcept {}
-    constexpr bool_(bool_ &&) noexcept {}
+    constexpr bool_(bool_ const &) noexcept : constant<bool, content>() {}
+    constexpr bool_(bool_ &&) noexcept : constant<bool, content>() {}
 
     template <
         class OtherConstant,

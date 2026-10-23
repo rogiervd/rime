@@ -17,6 +17,12 @@ common --registry https://bcr.bazel.build/
 build --cxxopt=-std=c++17
 build --cxxopt=-Werror
 build --cxxopt=-Wall
+# Extra warnings, for this project's own source files only.
+# Dependencies (e.g. Boost.Test with GCC 13) trigger -Wextra warnings.
+# Bazel applies these options if either the source file's path or its label
+# matches, so exclude both the path (external/...) and the label
+# (@@<repository>+//...) of files in dependencies.
+build --per_file_copt=.*,-^external/,-[+]//@-Wextra
 
 # Compiler selection.
 # These use the C++ toolchain that rules_cc auto-configures from the compiler
