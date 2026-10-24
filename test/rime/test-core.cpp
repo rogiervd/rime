@@ -380,27 +380,29 @@ BOOST_AUTO_TEST_CASE(test_rime_constant_convert_example)
     BOOST_CHECK_THROW(
         add_check_overflow(uint8_t(0xFF), uint8_t(0xFF)), std::exception);
 
-    // Unsigned.
+    // Signed.
+    // Values from 0x80 upwards do not fit in an int8_t, so write them as the
+    // negative values they represent (two's complement).
     BOOST_CHECK_EQUAL(add_check_overflow(int8_t(3), int8_t(3)), int8_t(6));
     BOOST_CHECK_EQUAL(
         add_check_overflow(int8_t(0x7F), int8_t(0x00)), int8_t(0x7F));
     BOOST_CHECK_EQUAL(
         add_check_overflow(int8_t(0x3F), int8_t(0x40)), int8_t(0x7F));
     BOOST_CHECK_EQUAL(
-        add_check_overflow(int8_t(0xA0), int8_t(0xE0)), int8_t(0x80));
+        add_check_overflow(int8_t(-0x60), int8_t(-0x20)), int8_t(-0x80));
     BOOST_CHECK_EQUAL(
-        add_check_overflow(int8_t(0x80), int8_t(0x00)), int8_t(0x80));
+        add_check_overflow(int8_t(-0x80), int8_t(0x00)), int8_t(-0x80));
     BOOST_CHECK_EQUAL(
-        add_check_overflow(int8_t(0x80), int8_t(0x05)), int8_t(0x85));
+        add_check_overflow(int8_t(-0x80), int8_t(0x05)), int8_t(-0x7B));
 
     BOOST_CHECK_THROW(
         add_check_overflow(int8_t(0x7F), int8_t(1)), std::exception);
     BOOST_CHECK_THROW(
-        add_check_overflow(int8_t(0x80), int8_t(-1)), std::exception);
+        add_check_overflow(int8_t(-0x80), int8_t(-1)), std::exception);
     BOOST_CHECK_THROW(
         add_check_overflow(int8_t(0x7F), int8_t(0x7F)), std::exception);
     BOOST_CHECK_THROW(
-        add_check_overflow(int8_t(0x80), int8_t(0x80)), std::exception);
+        add_check_overflow(int8_t(-0x80), int8_t(-0x80)), std::exception);
 }
 
 BOOST_AUTO_TEST_CASE(test_rime_core_constant_assign)

@@ -10,10 +10,19 @@ on:
   workflow_dispatch:
 jobs:
   test-release:
-    runs-on: ubuntu-26.04
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        compiler: [gcc, clang]
+        # A selection of operating system and compiler combinations.
+        include:
+          - os: ubuntu-26.04
+            compiler: gcc
+          - os: ubuntu-26.04
+            compiler: clang
+          - os: macos-26
+            compiler: clang
+          - os: windows-2025
+            compiler: msvc
     steps:
       - uses: actions/checkout@v7
       - uses: bazel-contrib/setup-bazel@0.19.0
@@ -24,4 +33,4 @@ jobs:
           disk-cache: ${{ github.workflow }}
           # Share repository cache between workflows.
           repository-cache: true
-      - run: bazel test -c opt --config=${{ matrix.compiler }} //test/...
+      - run: bazel test --keep_going -c opt --config=${{ matrix.compiler }} //test/...
