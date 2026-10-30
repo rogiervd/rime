@@ -3,15 +3,15 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #define BOOST_TEST_MODULE test_rime
-#include <boost/test/unit_test.hpp>
+#include "boost/test/unit_test.hpp"
 
 #include "rime/core.hpp"
 
 #include <type_traits>
 
-#include <boost/mpl/assert.hpp>
-#include <boost/mpl/int.hpp>
-#include <boost/mpl/size_t.hpp>
+#include "boost/mpl/assert.hpp"
+#include "boost/mpl/int.hpp"
+#include "boost/mpl/size_t.hpp"
 
 struct base {};
 struct derived : base {};

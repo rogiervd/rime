@@ -3,14 +3,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #define BOOST_TEST_MODULE test_rime_nothing
-#include <boost/test/unit_test.hpp>
+#include "boost/test/unit_test.hpp"
 
 #include "rime/nothing.hpp"
 
 #include <string>
 #include <type_traits>
 
-#include <boost/mpl/assert.hpp>
+#include "boost/mpl/assert.hpp"
 
 BOOST_AUTO_TEST_SUITE(test_rime_nothing)
 

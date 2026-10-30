@@ -10,8 +10,8 @@ operator() and operator[] must be defined inside the class.
 #ifndef RIME_DETAIL_VARIANT_OPERATOR_HPP_INCLUDED
 #define RIME_DETAIL_VARIANT_OPERATOR_HPP_INCLUDED
 
-#include <boost/mpl/or.hpp>
-#include <boost/utility/enable_if.hpp>
+#include "boost/mpl/or.hpp"
+#include "boost/utility/enable_if.hpp"
 
 #include "variant_dispatch.hpp"
 #include "variant_fwd.hpp"

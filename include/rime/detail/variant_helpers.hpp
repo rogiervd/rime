@@ -5,7 +5,7 @@
 #ifndef RIME_VARIANT_HELPERS_HPP
 #define RIME_VARIANT_HELPERS_HPP
 
-#include <boost/mpl/bool.hpp>
+#include "boost/mpl/bool.hpp"
 
 #include "meta/vector.hpp"
 

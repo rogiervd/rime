@@ -3,13 +3,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #define BOOST_TEST_MODULE test_rime_enable_if_constant
-#include <boost/test/unit_test.hpp>
+#include "boost/test/unit_test.hpp"
 
 #include "rime/enable_if_constant.hpp"
 
 #include <type_traits>
 
-#include <rime/core.hpp>
+#include "rime/core.hpp"
 
 struct runtime_type {};
 

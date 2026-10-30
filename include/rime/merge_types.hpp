@@ -11,14 +11,14 @@ Merge duplicate types (according to a stack of criteria) in a type sequence.
 
 #include <type_traits>
 
-#include <boost/mpl/eval_if.hpp>
-#include <boost/mpl/has_xxx.hpp>
-#include <boost/mpl/if.hpp>
-#include <boost/mpl/not.hpp>
-#include <boost/mpl/pair.hpp>
-#include <boost/mpl/placeholders.hpp>
+#include "boost/mpl/eval_if.hpp"
+#include "boost/mpl/has_xxx.hpp"
+#include "boost/mpl/if.hpp"
+#include "boost/mpl/not.hpp"
+#include "boost/mpl/pair.hpp"
+#include "boost/mpl/placeholders.hpp"
 
-#include <boost/utility/enable_if.hpp>
+#include "boost/utility/enable_if.hpp"
 
 #include "meta/fold.hpp"
 #include "meta/range.hpp"
