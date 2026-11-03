@@ -77,7 +77,8 @@ public:
     template <typename Left, typename Right>
     Left && operator()(Left && left, Right && right) const
     {
-        left += right;
+        // The types can differ, e.g. int and float, so convert explicitly.
+        left = static_cast<std::decay_t<Left>>(left + right);
         return std::forward<Left>(left);
     }
 

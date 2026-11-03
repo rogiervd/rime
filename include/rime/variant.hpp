@@ -285,6 +285,14 @@ private:
                 type>::assert_unambiguous::dummy...>::type dummy;
     };
 
+#if defined(_MSC_VER)
+#    pragma warning(push)
+// The variant converts the argument to the type it chooses, e.g. from int to
+// float, on purpose. MSVC warns about such conversions (C4244), so switch the
+// warning off.
+#    pragma warning(disable : 4244)
+#endif
+
     /**
     Construct from another type.
     The other type should not be a variant, but instead a type extracted from
@@ -325,6 +333,10 @@ private:
         // Copy-construct or move-construct as type "store_type"
         new (memory()) store_type(std::forward<Actual>(actual));
     }
+
+#if defined(_MSC_VER)
+#    pragma warning(pop)
+#endif
 
     /**
     Construct from a type when this is impossible.
