@@ -16,8 +16,11 @@
 // However, all we require here is for the behaviour to be the same between
 // the variant and non-variant versions.
 // (This includes warnings, but that is hard to test for.)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wsign-compare"
+// MSVC does not know these pragmas (and warns about them).
+#if defined(__GNUC__) || defined(__clang__)
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wsign-compare"
+#endif
 
 #include "rime/variant.hpp"
 
@@ -77,7 +80,8 @@ public:
     template <typename Left, typename Right>
     Left && operator()(Left && left, Right && right) const
     {
-        left += right;
+        // The types can differ, e.g. int and float, so convert explicitly.
+        left = static_cast<std::decay_t<Left>>(left + right);
         return std::forward<Left>(left);
     }
 
