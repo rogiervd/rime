@@ -52,6 +52,8 @@ repos:
       - id: clang-tidy
         args: [--version=23.1.4, --jobs=4]
         stages: [manual]
+        # These tests are meant not to compile.
+        exclude: ^test/rime/check/test-check_equal-fail-.*\.cpp$
   # Check licensing and copyright information, following the REUSE
   # specification by the FSF Europe: https://reuse.software
   - repo: https://github.com/fsfe/reuse-tool
