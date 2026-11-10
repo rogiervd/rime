@@ -7,6 +7,10 @@
 
 #include "rime/check/check_equal.hpp"
 
+#include <type_traits>
+
+#include "rime/core.hpp"
+
 BOOST_AUTO_TEST_SUITE(fail_rime_check_equal)
 
 BOOST_AUTO_TEST_CASE(fail_rime_check_equal)

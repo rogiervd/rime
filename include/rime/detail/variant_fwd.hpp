@@ -5,8 +5,7 @@
 #ifndef RIME_VARIANT_FWD_HPP
 #define RIME_VARIANT_FWD_HPP
 
-#include "boost/utility/enable_if.hpp"
-
+#include "boost/core/enable_if.hpp"
 #include "boost/mpl/and.hpp"
 
 #include "meta/contains.hpp"

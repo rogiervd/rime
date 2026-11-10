@@ -5,6 +5,10 @@
 #ifndef RIME_CAST_HPP_INCLUDED
 #define RIME_CAST_HPP_INCLUDED
 
+#include "boost/core/enable_if.hpp"
+#include "boost/mpl/eval_if.hpp"
+#include "boost/mpl/identity.hpp"
+
 #include "core.hpp"
 
 #include "utility/returns.hpp"

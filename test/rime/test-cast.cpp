@@ -7,7 +7,10 @@
 
 #include "rime/cast.hpp"
 
+#include <cstddef>
+
 #include "rime/check/check_equal.hpp"
+#include "rime/core.hpp"
 
 BOOST_AUTO_TEST_SUITE(test_rime_cast)
 

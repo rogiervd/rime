@@ -5,8 +5,11 @@
 #define BOOST_TEST_MODULE test_rime_min_max
 #include "boost/test/unit_test.hpp"
 
+#include "rime/core.hpp"
 #include "rime/max.hpp"
+#include "rime/merge_types.hpp"
 #include "rime/min.hpp"
+#include "rime/variant.hpp"
 
 #include <type_traits>
 #include "boost/mpl/assert.hpp"

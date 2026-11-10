@@ -6,10 +6,10 @@
 #include "boost/test/unit_test.hpp"
 
 #include <type_traits>
+#include <typeinfo>
+#include <utility>
 
 #include "boost/mpl/assert.hpp"
-
-#include <string>
 
 // GCC rightfully complains about comparisons between signed and unsigned
 // integers when testing binary operators.

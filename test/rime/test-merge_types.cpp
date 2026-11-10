@@ -9,6 +9,8 @@
 
 #include "boost/mpl/assert.hpp"
 
+#include "meta/vector.hpp"
+
 #include "rime/merge_types.hpp"
 
 BOOST_AUTO_TEST_SUITE(test_rime_detail_merge_types)

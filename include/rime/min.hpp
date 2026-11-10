@@ -5,7 +5,8 @@
 #ifndef RIME_MIN_HPP_INCLUDED
 #define RIME_MIN_HPP_INCLUDED
 
-#include "core.hpp"
+#include "rime/variant.hpp"
+
 #include "if.hpp"
 #include "sign.hpp"
 
