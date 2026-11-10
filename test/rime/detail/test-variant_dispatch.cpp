@@ -9,6 +9,8 @@
 
 #include "boost/mpl/assert.hpp"
 
+#include "meta/vector.hpp"
+
 #include "rime/detail/variant_dispatch.hpp"
 
 #include "rime/variant.hpp"

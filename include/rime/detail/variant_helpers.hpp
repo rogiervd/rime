@@ -9,8 +9,6 @@
 
 #include "meta/vector.hpp"
 
-#include "utility/storage.hpp"
-
 #include "rime/detail/variant_fwd.hpp"
 
 namespace rime {

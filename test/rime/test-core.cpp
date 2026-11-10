@@ -7,6 +7,11 @@
 
 #include "rime/core.hpp"
 
+#include <cstddef>
+#include <cstdint>
+#include <exception>
+#include <limits>
+#include <stdexcept>
 #include <type_traits>
 
 #include "boost/mpl/assert.hpp"

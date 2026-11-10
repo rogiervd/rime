@@ -7,6 +7,7 @@
 
 #include "rime/sign.hpp"
 
+#include <cstddef>
 #include <string>
 #include <type_traits>
 

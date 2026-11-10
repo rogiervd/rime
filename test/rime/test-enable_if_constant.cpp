@@ -7,8 +7,6 @@
 
 #include "rime/enable_if_constant.hpp"
 
-#include <type_traits>
-
 #include "rime/core.hpp"
 
 struct runtime_type {};

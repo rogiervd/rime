@@ -5,9 +5,9 @@
 #define BOOST_TEST_MODULE test_rime_detail_switch
 #include "boost/test/unit_test.hpp"
 
-#include "boost/mpl/assert.hpp"
-
 #include "rime/detail/switch.hpp"
+
+#include "meta/vector.hpp"
 
 BOOST_AUTO_TEST_SUITE(test_rime_detail_switch)
 

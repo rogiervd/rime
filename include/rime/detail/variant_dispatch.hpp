@@ -15,17 +15,20 @@ being introduced first.
 #ifndef RIME_DETAIL_VARIANT_DISPATCH_HPP_INCLUDED
 #define RIME_DETAIL_VARIANT_DISPATCH_HPP_INCLUDED
 
+#include <cstddef>
 #include <type_traits>
 #include <utility>
 
+#include "boost/config.hpp"
+#include "boost/core/enable_if.hpp"
 #include "boost/detail/workaround.hpp"
+#include "boost/mpl/if.hpp"
 
-#include "boost/utility/enable_if.hpp"
-
-#include "boost/mpl/eval_if.hpp"
 #include "boost/mpl/placeholders.hpp"
 
+#include "meta/contains.hpp"
 #include "meta/flatten.hpp"
+#include "meta/range.hpp"
 #include "meta/transform.hpp"
 #include "meta/vector.hpp"
 #include "rime/detail/switch.hpp"
