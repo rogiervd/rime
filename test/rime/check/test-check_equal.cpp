@@ -12,6 +12,12 @@ Different types of failure are in fail-check_equal.
 
 #include "rime/check/check_equal.hpp"
 
+#include <cstddef>
+#include <ostream>
+#include <type_traits>
+
+#include "rime/core.hpp"
+
 BOOST_AUTO_TEST_SUITE(test_rime_check_equal)
 
 /// Object that can be compared with BOOST_CHECK_EQUAL.

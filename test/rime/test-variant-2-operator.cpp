@@ -5,11 +5,15 @@
 #define BOOST_TEST_MODULE test_rime_variant_operator
 #include "boost/test/unit_test.hpp"
 
+#include <memory>
 #include <type_traits>
 
 #include "boost/mpl/assert.hpp"
 
-#include <string>
+#include "meta/vector.hpp"
+
+#include "rime/core.hpp"
+
 #include "utility/test/tracked.hpp"
 
 // GCC rightfully complains about comparisons between signed and unsigned
@@ -32,7 +36,6 @@
 #include "rime/variant.hpp"
 
 #include <array>
-#include <iostream>
 
 using std::is_same;
 

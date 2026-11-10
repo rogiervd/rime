@@ -5,11 +5,8 @@
 #ifndef RIME_ALWAYS_HPP_INCLUDED
 #define RIME_ALWAYS_HPP_INCLUDED
 
-#include <type_traits>
 #include <utility>
-#include "boost/utility/enable_if.hpp"
 
-#include "core.hpp"
 
 namespace rime {
 

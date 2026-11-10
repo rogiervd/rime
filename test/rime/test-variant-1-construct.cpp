@@ -5,7 +5,9 @@
 #define BOOST_TEST_MODULE test_rime_variant
 #include "boost/test/unit_test.hpp"
 
+#include <stdexcept>
 #include <type_traits>
+#include <utility>
 
 #include "boost/mpl/assert.hpp"
 
@@ -22,8 +24,6 @@
 
 #include "rime/variant.hpp"
 
-#include <array>
-#include <iostream>
 
 struct convertee {};
 struct converted

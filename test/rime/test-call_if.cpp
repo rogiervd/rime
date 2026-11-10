@@ -11,6 +11,9 @@
 #include "boost/mpl/assert.hpp"
 
 #include "rime/check/check_equal.hpp"
+#include "rime/core.hpp"
+#include "rime/merge_types.hpp"
+#include "rime/variant.hpp"
 
 BOOST_AUTO_TEST_SUITE(test_rime_if)
 
