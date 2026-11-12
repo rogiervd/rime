@@ -11,7 +11,6 @@ Merge duplicate types (according to a stack of criteria) in a type sequence.
 
 #include <type_traits>
 
-#include "boost/core/enable_if.hpp"
 #include "boost/mpl/eval_if.hpp"
 #include "boost/mpl/has_xxx.hpp"
 #include "boost/mpl/if.hpp"
@@ -168,15 +167,13 @@ namespace merge_policy {
         };
 
         template <class Type1, class Type2> struct apply<
-            Type1, Type2,
-            typename boost::enable_if<std::is_base_of<Type1, Type2>>::type>
+            Type1, Type2, std::enable_if_t<std::is_base_of_v<Type1, Type2>>>
         {
             typedef Type1 type;
         };
 
         template <class Type1, class Type2> struct apply<
-            Type1, Type2,
-            typename boost::enable_if<std::is_base_of<Type2, Type1>>::type>
+            Type1, Type2, std::enable_if_t<std::is_base_of_v<Type2, Type1>>>
         {
             typedef Type2 type;
         };
