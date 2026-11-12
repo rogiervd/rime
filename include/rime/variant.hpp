@@ -827,8 +827,6 @@ namespace variant_detail {
         void operator()([[maybe_unused]] Variant && variant) const
         {
             assert(variant.template contains<void>());
-            // Avoid a warning about an unused parameter if NDEBUG is defined.
-            (void) variant;
         }
 
         // It is not clear that it makes sense to return a void * with a
@@ -837,7 +835,6 @@ namespace variant_detail {
         void * operator()([[maybe_unused]] Variant * variant) const
         {
             assert(variant->template contains<void>());
-            (void) variant;
             return nullptr;
         }
 
@@ -845,7 +842,6 @@ namespace variant_detail {
         void const * operator()([[maybe_unused]] Variant const * variant) const
         {
             assert(variant->template contains<void>());
-            (void) variant;
             return nullptr;
         }
     };
