@@ -3,13 +3,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #define BOOST_TEST_MODULE test_rime_variant_visit
-#include <boost/test/unit_test.hpp>
+#include "boost/test/unit_test.hpp"
 
 #include <type_traits>
+#include <typeinfo>
+#include <utility>
 
-#include <boost/mpl/assert.hpp>
-
-#include <string>
+#include "boost/mpl/assert.hpp"
 
 // GCC rightfully complains about comparisons between signed and unsigned
 // integers when testing binary operators.

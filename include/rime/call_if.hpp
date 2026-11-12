@@ -7,12 +7,9 @@
 
 #include <type_traits>
 
-#include <boost/mpl/and.hpp>
-#include <boost/mpl/not.hpp>
-
-#include <boost/utility/enable_if.hpp>
-
-#include "meta/vector.hpp"
+#include "boost/core/enable_if.hpp"
+#include "boost/mpl/and.hpp"
+#include "boost/mpl/not.hpp"
 
 #include "utility/returns.hpp"
 

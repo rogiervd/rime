@@ -16,8 +16,10 @@ MPL constants: the behaviour of existing code does not change.
 
 #include <type_traits>
 
-#include <boost/mpl/and.hpp>
-#include <boost/utility/enable_if.hpp>
+#include "boost/core/enable_if.hpp"
+#include "boost/mpl/and.hpp"
+#include "boost/mpl/if.hpp"
+#include "boost/mpl/or.hpp"
 
 #include "rime/core.hpp"
 

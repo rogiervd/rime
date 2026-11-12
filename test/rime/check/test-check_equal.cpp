@@ -8,9 +8,15 @@ Different types of failure are in fail-check_equal.
 */
 
 #define BOOST_TEST_MODULE test_rime_check_equal
-#include <boost/test/unit_test.hpp>
+#include "boost/test/unit_test.hpp"
 
 #include "rime/check/check_equal.hpp"
+
+#include <cstddef>
+#include <ostream>
+#include <type_traits>
+
+#include "rime/core.hpp"
 
 BOOST_AUTO_TEST_SUITE(test_rime_check_equal)
 

@@ -7,6 +7,8 @@
 
 #include <cassert>
 
+#include "boost/core/enable_if.hpp"
+
 #include "core.hpp"
 
 namespace rime {

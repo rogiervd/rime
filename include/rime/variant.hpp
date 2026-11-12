@@ -10,26 +10,25 @@ Define a variant type, similar to boost::variant.
 #ifndef RIME_VARIANT_HPP_INCLUDED
 #define RIME_VARIANT_HPP_INCLUDED
 
+#include <cassert>
+#include <cstddef>
 #include <stdexcept>
 #include <utility>
 
 #include <type_traits>
 
-#include <boost/utility/enable_if.hpp>
-
-#include <boost/mpl/and.hpp>
-#include <boost/mpl/bind.hpp>
-#include <boost/mpl/empty.hpp>
-#include <boost/mpl/equal_to.hpp>
-#include <boost/mpl/eval_if.hpp>
-#include <boost/mpl/greater.hpp>
-#include <boost/mpl/greater_equal.hpp>
-#include <boost/mpl/int.hpp>
-#include <boost/mpl/less_equal.hpp>
-#include <boost/mpl/not.hpp>
-#include <boost/mpl/placeholders.hpp>
-#include <boost/mpl/size.hpp>
-#include <boost/mpl/sizeof.hpp>
+#include "boost/core/enable_if.hpp"
+#include "boost/mpl/and.hpp"
+#include "boost/mpl/bind.hpp"
+#include "boost/mpl/eval_if.hpp"
+#include "boost/mpl/greater.hpp"
+#include "boost/mpl/greater_equal.hpp"
+#include "boost/mpl/identity.hpp"
+#include "boost/mpl/int.hpp"
+#include "boost/mpl/not.hpp"
+#include "boost/mpl/pair.hpp"
+#include "boost/mpl/placeholders.hpp"
+#include "boost/mpl/size.hpp"
 
 #include "utility/aligned_union.hpp"
 #include "utility/storage.hpp"
@@ -38,7 +37,7 @@ Define a variant type, similar to boost::variant.
 #include "meta/enumerate.hpp"
 #include "meta/filter.hpp"
 #include "meta/flatten.hpp"
-#include "meta/max_element.hpp"
+#include "meta/range.hpp"
 #include "meta/transform.hpp"
 #include "meta/vector.hpp"
 #include "rime/core.hpp"
@@ -46,10 +45,10 @@ Define a variant type, similar to boost::variant.
 
 #include "rime/detail/switch.hpp"
 
-#include "rime/detail/variant_dispatch.hpp"
+#include "rime/detail/variant_dispatch.hpp"  // IWYU pragma: export
 #include "rime/detail/variant_fwd.hpp"
 #include "rime/detail/variant_helpers.hpp"
-#include "rime/detail/variant_operator.hpp"
+#include "rime/detail/variant_operator.hpp"  // IWYU pragma: export
 
 namespace rime {
 

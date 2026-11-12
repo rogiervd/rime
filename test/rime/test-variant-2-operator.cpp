@@ -3,13 +3,17 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #define BOOST_TEST_MODULE test_rime_variant_operator
-#include <boost/test/unit_test.hpp>
+#include "boost/test/unit_test.hpp"
 
+#include <memory>
 #include <type_traits>
 
-#include <boost/mpl/assert.hpp>
+#include "boost/mpl/assert.hpp"
 
-#include <string>
+#include "meta/vector.hpp"
+
+#include "rime/core.hpp"
+
 #include "utility/test/tracked.hpp"
 
 // GCC rightfully complains about comparisons between signed and unsigned
@@ -32,19 +36,9 @@
 #    pragma warning(disable : 4018 4146 4244 4389)
 #endif
 
-// The same goes for MSVC's warnings about signed/unsigned comparisons (C4018,
-// C4389), about narrowing in assignments like "short += int" (C4244), and
-// about negating a variant that contains an unsigned value (C4146).
-// These are disabled before the header is included, because MSVC uses the
-// warning state where the templates are defined.
-#if defined(_MSC_VER)
-#    pragma warning(disable : 4018 4146 4244 4389)
-#endif
-
 #include "rime/variant.hpp"
 
 #include <array>
-#include <iostream>
 
 using std::is_same;
 

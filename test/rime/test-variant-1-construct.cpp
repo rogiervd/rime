@@ -3,11 +3,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #define BOOST_TEST_MODULE test_rime_variant
-#include <boost/test/unit_test.hpp>
+#include "boost/test/unit_test.hpp"
 
+#include <stdexcept>
 #include <type_traits>
+#include <utility>
 
-#include <boost/mpl/assert.hpp>
+#include "boost/mpl/assert.hpp"
 
 #include <string>
 #include "utility/test/tracked.hpp"
@@ -25,8 +27,6 @@
 
 #include "rime/variant.hpp"
 
-#include <array>
-#include <iostream>
 
 struct convertee {};
 struct converted

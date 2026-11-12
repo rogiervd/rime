@@ -15,10 +15,11 @@ is too limited for general use.
 #define RIME_DETAIL_SWITCH_HPP_INCLUDED
 
 #include <cassert>
+#include <cstddef>
 #include <utility>
 
+#include "meta/range.hpp"
 #include "meta/vector.hpp"
-#include "rime/core.hpp"
 
 namespace rime { namespace detail {
 
