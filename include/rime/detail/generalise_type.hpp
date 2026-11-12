@@ -7,9 +7,10 @@
 
 #include <type_traits>
 
-#include <boost/mpl/apply.hpp>
-#include <boost/mpl/if.hpp>
+#include "boost/mpl/apply.hpp"
+#include "boost/mpl/if.hpp"
 
+#include "meta/fwd.hpp"
 #include "meta/range.hpp"
 
 namespace rime { namespace detail {

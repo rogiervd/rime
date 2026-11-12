@@ -3,21 +3,24 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #define BOOST_TEST_MODULE test_rime_variant_visit
-#include <boost/test/unit_test.hpp>
+#include "boost/test/unit_test.hpp"
 
 #include <type_traits>
+#include <typeinfo>
+#include <utility>
 
-#include <boost/mpl/assert.hpp>
-
-#include <string>
+#include "boost/mpl/assert.hpp"
 
 // GCC rightfully complains about comparisons between signed and unsigned
 // integers when testing binary operators.
 // However, all we require here is for the behaviour to be the same between
 // the variant and non-variant versions.
 // (This includes warnings, but that is hard to test for.)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wsign-compare"
+// MSVC does not know these pragmas (and warns about them).
+#if defined(__GNUC__) || defined(__clang__)
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wsign-compare"
+#endif
 
 #include "rime/variant.hpp"
 

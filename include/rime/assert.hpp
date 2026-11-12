@@ -7,6 +7,8 @@
 
 #include <cassert>
 
+#include "boost/core/enable_if.hpp"
+
 #include "core.hpp"
 
 namespace rime {
@@ -29,7 +31,7 @@ namespace detail {
         Condition,
         typename boost::disable_if<rime::is_constant<Condition>>::type>
     {
-        void operator()(Condition const & condition) const
+        void operator()([[maybe_unused]] Condition const & condition) const
         {
             assert(condition);
             // Avoid a warning about an unused parameter if NDEBUG is defined.

@@ -16,8 +16,10 @@ MPL constants: the behaviour of existing code does not change.
 
 #include <type_traits>
 
-#include <boost/mpl/and.hpp>
-#include <boost/utility/enable_if.hpp>
+#include "boost/core/enable_if.hpp"
+#include "boost/mpl/and.hpp"
+#include "boost/mpl/if.hpp"
+#include "boost/mpl/or.hpp"
 
 #include "rime/core.hpp"
 
@@ -31,7 +33,7 @@ namespace callable
     struct plus
     {
         template <class Left, class Right>
-            auto operator() (Left const & left, Right const & right) const
+            auto operator() (Left const &, Right const &) const
         -> typename boost::enable_if <
             mpl::and_ <is_constant <Left>, is_constant <Right> >,
             constant <
@@ -61,7 +63,7 @@ namespace callable
 static const callable::plus plus = {};
 
 template <class Left, class Right>
-    auto operator + (Left const & left, Right const & right)
+    auto operator + (Left const &, Right const &)
 -> typename boost::enable_if <
     mpl::and_ <is_constant <Left>, is_rime_<Right>,
         mpl::or_ <is_rime_constant <Left>, is_rime_constant <Right> > >,

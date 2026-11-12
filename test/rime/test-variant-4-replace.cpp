@@ -3,16 +3,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #define BOOST_TEST_MODULE test_rime_variant
-#include <boost/test/unit_test.hpp>
+#include "boost/test/unit_test.hpp"
 
-#include <type_traits>
 #include "rime/variant.hpp"
 
-#include <boost/mpl/assert.hpp>
+#include <utility>
 
-#include <array>
-#include <iostream>
-
+#include "utility/test/thrower.hpp"
 #include "utility/test/throwing.hpp"
 #include "utility/test/tracked.hpp"
 

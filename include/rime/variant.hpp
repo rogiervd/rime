@@ -10,26 +10,25 @@ Define a variant type, similar to boost::variant.
 #ifndef RIME_VARIANT_HPP_INCLUDED
 #define RIME_VARIANT_HPP_INCLUDED
 
+#include <cassert>
+#include <cstddef>
 #include <stdexcept>
 #include <utility>
 
 #include <type_traits>
 
-#include <boost/utility/enable_if.hpp>
-
-#include <boost/mpl/and.hpp>
-#include <boost/mpl/bind.hpp>
-#include <boost/mpl/empty.hpp>
-#include <boost/mpl/equal_to.hpp>
-#include <boost/mpl/eval_if.hpp>
-#include <boost/mpl/greater.hpp>
-#include <boost/mpl/greater_equal.hpp>
-#include <boost/mpl/int.hpp>
-#include <boost/mpl/less_equal.hpp>
-#include <boost/mpl/not.hpp>
-#include <boost/mpl/placeholders.hpp>
-#include <boost/mpl/size.hpp>
-#include <boost/mpl/sizeof.hpp>
+#include "boost/core/enable_if.hpp"
+#include "boost/mpl/and.hpp"
+#include "boost/mpl/bind.hpp"
+#include "boost/mpl/eval_if.hpp"
+#include "boost/mpl/greater.hpp"
+#include "boost/mpl/greater_equal.hpp"
+#include "boost/mpl/identity.hpp"
+#include "boost/mpl/int.hpp"
+#include "boost/mpl/not.hpp"
+#include "boost/mpl/pair.hpp"
+#include "boost/mpl/placeholders.hpp"
+#include "boost/mpl/size.hpp"
 
 #include "utility/aligned_union.hpp"
 #include "utility/storage.hpp"
@@ -38,7 +37,7 @@ Define a variant type, similar to boost::variant.
 #include "meta/enumerate.hpp"
 #include "meta/filter.hpp"
 #include "meta/flatten.hpp"
-#include "meta/max_element.hpp"
+#include "meta/range.hpp"
 #include "meta/transform.hpp"
 #include "meta/vector.hpp"
 #include "rime/core.hpp"
@@ -46,10 +45,10 @@ Define a variant type, similar to boost::variant.
 
 #include "rime/detail/switch.hpp"
 
-#include "rime/detail/variant_dispatch.hpp"
+#include "rime/detail/variant_dispatch.hpp"  // IWYU pragma: export
 #include "rime/detail/variant_fwd.hpp"
 #include "rime/detail/variant_helpers.hpp"
-#include "rime/detail/variant_operator.hpp"
+#include "rime/detail/variant_operator.hpp"  // IWYU pragma: export
 
 namespace rime {
 
@@ -365,11 +364,15 @@ public:
     template <typename Actual> variant(
         Actual && actual,
         // Make sure that the copy constructor is picked up.
-        typename boost::disable_if<is_variant<Actual>>::type * = 0,
-        // Trigger assertion here already.
-        // This keeps the backtrace in the compiler error shortish.
-        int = typename conversion_for<Actual>::assert_unambiguous::dummy())
+        typename boost::disable_if<is_variant<Actual>>::type * = 0)
     {
+        // Trigger the assertion here already.
+        // This keeps the backtrace in the compiler error shortish.
+        typedef typename conversion_for<Actual>::assert_unambiguous::dummy
+            check_conversion;
+        // Actually use this type to trigger the check.
+        static_assert(std::is_same<check_conversion, int>::value);
+
         construct(std::forward<Actual>(actual));
     }
 
@@ -820,7 +823,8 @@ namespace variant_detail {
     // Specialise for void.
     template <> struct get<void>
     {
-        template <class Variant> void operator()(Variant && variant) const
+        template <class Variant>
+        void operator()([[maybe_unused]] Variant && variant) const
         {
             assert(variant.template contains<void>());
             // Avoid a warning about an unused parameter if NDEBUG is defined.
@@ -829,7 +833,8 @@ namespace variant_detail {
 
         // It is not clear that it makes sense to return a void * with a
         // meaningless value, but it makes it easier to write generic code.
-        template <class Variant> void * operator()(Variant * variant) const
+        template <class Variant>
+        void * operator()([[maybe_unused]] Variant * variant) const
         {
             assert(variant->template contains<void>());
             (void) variant;
@@ -837,7 +842,7 @@ namespace variant_detail {
         }
 
         template <class Variant>
-        void const * operator()(Variant const * variant) const
+        void const * operator()([[maybe_unused]] Variant const * variant) const
         {
             assert(variant->template contains<void>());
             (void) variant;
