@@ -41,21 +41,21 @@ struct degenerate
 
 BOOST_AUTO_TEST_CASE(test_rime_detail_generalise_type)
 {
-    BOOST_MPL_ASSERT((meta::equal<
-                      rime::detail::generalise_type<int, degenerate>,
-                      meta::vector<int>>) );
+    static_assert(meta::equal<
+                  rime::detail::generalise_type<int, degenerate>,
+                  meta::vector<int>>::type::value);
 
-    BOOST_MPL_ASSERT((meta::equal<
-                      rime::detail::generalise_type<int const, degenerate>,
-                      meta::vector<int const, int>>) );
+    static_assert(meta::equal<
+                  rime::detail::generalise_type<int const, degenerate>,
+                  meta::vector<int const, int>>::type::value);
 
-    BOOST_MPL_ASSERT((meta::equal<
-                      rime::detail::generalise_type<int const &, degenerate>,
-                      meta::vector<int const &, int const, int>>) );
+    static_assert(meta::equal<
+                  rime::detail::generalise_type<int const &, degenerate>,
+                  meta::vector<int const &, int const, int>>::type::value);
 
-    BOOST_MPL_ASSERT((meta::equal<
-                      rime::detail::generalise_type<int_<4>, degenerate>,
-                      meta::vector<int_<4>, int const, int>>) );
+    static_assert(meta::equal<
+                  rime::detail::generalise_type<int_<4>, degenerate>,
+                  meta::vector<int_<4>, int const, int>>::type::value);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

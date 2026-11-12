@@ -50,16 +50,16 @@ BOOST_AUTO_TEST_CASE(test_rime_if)
     double d = 3.;
     double & rd = d;
 
-    BOOST_MPL_ASSERT(
-        (std::is_same<decltype(rime::if_(rime::true_, 1u, rd)), unsigned>) );
-    BOOST_MPL_ASSERT(
-        (std::is_same<decltype(rime::if_(rime::false_, ri, 2.3)), double>) );
-    BOOST_MPL_ASSERT(
-        (std::is_same<decltype(rime::if_(rime::true_, i, rd)), int &>) );
-    BOOST_MPL_ASSERT(
-        (std::is_same<decltype(rime::if_(rime::false_, ri, rd)), double &>) );
-    BOOST_MPL_ASSERT(
-        (std::is_same<decltype(rime::if_(rime::true_, ri, rd)), int const &>) );
+    static_assert(
+        std::is_same_v<decltype(rime::if_(rime::true_, 1u, rd)), unsigned>);
+    static_assert(
+        std::is_same_v<decltype(rime::if_(rime::false_, ri, 2.3)), double>);
+    static_assert(
+        std::is_same_v<decltype(rime::if_(rime::true_, i, rd)), int &>);
+    static_assert(
+        std::is_same_v<decltype(rime::if_(rime::false_, ri, rd)), double &>);
+    static_assert(
+        std::is_same_v<decltype(rime::if_(rime::true_, ri, rd)), int const &>);
 
     RIME_CHECK_EQUAL(
         rime::if_(rime::true_, return_as_double(), return_as_long())(6), 6.);
@@ -116,19 +116,19 @@ BOOST_AUTO_TEST_CASE(test_rime_if_merge)
     long double const six = 6;
 
     auto && v1 = rime::if_<policy>(true, four, 5.f);
-    BOOST_MPL_ASSERT((std::is_same<decltype(v1), float &&>) );
+    static_assert(std::is_same_v<decltype(v1), float &&>);
 
     auto && v2 = rime::if_<policy>(true, 4., 5.f);
-    BOOST_MPL_ASSERT((std::is_same<decltype(v2), double &&>) );
+    static_assert(std::is_same_v<decltype(v2), double &&>);
 
     auto && v3 = rime::if_<policy>(true, four, 5.);
-    BOOST_MPL_ASSERT((std::is_same<decltype(v3), double &&>) );
+    static_assert(std::is_same_v<decltype(v3), double &&>);
 
     auto && v4 = rime::if_<policy>(true, four, five);
-    BOOST_MPL_ASSERT((std::is_same<decltype(v4), long double &&>) );
+    static_assert(std::is_same_v<decltype(v4), long double &&>);
 
     auto && v5 = rime::if_<policy>(true, six, five);
-    BOOST_MPL_ASSERT((std::is_same<decltype(v5), long double const &>) );
+    static_assert(std::is_same_v<decltype(v5), long double const &>);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

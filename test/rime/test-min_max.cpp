@@ -23,16 +23,14 @@ BOOST_AUTO_TEST_CASE(test_rime_min_max__common_constant)
     typedef rime::merge_policy::constant<rime::merge_policy::common_type>
         common_constant;
 
-    BOOST_MPL_ASSERT(
-        (std::is_same<
-            common_constant::apply<unsigned char, float>::type, float>) );
-    BOOST_MPL_ASSERT(
-        (std::is_same<
-            common_constant::apply<rime::int_<5>, float>::type, float>) );
-    BOOST_MPL_ASSERT((std::is_same<
-                      common_constant::apply<
-                          rime::int_<5>, rime::constant<unsigned, 5>>::type,
-                      rime::constant<unsigned, 5>>) );
+    static_assert(std::is_same_v<
+                  common_constant::apply<unsigned char, float>::type, float>);
+    static_assert(std::is_same_v<
+                  common_constant::apply<rime::int_<5>, float>::type, float>);
+    static_assert(std::is_same_v<
+                  common_constant::apply<
+                      rime::int_<5>, rime::constant<unsigned, 5>>::type,
+                  rime::constant<unsigned, 5>>);
 }
 
 BOOST_AUTO_TEST_CASE(test_rime_min_max)
@@ -96,15 +94,14 @@ BOOST_AUTO_TEST_CASE(test_rime_min_max__policy)
     typedef rime::merge_policy::constant<rime::merge_policy::common_type>
         merge_policy;
 
-    BOOST_MPL_ASSERT(
-        (std::is_same<merge_policy::apply<int, char>::type, int>) );
+    static_assert(std::is_same_v<merge_policy::apply<int, char>::type, int>);
 
     auto v1 = rime::min_<merge_policy>(char(7), double(3));
-    BOOST_MPL_ASSERT((std::is_same<decltype(v1), double>) );
+    static_assert(std::is_same_v<decltype(v1), double>);
     BOOST_CHECK_EQUAL(v1, 3.);
 
     auto v2 = rime::max_<merge_policy>(char(7), double(3));
-    BOOST_MPL_ASSERT((std::is_same<decltype(v1), double>) );
+    static_assert(std::is_same_v<decltype(v1), double>);
     BOOST_CHECK_EQUAL(v2, 7.);
 
     v1 = rime::min_<merge_policy>(char(4), double(7));
@@ -117,11 +114,11 @@ BOOST_AUTO_TEST_CASE(test_rime_min_max__policy)
     int i = 5;
 
     auto v3 = rime::min_<merge_policy>(c, i);
-    BOOST_MPL_ASSERT((std::is_same<decltype(v3), int>) );
+    static_assert(std::is_same_v<decltype(v3), int>);
     BOOST_CHECK_EQUAL(v3, 1);
 
     auto v4 = rime::max_<merge_policy>(c, i);
-    BOOST_MPL_ASSERT((std::is_same<decltype(v3), int>) );
+    static_assert(std::is_same_v<decltype(v3), int>);
     BOOST_CHECK_EQUAL(v4, 5);
 
     v3 = rime::min_<merge_policy>(char(7), i);

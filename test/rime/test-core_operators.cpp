@@ -21,7 +21,7 @@ template <class Type, Type Content, class ReferenceType>
 void check_constant_equals(
     rime::constant<Type, Content> const &, ReferenceType const & reference)
 {
-    BOOST_MPL_ASSERT((std::is_same<Type, ReferenceType>) );
+    static_assert(std::is_same_v<Type, ReferenceType>);
     BOOST_CHECK_EQUAL(Content, reference);
 }
 

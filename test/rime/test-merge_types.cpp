@@ -54,99 +54,90 @@ BOOST_AUTO_TEST_CASE(test_merge_types_merge_policy)
     using rime::merge_policy::common_type;
 
     // same
-    BOOST_MPL_ASSERT((is_implemented<same, int, int>) );
-    BOOST_MPL_ASSERT((is_implemented<same, long, long>) );
-    BOOST_MPL_ASSERT((is_unimplemented<same, int, long>) );
+    static_assert(is_implemented<same, int, int>::value);
+    static_assert(is_implemented<same, long, long>::value);
+    static_assert(is_unimplemented<same, int, long>::value);
 
-    BOOST_MPL_ASSERT((std::is_same<same::apply<int, int>::type, int>) );
+    static_assert(std::is_same_v<same::apply<int, int>::type, int>);
 
-    BOOST_MPL_ASSERT((std::is_same<same::apply<long, long>::type, long>) );
+    static_assert(std::is_same_v<same::apply<long, long>::type, long>);
 
     // const
-    BOOST_MPL_ASSERT((is_implemented<const_, int, int>) );
-    BOOST_MPL_ASSERT((is_implemented<const_, int const, int const>) );
-    BOOST_MPL_ASSERT((is_implemented<const_, int const, int>) );
-    BOOST_MPL_ASSERT((is_implemented<const_, int, int const>) );
-    BOOST_MPL_ASSERT((is_unimplemented<const_, int, long>) );
-    BOOST_MPL_ASSERT((is_unimplemented<const_, int, long const>) );
+    static_assert(is_implemented<const_, int, int>::value);
+    static_assert(is_implemented<const_, int const, int const>::value);
+    static_assert(is_implemented<const_, int const, int>::value);
+    static_assert(is_implemented<const_, int, int const>::value);
+    static_assert(is_unimplemented<const_, int, long>::value);
+    static_assert(is_unimplemented<const_, int, long const>::value);
 
-    BOOST_MPL_ASSERT((std::is_same<const_::apply<int, int>::type, int>) );
+    static_assert(std::is_same_v<const_::apply<int, int>::type, int>);
 
-    BOOST_MPL_ASSERT(
-        (std::is_same<const_::apply<int const, int>::type, int const>) );
+    static_assert(
+        std::is_same_v<const_::apply<int const, int>::type, int const>);
 
-    BOOST_MPL_ASSERT(
-        (std::is_same<const_::apply<int const, int const>::type, int const>) );
+    static_assert(
+        std::is_same_v<const_::apply<int const, int const>::type, int const>);
 
     // reference
-    BOOST_MPL_ASSERT((is_implemented<reference, int, int>) );
-    BOOST_MPL_ASSERT((is_implemented<reference, int, int &>) );
-    BOOST_MPL_ASSERT((is_implemented<reference, int, int &&>) );
-    BOOST_MPL_ASSERT((is_implemented<reference, int &, int>) );
-    BOOST_MPL_ASSERT((is_implemented<reference, int &, int &>) );
-    BOOST_MPL_ASSERT((is_implemented<reference, int &, int &&>) );
-    BOOST_MPL_ASSERT((is_implemented<reference, int &&, int>) );
-    BOOST_MPL_ASSERT((is_implemented<reference, int &&, int &>) );
-    BOOST_MPL_ASSERT((is_implemented<reference, int &&, int &&>) );
+    static_assert(is_implemented<reference, int, int>::value);
+    static_assert(is_implemented<reference, int, int &>::value);
+    static_assert(is_implemented<reference, int, int &&>::value);
+    static_assert(is_implemented<reference, int &, int>::value);
+    static_assert(is_implemented<reference, int &, int &>::value);
+    static_assert(is_implemented<reference, int &, int &&>::value);
+    static_assert(is_implemented<reference, int &&, int>::value);
+    static_assert(is_implemented<reference, int &&, int &>::value);
+    static_assert(is_implemented<reference, int &&, int &&>::value);
 
-    BOOST_MPL_ASSERT((is_unimplemented<reference, int &, long &>) );
-    BOOST_MPL_ASSERT((is_unimplemented<reference, int, long &>) );
+    static_assert(is_unimplemented<reference, int &, long &>::value);
+    static_assert(is_unimplemented<reference, int, long &>::value);
 
-    BOOST_MPL_ASSERT((std::is_same<reference::apply<int, int>::type, int>) );
+    static_assert(std::is_same_v<reference::apply<int, int>::type, int>);
 
-    BOOST_MPL_ASSERT((std::is_same<reference::apply<int &, int>::type, int>) );
+    static_assert(std::is_same_v<reference::apply<int &, int>::type, int>);
 
-    BOOST_MPL_ASSERT(
-        (std::is_same<reference::apply<int &, int &>::type, int &>) );
+    static_assert(std::is_same_v<reference::apply<int &, int &>::type, int &>);
 
     // const_ underlies reference.
-    BOOST_MPL_ASSERT(
-        (std::is_same<reference::apply<int &, int const>::type, int const>) );
+    static_assert(
+        std::is_same_v<reference::apply<int &, int const>::type, int const>);
 
     // decay
-    BOOST_MPL_ASSERT((is_implemented<decay, int, int>) );
-    BOOST_MPL_ASSERT((is_implemented<decay, int &, int>) );
-    BOOST_MPL_ASSERT((is_implemented<decay, int, int &&>) );
-    BOOST_MPL_ASSERT((is_implemented<decay, int const &, int &>) );
-    BOOST_MPL_ASSERT((is_unimplemented<decay, int, long>) );
-    BOOST_MPL_ASSERT((is_unimplemented<decay, int &, long &>) );
-    BOOST_MPL_ASSERT((is_unimplemented<decay, int, long &>) );
+    static_assert(is_implemented<decay, int, int>::value);
+    static_assert(is_implemented<decay, int &, int>::value);
+    static_assert(is_implemented<decay, int, int &&>::value);
+    static_assert(is_implemented<decay, int const &, int &>::value);
+    static_assert(is_unimplemented<decay, int, long>::value);
+    static_assert(is_unimplemented<decay, int &, long &>::value);
+    static_assert(is_unimplemented<decay, int, long &>::value);
 
     // Forward to "same".
-    BOOST_MPL_ASSERT((std::is_same<decay::apply<int, int>::type, int>) );
-    BOOST_MPL_ASSERT(
-        (std::is_same<decay::apply<int const, int const>::type, int const>) );
-    BOOST_MPL_ASSERT(
-        (std::is_same<decay::apply<int &&, int &&>::type, int &&>) );
+    static_assert(std::is_same_v<decay::apply<int, int>::type, int>);
+    static_assert(
+        std::is_same_v<decay::apply<int const, int const>::type, int const>);
+    static_assert(std::is_same_v<decay::apply<int &&, int &&>::type, int &&>);
     // Decay and forward to "same".
-    BOOST_MPL_ASSERT((std::is_same<decay::apply<int &&, int &>::type, int>) );
-    BOOST_MPL_ASSERT(
-        (std::is_same<decay::apply<int const &, int>::type, int>) );
-    BOOST_MPL_ASSERT(
-        (std::is_same<decay::apply<int const &, int>::type, int>) );
+    static_assert(std::is_same_v<decay::apply<int &&, int &>::type, int>);
+    static_assert(std::is_same_v<decay::apply<int const &, int>::type, int>);
+    static_assert(std::is_same_v<decay::apply<int const &, int>::type, int>);
 
     // base_class.
-    BOOST_MPL_ASSERT((std::is_same<base_class::apply<int, int>::type, int>) );
-    BOOST_MPL_ASSERT((is_unimplemented<base_class, int, long>) );
+    static_assert(std::is_same_v<base_class::apply<int, int>::type, int>);
+    static_assert(is_unimplemented<base_class, int, long>::value);
 
-    BOOST_MPL_ASSERT(
-        (std::is_same<base_class::apply<base, base>::type, base>) );
-    BOOST_MPL_ASSERT(
-        (std::is_same<base_class::apply<base, derived>::type, base>) );
-    BOOST_MPL_ASSERT(
-        (std::is_same<base_class::apply<derived, base>::type, base>) );
-    BOOST_MPL_ASSERT(
-        (std::is_same<base_class::apply<derived, derived>::type, derived>) );
+    static_assert(std::is_same_v<base_class::apply<base, base>::type, base>);
+    static_assert(std::is_same_v<base_class::apply<base, derived>::type, base>);
+    static_assert(std::is_same_v<base_class::apply<derived, base>::type, base>);
+    static_assert(
+        std::is_same_v<base_class::apply<derived, derived>::type, derived>);
 
     // common_type.
-    BOOST_MPL_ASSERT((std::is_same<common_type::apply<int, int>::type, int>) );
-    BOOST_MPL_ASSERT(
-        (std::is_same<common_type::apply<int, long>::type, long>) );
-    BOOST_MPL_ASSERT(
-        (std::is_same<
-            common_type::apply<unsigned char, unsigned>::type, unsigned>) );
-    BOOST_MPL_ASSERT(
-        (std::is_same<common_type::apply<unsigned char, float>::type, float>) );
+    static_assert(std::is_same_v<common_type::apply<int, int>::type, int>);
+    static_assert(std::is_same_v<common_type::apply<int, long>::type, long>);
+    static_assert(std::is_same_v<
+                  common_type::apply<unsigned char, unsigned>::type, unsigned>);
+    static_assert(
+        std::is_same_v<common_type::apply<unsigned char, float>::type, float>);
 }
 
 BOOST_AUTO_TEST_CASE(test_merge_policy_collapse)
@@ -420,27 +411,27 @@ BOOST_AUTO_TEST_CASE(test_merge_types_internal_insert)
     using rime::merge_detail::insert;
     typedef rime::merge_policy::reference<> merge_two;
 
-    BOOST_MPL_ASSERT(
-        (std::is_same<insert<merge_two, int, vector<>>::type, vector<int>>) );
+    static_assert(
+        std::is_same_v<insert<merge_two, int, vector<>>::type, vector<int>>);
 
-    BOOST_MPL_ASSERT((
-        std::is_same<insert<merge_two, int, vector<int>>::type, vector<int>>) );
+    static_assert(
+        std::is_same_v<insert<merge_two, int, vector<int>>::type, vector<int>>);
 
-    BOOST_MPL_ASSERT(
-        (std::is_same<
-            insert<merge_two, int, vector<long>>::type, vector<int, long>>) );
+    static_assert(
+        std::is_same_v<
+            insert<merge_two, int, vector<long>>::type, vector<int, long>>);
 
-    BOOST_MPL_ASSERT((std::is_same<
-                      insert<merge_two, int const, vector<int &>>::type,
-                      vector<int const>>) );
+    static_assert(std::is_same_v<
+                  insert<merge_two, int const, vector<int &>>::type,
+                  vector<int const>>);
 
-    BOOST_MPL_ASSERT((std::is_same<
-                      insert<merge_two, int const, vector<char, int &>>::type,
-                      vector<int const, char>>) );
+    static_assert(std::is_same_v<
+                  insert<merge_two, int const, vector<char, int &>>::type,
+                  vector<int const, char>>);
 
-    BOOST_MPL_ASSERT((std::is_same<
-                      insert<merge_two, int const, vector<int &, char>>::type,
-                      vector<int const, char>>) );
+    static_assert(std::is_same_v<
+                  insert<merge_two, int const, vector<int &, char>>::type,
+                  vector<int const, char>>);
 }
 
 BOOST_AUTO_TEST_CASE(test_merge_types_reference)
@@ -450,63 +441,61 @@ BOOST_AUTO_TEST_CASE(test_merge_types_reference)
     typedef rime::merge_policy::reference<> merge_two;
 
     {
-        BOOST_MPL_ASSERT(
-            (std::is_same<merge_types<merge_two, vector<>>::type, vector<>>) );
+        static_assert(
+            std::is_same_v<merge_types<merge_two, vector<>>::type, vector<>>);
     }
 
     {
-        BOOST_MPL_ASSERT((std::is_same<
-                          merge_types<
-                              merge_two,
-                              vector<int, int, long &, int const, int &>>::type,
-                          vector<int const, long &>>) );
+        static_assert(std::is_same_v<
+                      merge_types<
+                          merge_two,
+                          vector<int, int, long &, int const, int &>>::type,
+                      vector<int const, long &>>);
     }
 
     {
-        BOOST_MPL_ASSERT(
-            (std::is_same<
-                merge_types<merge_two, vector<int>>::type, vector<int>>) );
+        static_assert(std::is_same_v<
+                      merge_types<merge_two, vector<int>>::type, vector<int>>);
     }
 
     {
-        BOOST_MPL_ASSERT((std::is_same<
-                          merge_types<merge_two, vector<int, long>>::type,
-                          vector<int, long>>) );
+        static_assert(std::is_same_v<
+                      merge_types<merge_two, vector<int, long>>::type,
+                      vector<int, long>>);
     }
 
     {
-        BOOST_MPL_ASSERT((std::is_same<
-                          merge_types<merge_two, vector<int &, long>>::type,
-                          vector<int &, long>>) );
+        static_assert(std::is_same_v<
+                      merge_types<merge_two, vector<int &, long>>::type,
+                      vector<int &, long>>);
     }
 
     {
-        BOOST_MPL_ASSERT(
-            (std::is_same<
-                merge_types<merge_two, vector<int const &, int>>::type,
-                vector<int const>>) );
+        static_assert(std::is_same_v<
+                      merge_types<merge_two, vector<int const &, int>>::type,
+                      vector<int const>>);
     }
 
     {
-        BOOST_MPL_ASSERT(
-            (std::is_same<
+        static_assert(
+            std::is_same_v<
                 merge_types<merge_two, vector<long, int const &, int>>::type,
-                vector<long, int const>>) );
+                vector<long, int const>>);
     }
 
     {
-        BOOST_MPL_ASSERT(
-            (std::is_same<
+        static_assert(
+            std::is_same_v<
                 merge_types<merge_two, vector<int const &, int, long>>::type,
-                vector<int const, long>>) );
+                vector<int const, long>>);
     }
 
     {
-        BOOST_MPL_ASSERT((std::is_same<
-                          merge_types<
-                              merge_two,
-                              vector<int, int, long &, int const, int &>>::type,
-                          vector<int const, long &>>) );
+        static_assert(std::is_same_v<
+                      merge_types<
+                          merge_two,
+                          vector<int, int, long &, int const, int &>>::type,
+                      vector<int const, long &>>);
     }
 }
 
@@ -519,24 +508,24 @@ BOOST_AUTO_TEST_CASE(test_merge_types_full)
         merge_two;
 
     {
-        BOOST_MPL_ASSERT((std::is_same<
-                          merge_types<
-                              merge_two,
-                              vector<int, int, long &, int const, int &>>::type,
-                          vector<int const, long &>>) );
+        static_assert(std::is_same_v<
+                      merge_types<
+                          merge_two,
+                          vector<int, int, long &, int const, int &>>::type,
+                      vector<int const, long &>>);
     }
     {
-        BOOST_MPL_ASSERT(
-            (std::is_same<
+        static_assert(
+            std::is_same_v<
                 merge_types<merge_two, vector<int, constant<int, 3>>>::type,
-                vector<int>>) );
+                vector<int>>);
     }
     {
-        BOOST_MPL_ASSERT(
-            (std::is_same<
+        static_assert(
+            std::is_same_v<
                 merge_types<
                     merge_two, vector<int const &, constant<int, 3>>>::type,
-                vector<int const>>) );
+                vector<int const>>);
     }
 }
 

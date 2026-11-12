@@ -191,36 +191,32 @@ BOOST_AUTO_TEST_CASE(test_rime_variant_visit)
         variant v1(4);
         variant v2(d);
         auto result = rime::visit(plus())(v1, v2);
-        BOOST_MPL_ASSERT(
-            (std::is_same<
-                decltype(result), rime::variant<int, float, double>>) );
+        static_assert(std::is_same_v<
+                      decltype(result), rime::variant<int, float, double>>);
         BOOST_CHECK_EQUAL(rime::get<double>(result), 10.7);
     }
     {
         variant v1(4.f);
         variant v2(3.f);
         auto result = rime::visit(plus())(v1, v2);
-        BOOST_MPL_ASSERT(
-            (std::is_same<
-                decltype(result), rime::variant<int, float, double>>) );
+        static_assert(std::is_same_v<
+                      decltype(result), rime::variant<int, float, double>>);
         BOOST_CHECK_EQUAL(rime::get<float>(result), 7.f);
     }
     {
         variant v1(4);
         variant v2(3.f);
         auto result = rime::visit(plus())(v1, v2);
-        BOOST_MPL_ASSERT(
-            (std::is_same<
-                decltype(result), rime::variant<int, float, double>>) );
+        static_assert(std::is_same_v<
+                      decltype(result), rime::variant<int, float, double>>);
         BOOST_CHECK_EQUAL(rime::get<float>(result), 7.f);
     }
     {
         variant v1(-3);
         variant v2(-6);
         auto result = rime::visit(plus())(v1, v2);
-        BOOST_MPL_ASSERT(
-            (std::is_same<
-                decltype(result), rime::variant<int, float, double>>) );
+        static_assert(std::is_same_v<
+                      decltype(result), rime::variant<int, float, double>>);
         BOOST_CHECK_EQUAL(rime::get<int>(result), -9);
     }
     {
