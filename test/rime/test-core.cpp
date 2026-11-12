@@ -14,7 +14,6 @@
 #include <stdexcept>
 #include <type_traits>
 
-#include "boost/mpl/assert.hpp"
 #include "boost/mpl/int.hpp"
 #include "boost/mpl/size_t.hpp"
 
@@ -39,50 +38,47 @@ BOOST_AUTO_TEST_CASE(test_rime_core)
     int int_three = 3;
 
     // is_rime_constant
-    BOOST_MPL_ASSERT_NOT((rime::is_rime_constant<std::true_type>) );
-    BOOST_MPL_ASSERT_NOT(
-        (rime::is_rime_constant<std::integral_constant<int, 3>>) );
-    BOOST_MPL_ASSERT_NOT((rime::is_rime_constant<boost::mpl::true_>) );
-    BOOST_MPL_ASSERT_NOT((rime::is_rime_constant<boost::mpl::int_<3>>) );
-    BOOST_MPL_ASSERT((rime::is_rime_constant<rime::bool_<true>>) );
-    BOOST_MPL_ASSERT((rime::is_rime_constant<rime::int_<3> const>) );
-    BOOST_MPL_ASSERT((rime::is_rime_constant<rime::constant<long, 3> &>) );
+    static_assert(!rime::is_rime_constant<std::true_type>::value);
+    static_assert(
+        !rime::is_rime_constant<std::integral_constant<int, 3>>::value);
+    static_assert(!rime::is_rime_constant<boost::mpl::true_>::value);
+    static_assert(!rime::is_rime_constant<boost::mpl::int_<3>>::value);
+    static_assert(rime::is_rime_constant<rime::bool_<true>>::value);
+    static_assert(rime::is_rime_constant<rime::int_<3> const>::value);
+    static_assert(rime::is_rime_constant<rime::constant<long, 3> &>::value);
 
     // is_constant
-    BOOST_MPL_ASSERT((rime::is_constant<std::true_type>) );
-    BOOST_MPL_ASSERT((rime::is_constant<std::integral_constant<int, 3> &>) );
-    BOOST_MPL_ASSERT((rime::is_constant<std::is_integral<int> const>) );
-    BOOST_MPL_ASSERT((rime::is_constant<std::is_same<int, bool> const &>) );
-    BOOST_MPL_ASSERT((rime::is_constant<std::is_base_of<base, derived>>) );
-    BOOST_MPL_ASSERT((rime::is_constant<std::is_base_of<derived, base>>) );
+    static_assert(rime::is_constant<std::true_type>::value);
+    static_assert(rime::is_constant<std::integral_constant<int, 3> &>::value);
+    static_assert(rime::is_constant<std::is_integral<int> const>::value);
+    static_assert(rime::is_constant<std::is_same<int, bool> const &>::value);
+    static_assert(rime::is_constant<std::is_base_of<base, derived>>::value);
+    static_assert(rime::is_constant<std::is_base_of<derived, base>>::value);
 
-    BOOST_MPL_ASSERT((rime::is_constant<boost::mpl::true_>) );
-    BOOST_MPL_ASSERT((rime::is_constant<boost::mpl::int_<3> &>) );
-    BOOST_MPL_ASSERT((rime::is_constant<rime::bool_<true>>) );
-    BOOST_MPL_ASSERT((rime::is_constant<rime::int_<3> const>) );
-    BOOST_MPL_ASSERT((rime::is_constant<rime::constant<long, 3>>) );
+    static_assert(rime::is_constant<boost::mpl::true_>::value);
+    static_assert(rime::is_constant<boost::mpl::int_<3> &>::value);
+    static_assert(rime::is_constant<rime::bool_<true>>::value);
+    static_assert(rime::is_constant<rime::int_<3> const>::value);
+    static_assert(rime::is_constant<rime::constant<long, 3>>::value);
 
-    BOOST_MPL_ASSERT_NOT((rime::is_constant<int>) );
-    BOOST_MPL_ASSERT_NOT((rime::is_constant<double>) );
-    BOOST_MPL_ASSERT_NOT((rime::is_constant<derived>) );
-    BOOST_MPL_ASSERT_NOT((rime::is_constant<void>) );
+    static_assert(!rime::is_constant<int>::value);
+    static_assert(!rime::is_constant<double>::value);
+    static_assert(!rime::is_constant<derived>::value);
+    static_assert(!rime::is_constant<void>::value);
 
     // value
-    BOOST_MPL_ASSERT(
-        (std::is_same<rime::value<boost::mpl::true_>::type, bool>) );
-    BOOST_MPL_ASSERT(
-        (std::is_same<rime::value<boost::mpl::false_ &>::type, bool>) );
-    BOOST_MPL_ASSERT((std::is_same<rime::value<rime::int_<3>>::type, int>) );
-    BOOST_MPL_ASSERT(
-        (std::is_same<rime::value<rime::int_<0> const>::type, int>) );
-    BOOST_MPL_ASSERT(
-        (std::is_same<rime::value<rime::int_<5> const &>::type, int>) );
+    static_assert(std::is_same_v<rime::value<boost::mpl::true_>::type, bool>);
+    static_assert(
+        std::is_same_v<rime::value<boost::mpl::false_ &>::type, bool>);
+    static_assert(std::is_same_v<rime::value<rime::int_<3>>::type, int>);
+    static_assert(std::is_same_v<rime::value<rime::int_<0> const>::type, int>);
+    static_assert(
+        std::is_same_v<rime::value<rime::int_<5> const &>::type, int>);
 
-    BOOST_MPL_ASSERT((std::is_same<rime::value<int>::type, int>) );
-    BOOST_MPL_ASSERT((std::is_same<rime::value<int const>::type, int const>) );
-    BOOST_MPL_ASSERT((std::is_same<rime::value<int &>::type, int &>) );
-    BOOST_MPL_ASSERT(
-        (std::is_same<rime::value<int const &>::type, int const &>) );
+    static_assert(std::is_same_v<rime::value<int>::type, int>);
+    static_assert(std::is_same_v<rime::value<int const>::type, int const>);
+    static_assert(std::is_same_v<rime::value<int &>::type, int &>);
+    static_assert(std::is_same_v<rime::value<int const &>::type, int const &>);
 
     // get_value
     BOOST_CHECK_EQUAL(rime::get_value(rime::int_<3>()), 3);
@@ -92,87 +88,86 @@ BOOST_AUTO_TEST_CASE(test_rime_core)
     BOOST_CHECK_EQUAL(rime::get_value(4.7), 4.7);
 
     // equal_constant
-    BOOST_MPL_ASSERT(
-        (rime::equal_constant<boost::mpl::true_, rime::bool_<true>>) );
-    BOOST_MPL_ASSERT(
-        (rime::equal_constant<std::false_type, rime::bool_<false>>) );
-    BOOST_MPL_ASSERT(
-        (rime::equal_constant<boost::mpl::int_<5>, rime::int_<5>>) );
-    BOOST_MPL_ASSERT(
-        (rime::equal_constant<rime::bool_<true>, rime::bool_<true>>) );
-    BOOST_MPL_ASSERT_NOT((rime::equal_constant<rime::int_<4>, rime::int_<5>>) );
-    BOOST_MPL_ASSERT(
-        (rime::equal_constant<rime::constant<unsigned, 5u>, rime::int_<5>>) );
-    BOOST_MPL_ASSERT_NOT(
-        (rime::equal_constant<boost::mpl::int_<4>, rime::int_<5>>) );
-    BOOST_MPL_ASSERT_NOT((rime::equal_constant<
-                          boost::mpl::bool_<false>, boost::mpl::bool_<true>>) );
-    BOOST_MPL_ASSERT_NOT(
-        (rime::equal_constant<rime::bool_<false>, rime::bool_<true>>) );
+    static_assert(
+        rime::equal_constant<boost::mpl::true_, rime::bool_<true>>::value);
+    static_assert(
+        rime::equal_constant<std::false_type, rime::bool_<false>>::value);
+    static_assert(
+        rime::equal_constant<boost::mpl::int_<5>, rime::int_<5>>::value);
+    static_assert(
+        rime::equal_constant<rime::bool_<true>, rime::bool_<true>>::value);
+    static_assert(!rime::equal_constant<rime::int_<4>, rime::int_<5>>::value);
+    static_assert(rime::equal_constant<
+                  rime::constant<unsigned, 5u>, rime::int_<5>>::value);
+    static_assert(
+        !rime::equal_constant<boost::mpl::int_<4>, rime::int_<5>>::value);
+    static_assert(!rime::equal_constant<
+                  boost::mpl::bool_<false>, boost::mpl::bool_<true>>::value);
+    static_assert(
+        !rime::equal_constant<rime::bool_<false>, rime::bool_<true>>::value);
     // This does work, but it's hardly the intended purpose.
     /*BOOST_MPL_ASSERT ((rime::equal_constant <
         rime::int_ <1>, rime::constant <bool, true>>));*/
-    BOOST_MPL_ASSERT_NOT((rime::equal_constant<bool, rime::bool_<true>>) );
-    BOOST_MPL_ASSERT_NOT((rime::equal_constant<bool, bool>) );
-    BOOST_MPL_ASSERT_NOT((rime::equal_constant<boost::mpl::int_<4>, int>) );
-    BOOST_MPL_ASSERT_NOT((rime::equal_constant<int, int>) );
-    BOOST_MPL_ASSERT_NOT((rime::equal_constant<int, bool>) );
+    static_assert(!rime::equal_constant<bool, rime::bool_<true>>::value);
+    static_assert(!rime::equal_constant<bool, bool>::value);
+    static_assert(!rime::equal_constant<boost::mpl::int_<4>, int>::value);
+    static_assert(!rime::equal_constant<int, int>::value);
+    static_assert(!rime::equal_constant<int, bool>::value);
 
     // same_constant
-    BOOST_MPL_ASSERT(
-        (rime::same_constant<boost::mpl::true_, rime::bool_<true>>) );
-    BOOST_MPL_ASSERT(
-        (rime::same_constant<std::false_type, rime::bool_<false>>) );
-    BOOST_MPL_ASSERT(
-        (rime::same_constant<boost::mpl::int_<5>, rime::int_<5>>) );
-    BOOST_MPL_ASSERT(
-        (rime::same_constant<rime::bool_<true>, rime::bool_<true>>) );
-    BOOST_MPL_ASSERT_NOT((rime::same_constant<rime::int_<4>, rime::int_<5>>) );
-    BOOST_MPL_ASSERT_NOT(
-        (rime::same_constant<rime::constant<unsigned, 5u>, rime::int_<5>>) );
-    BOOST_MPL_ASSERT_NOT(
-        (rime::same_constant<boost::mpl::int_<4>, rime::int_<5>>) );
-    BOOST_MPL_ASSERT_NOT((rime::same_constant<
-                          boost::mpl::bool_<false>, boost::mpl::bool_<true>>) );
-    BOOST_MPL_ASSERT_NOT(
-        (rime::same_constant<rime::bool_<false>, rime::bool_<true>>) );
-    BOOST_MPL_ASSERT_NOT(
-        (rime::same_constant<rime::int_<5>, rime::constant<unsigned, 5u>>) );
-    BOOST_MPL_ASSERT_NOT((rime::same_constant<bool, rime::bool_<true>>) );
-    BOOST_MPL_ASSERT_NOT((rime::same_constant<bool, bool>) );
-    BOOST_MPL_ASSERT_NOT((rime::same_constant<boost::mpl::int_<4>, int>) );
-    BOOST_MPL_ASSERT_NOT((rime::same_constant<int, int>) );
-    BOOST_MPL_ASSERT_NOT((rime::same_constant<int, bool>) );
+    static_assert(
+        rime::same_constant<boost::mpl::true_, rime::bool_<true>>::value);
+    static_assert(
+        rime::same_constant<std::false_type, rime::bool_<false>>::value);
+    static_assert(
+        rime::same_constant<boost::mpl::int_<5>, rime::int_<5>>::value);
+    static_assert(
+        rime::same_constant<rime::bool_<true>, rime::bool_<true>>::value);
+    static_assert(!rime::same_constant<rime::int_<4>, rime::int_<5>>::value);
+    static_assert(!rime::same_constant<
+                  rime::constant<unsigned, 5u>, rime::int_<5>>::value);
+    static_assert(
+        !rime::same_constant<boost::mpl::int_<4>, rime::int_<5>>::value);
+    static_assert(!rime::same_constant<
+                  boost::mpl::bool_<false>, boost::mpl::bool_<true>>::value);
+    static_assert(
+        !rime::same_constant<rime::bool_<false>, rime::bool_<true>>::value);
+    static_assert(!rime::same_constant<
+                  rime::int_<5>, rime::constant<unsigned, 5u>>::value);
+    static_assert(!rime::same_constant<bool, rime::bool_<true>>::value);
+    static_assert(!rime::same_constant<bool, bool>::value);
+    static_assert(!rime::same_constant<boost::mpl::int_<4>, int>::value);
+    static_assert(!rime::same_constant<int, int>::value);
+    static_assert(!rime::same_constant<int, bool>::value);
 
     // Predefined types.
-    BOOST_MPL_ASSERT((
-        rime::same_constant<rime::bool_<false>, rime::constant<bool, false>>) );
-    BOOST_MPL_ASSERT(
-        (rime::same_constant<rime::false_type, rime::bool_<false>>) );
-    BOOST_MPL_ASSERT(
-        (rime::same_constant<rime::true_type, rime::bool_<true>>) );
-    BOOST_MPL_ASSERT(
-        (rime::same_constant<decltype(rime::false_), rime::bool_<false>>) );
-    BOOST_MPL_ASSERT(
-        (rime::same_constant<decltype(rime::true_), rime::bool_<true>>) );
+    static_assert(rime::same_constant<
+                  rime::bool_<false>, rime::constant<bool, false>>::value);
+    static_assert(
+        rime::same_constant<rime::false_type, rime::bool_<false>>::value);
+    static_assert(
+        rime::same_constant<rime::true_type, rime::bool_<true>>::value);
+    static_assert(
+        rime::same_constant<decltype(rime::false_), rime::bool_<false>>::value);
+    static_assert(
+        rime::same_constant<decltype(rime::true_), rime::bool_<true>>::value);
 
-    BOOST_MPL_ASSERT(
-        (rime::same_constant<rime::int_<7>, rime::constant<int, 7>>) );
-    BOOST_MPL_ASSERT((rime::same_constant<
-                      rime::size_t<8u>, rime::constant<std::size_t, 8u>>) );
+    static_assert(
+        rime::same_constant<rime::int_<7>, rime::constant<int, 7>>::value);
+    static_assert(rime::same_constant<
+                  rime::size_t<8u>, rime::constant<std::size_t, 8u>>::value);
 
     // as_rime_constant
-    BOOST_MPL_ASSERT((std::is_same<
-                      rime::as_rime_constant<boost::mpl::int_<7>>::type,
-                      rime::constant<int, 7>>) );
-    BOOST_MPL_ASSERT(
-        (std::is_same<
+    static_assert(std::is_same_v<
+                  rime::as_rime_constant<boost::mpl::int_<7>>::type,
+                  rime::constant<int, 7>>);
+    static_assert(
+        std::is_same_v<
             rime::as_rime_constant<std::integral_constant<bool, true>>::type,
-            rime::constant<bool, true>>) );
-    BOOST_MPL_ASSERT(
-        (std::is_same<
-            rime::as_rime_constant<rime::constant<unsigned, 45u>>::type,
-            rime::constant<unsigned, 45u>>) );
+            rime::constant<bool, true>>);
+    static_assert(std::is_same_v<
+                  rime::as_rime_constant<rime::constant<unsigned, 45u>>::type,
+                  rime::constant<unsigned, 45u>>);
 
     // Convert to run-time value
     BOOST_CHECK_EQUAL(rime_three, int_three);
@@ -186,62 +181,46 @@ BOOST_AUTO_TEST_CASE(test_rime_core)
 BOOST_AUTO_TEST_CASE(test_rime_constant_convert)
 {
     // All sorts of bools.
-    static_assert(
-        std::is_convertible<
-            rime::constant<bool, true>, rime::bool_<true>>::value,
-        "");
-    static_assert(
-        !std::is_convertible<
-            rime::constant<bool, true>, rime::bool_<false>>::value,
-        "");
+    static_assert(std::is_convertible<
+                  rime::constant<bool, true>, rime::bool_<true>>::value);
+    static_assert(!std::is_convertible<
+                  rime::constant<bool, true>, rime::bool_<false>>::value);
 
     static_assert(
-        std::is_convertible<rime::true_type, rime::bool_<true>>::value, "");
+        std::is_convertible<rime::true_type, rime::bool_<true>>::value);
     static_assert(
-        !std::is_convertible<rime::true_type, rime::bool_<false>>::value, "");
+        !std::is_convertible<rime::true_type, rime::bool_<false>>::value);
 
     static_assert(
-        std::is_convertible<std::true_type, rime::bool_<true>>::value, "");
+        std::is_convertible<std::true_type, rime::bool_<true>>::value);
     static_assert(
-        !std::is_convertible<std::true_type, rime::bool_<false>>::value, "");
+        !std::is_convertible<std::true_type, rime::bool_<false>>::value);
 
     static_assert(
-        !std::is_convertible<boost::mpl::false_, rime::bool_<true>>::value, "");
+        !std::is_convertible<boost::mpl::false_, rime::bool_<true>>::value);
     static_assert(
-        std::is_convertible<boost::mpl::false_, rime::bool_<false>>::value, "");
+        std::is_convertible<boost::mpl::false_, rime::bool_<false>>::value);
 
     static_assert(
-        !std::is_convertible<boost::mpl::false_, rime::bool_<true>>::value, "");
+        !std::is_convertible<boost::mpl::false_, rime::bool_<true>>::value);
     static_assert(
-        std::is_convertible<boost::mpl::false_, rime::bool_<false>>::value, "");
+        std::is_convertible<boost::mpl::false_, rime::bool_<false>>::value);
 
-    static_assert(
-        std::is_convertible<
-            std::integral_constant<int, 5>, rime::int_<5>>::value,
-        "");
-    static_assert(
-        !std::is_convertible<
-            std::integral_constant<int, 5>, rime::int_<7>>::value,
-        "");
+    static_assert(std::is_convertible<
+                  std::integral_constant<int, 5>, rime::int_<5>>::value);
+    static_assert(!std::is_convertible<
+                  std::integral_constant<int, 5>, rime::int_<7>>::value);
 
     // No conversion between types.
-    static_assert(
-        !std::is_convertible<
-            std::integral_constant<unsigned, 5>, rime::int_<5>>::value,
-        "");
-    static_assert(
-        !std::is_convertible<
-            boost::mpl::integral_c<short, 5>, rime::size_t<5>>::value,
-        "");
+    static_assert(!std::is_convertible<
+                  std::integral_constant<unsigned, 5>, rime::int_<5>>::value);
+    static_assert(!std::is_convertible<
+                  boost::mpl::integral_c<short, 5>, rime::size_t<5>>::value);
 
-    static_assert(
-        !std::is_convertible<
-            std::integral_constant<int, 0>, rime::false_type>::value,
-        "");
-    static_assert(
-        !std::is_convertible<
-            boost::mpl::integral_c<short, 0>, rime::false_type>::value,
-        "");
+    static_assert(!std::is_convertible<
+                  std::integral_constant<int, 0>, rime::false_type>::value);
+    static_assert(!std::is_convertible<
+                  boost::mpl::integral_c<short, 0>, rime::false_type>::value);
 }
 
 // This is useful particularly to call functions based on a compile-time
@@ -426,14 +405,13 @@ BOOST_AUTO_TEST_CASE(test_rime_core_constant_assign)
         five = *&five;
 
         static_assert(
-            std::is_assignable<rime::true_type &, rime::true_type>::value, "");
+            std::is_assignable<rime::true_type &, rime::true_type>::value);
         static_assert(
-            !std::is_assignable<rime::true_type &, rime::false_type>::value,
-            "");
+            !std::is_assignable<rime::true_type &, rime::false_type>::value);
         static_assert(
-            std::is_assignable<rime::int_<5> &, rime::int_<5>>::value, "");
+            std::is_assignable<rime::int_<5> &, rime::int_<5>>::value);
         static_assert(
-            !std::is_assignable<rime::int_<5> &, rime::int_<7>>::value, "");
+            !std::is_assignable<rime::int_<5> &, rime::int_<7>>::value);
     }
     // It should be possible to assign other constants to rime::constant.
     {
@@ -449,84 +427,74 @@ BOOST_AUTO_TEST_CASE(test_rime_core_constant_assign)
         five = std::integral_constant<size_t, 5>();
 
         static_assert(
-            std::is_assignable<rime::true_type &, std::true_type>::value, "");
+            std::is_assignable<rime::true_type &, std::true_type>::value);
         static_assert(
-            !std::is_assignable<rime::true_type &, boost::mpl::false_>::value,
-            "");
+            !std::is_assignable<rime::true_type &, boost::mpl::false_>::value);
         static_assert(
-            std::is_assignable<rime::int_<5> &, boost::mpl::int_<5>>::value,
-            "");
-        static_assert(
-            !std::is_assignable<
-                rime::int_<5> &, std::integral_constant<int, 7>>::value,
-            "");
+            std::is_assignable<rime::int_<5> &, boost::mpl::int_<5>>::value);
+        static_assert(!std::is_assignable<
+                      rime::int_<5> &, std::integral_constant<int, 7>>::value);
     }
 }
 
 BOOST_AUTO_TEST_CASE(test_rime_same_constant)
 {
     static_assert(
-        rime::same_constant<rime::int_<5>, rime::constant<int, 5>>::value, "");
+        rime::same_constant<rime::int_<5>, rime::constant<int, 5>>::value);
     static_assert(
-        !rime::same_constant<rime::int_<5>, rime::constant<int, 4>>::value, "");
+        !rime::same_constant<rime::int_<5>, rime::constant<int, 4>>::value);
     static_assert(
-        !rime::same_constant<rime::int_<5>, rime::constant<long, 5>>::value,
-        "");
+        !rime::same_constant<rime::int_<5>, rime::constant<long, 5>>::value);
     static_assert(
-        !rime::same_constant<rime::int_<5>, rime::constant<long, 4>>::value,
-        "");
+        !rime::same_constant<rime::int_<5>, rime::constant<long, 4>>::value);
 
-    static_assert(!rime::same_constant<int, rime::constant<int, 4>>::value, "");
-    static_assert(!rime::same_constant<rime::int_<5>, int>::value, "");
-    static_assert(!rime::same_constant<int, int>::value, "");
+    static_assert(!rime::same_constant<int, rime::constant<int, 4>>::value);
+    static_assert(!rime::same_constant<rime::int_<5>, int>::value);
+    static_assert(!rime::same_constant<int, int>::value);
 }
 
 BOOST_AUTO_TEST_CASE(test_rime_constant_equals)
 {
     static_assert(
-        rime::equal_constant<rime::int_<5>, rime::constant<int, 5>>::value, "");
+        rime::equal_constant<rime::int_<5>, rime::constant<int, 5>>::value);
     static_assert(
-        !rime::equal_constant<rime::int_<5>, rime::constant<int, 4>>::value,
-        "");
+        !rime::equal_constant<rime::int_<5>, rime::constant<int, 4>>::value);
     static_assert(
-        rime::equal_constant<rime::int_<5>, rime::constant<long, 5>>::value,
-        "");
+        rime::equal_constant<rime::int_<5>, rime::constant<long, 5>>::value);
     static_assert(
-        !rime::equal_constant<rime::int_<5>, rime::constant<long, 4>>::value,
-        "");
+        !rime::equal_constant<rime::int_<5>, rime::constant<long, 4>>::value);
 
-    static_assert(
-        !rime::equal_constant<int, rime::constant<int, 4>>::value, "");
-    static_assert(!rime::equal_constant<rime::int_<5>, int>::value, "");
-    static_assert(!rime::equal_constant<int, int>::value, "");
+    static_assert(!rime::equal_constant<int, rime::constant<int, 4>>::value);
+    static_assert(!rime::equal_constant<rime::int_<5>, int>::value);
+    static_assert(!rime::equal_constant<int, int>::value);
 }
 
 BOOST_AUTO_TEST_CASE(test_rime_is_constant_false)
 {
-    static_assert(rime::is_constant_false<rime::false_type>::value, "");
-    static_assert(!rime::is_constant_false<rime::true_type>::value, "");
+    static_assert(rime::is_constant_false<rime::false_type>::value);
+    static_assert(!rime::is_constant_false<rime::true_type>::value);
 
-    static_assert(rime::is_constant_false<rime::int_<0>>::value, "");
-    static_assert(!rime::is_constant_false<rime::int_<1>>::value, "");
-    static_assert(!rime::is_constant_false<rime::int_<-1>>::value, "");
-    static_assert(!rime::is_constant_false<rime::int_<5>>::value, "");
+    static_assert(rime::is_constant_false<rime::int_<0>>::value);
+    static_assert(!rime::is_constant_false<rime::int_<1>>::value);
+    static_assert(!rime::is_constant_false<rime::int_<-1>>::value);
+    static_assert(!rime::is_constant_false<rime::int_<5>>::value);
 
-    static_assert(!rime::is_constant_false<bool>::value, "");
-    static_assert(!rime::is_constant_false<int>::value, "");
+    static_assert(!rime::is_constant_false<bool>::value);
+    static_assert(!rime::is_constant_false<int>::value);
 }
 
 BOOST_AUTO_TEST_CASE(test_rime_is_constant_true)
 {
-    static_assert(!rime::is_constant_true<rime::false_type>::value, "");
-    static_assert(rime::is_constant_true<rime::true_type>::value, "");
+    static_assert(!rime::is_constant_true<rime::false_type>::value);
+    static_assert(rime::is_constant_true<rime::true_type>::value);
 
-    static_assert(!rime::is_constant_true<rime::int_<0>>::value, "");
-    static_assert(rime::is_constant_true<rime::int_<1>>::value, "");
-    static_assert(rime::is_constant_true<rime::int_<-1>>::value, "");
-    static_assert(rime::is_constant_true<rime::int_<5>>::value, "");
+    static_assert(!rime::is_constant_true<rime::int_<0>>::value);
+    static_assert(rime::is_constant_true<rime::int_<1>>::value);
+    static_assert(rime::is_constant_true<rime::int_<-1>>::value);
+    static_assert(rime::is_constant_true<rime::int_<5>>::value);
 
-    static_assert(!rime::is_constant_true<bool>::value, "");
-    static_assert(!rime::is_constant_true<int>::value, "");
+    static_assert(!rime::is_constant_true<bool>::value);
+    static_assert(!rime::is_constant_true<int>::value);
 }
 
 struct merge_same
@@ -543,17 +511,15 @@ BOOST_AUTO_TEST_CASE(test_rime_core_merge_constants)
 {
     typedef rime::merge_policy::constant<merge_same> constant;
 
-    BOOST_MPL_ASSERT((std::is_same<constant::apply<int, int>::type, int>) );
-    BOOST_MPL_ASSERT(
-        (std::is_same<constant::apply<rime::int_<5>, int>::type, int>) );
-    BOOST_MPL_ASSERT(
-        (std::is_same<
-            constant::apply<unsigned, rime::constant<unsigned, 12>>::type,
-            unsigned>) );
-    BOOST_MPL_ASSERT(
-        (std::is_same<
-            constant::apply<rime::int_<6>, rime::constant<int, 6>>::type,
-            rime::constant<int, 6>>) );
+    static_assert(std::is_same_v<constant::apply<int, int>::type, int>);
+    static_assert(
+        std::is_same_v<constant::apply<rime::int_<5>, int>::type, int>);
+    static_assert(std::is_same_v<
+                  constant::apply<unsigned, rime::constant<unsigned, 12>>::type,
+                  unsigned>);
+    static_assert(std::is_same_v<
+                  constant::apply<rime::int_<6>, rime::constant<int, 6>>::type,
+                  rime::constant<int, 6>>);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

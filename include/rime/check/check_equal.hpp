@@ -19,11 +19,11 @@ namespace rime {
 template <class Left, class Right> struct exactly_equal_implementation
 : std::integral_constant<
       bool,
-      std::is_same<Left, Right>::value
+      std::is_same_v<Left, Right>
           || (rime::is_constant<Left>::value && rime::is_constant<Right>::value
-              && std::is_same<
+              && std::is_same_v<
                   typename rime::value<Left>::type,
-                  typename rime::value<Right>::type>::value
+                  typename rime::value<Right>::type>
               && rime::equal_constant<Left, Right>::value)> {};
 
 template <class Left, class Right> struct exactly_equal

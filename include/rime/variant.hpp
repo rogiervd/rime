@@ -371,7 +371,7 @@ public:
         typedef typename conversion_for<Actual>::assert_unambiguous::dummy
             check_conversion;
         // Actually use this type to trigger the check.
-        static_assert(std::is_same<check_conversion, int>::value);
+        static_assert(std::is_same_v<check_conversion, int>);
 
         construct(std::forward<Actual>(actual));
     }
@@ -554,8 +554,7 @@ public:
         typedef typename meta::first<candidates>::type index_and_type;
 
         static_assert(
-            std::is_same<
-                typename mpl::second<index_and_type>::type, Actual>::value,
+            std::is_same_v<typename mpl::second<index_and_type>::type, Actual>,
             "Sanity check: should have found Actual");
 
         static std::size_t const value =
