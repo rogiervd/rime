@@ -10,8 +10,6 @@
 #include <string>
 #include <type_traits>
 
-#include "boost/mpl/assert.hpp"
-
 BOOST_AUTO_TEST_SUITE(test_rime_nothing)
 
 BOOST_AUTO_TEST_CASE(test_rime_nothing)

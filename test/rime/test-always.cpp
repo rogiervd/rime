@@ -10,8 +10,6 @@
 #include <string>
 #include <type_traits>
 
-#include "boost/mpl/assert.hpp"
-
 #include "rime/core.hpp"
 
 struct example_type

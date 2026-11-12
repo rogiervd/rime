@@ -9,8 +9,6 @@
 #include <typeinfo>
 #include <utility>
 
-#include "boost/mpl/assert.hpp"
-
 // GCC rightfully complains about comparisons between signed and unsigned
 // integers when testing binary operators.
 // However, all we require here is for the behaviour to be the same between

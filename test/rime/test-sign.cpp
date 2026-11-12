@@ -11,7 +11,6 @@
 #include <string>
 #include <type_traits>
 
-#include "boost/mpl/assert.hpp"
 #include "boost/mpl/int.hpp"
 
 #include "rime/core.hpp"

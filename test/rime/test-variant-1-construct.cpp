@@ -9,8 +9,6 @@
 #include <type_traits>
 #include <utility>
 
-#include "boost/mpl/assert.hpp"
-
 #include <string>
 #include "utility/test/tracked.hpp"
 

@@ -14,7 +14,6 @@
 #include <stdexcept>
 #include <type_traits>
 
-#include "boost/mpl/assert.hpp"
 #include "boost/mpl/int.hpp"
 #include "boost/mpl/size_t.hpp"
 

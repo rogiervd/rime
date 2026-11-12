@@ -9,7 +9,6 @@
 
 #include <type_traits>
 
-#include "boost/mpl/assert.hpp"
 #include "boost/mpl/integral_c.hpp"
 #include "rime/check/check_equal.hpp"
 

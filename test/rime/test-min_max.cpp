@@ -12,7 +12,6 @@
 #include "rime/variant.hpp"
 
 #include <type_traits>
-#include "boost/mpl/assert.hpp"
 
 #include "rime/check/check_equal.hpp"
 

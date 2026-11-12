@@ -8,7 +8,6 @@
 #include "rime/if.hpp"
 
 #include <type_traits>
-#include "boost/mpl/assert.hpp"
 
 #include "rime/check/check_equal.hpp"
 #include "rime/core.hpp"

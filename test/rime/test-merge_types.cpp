@@ -7,8 +7,6 @@
 
 #include <type_traits>
 
-#include "boost/mpl/assert.hpp"
-
 #include "meta/vector.hpp"
 
 #include "rime/merge_types.hpp"
