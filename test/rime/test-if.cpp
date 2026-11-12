@@ -127,12 +127,18 @@ BOOST_AUTO_TEST_CASE(test_rime_if_merge)
     auto && v4 = rime::if_<policy>(true, four, five);
     BOOST_MPL_ASSERT((std::is_same<decltype(v4), long double &&>) );
 
-    // Check the type without binding the result to a reference.
-    // GCC 13's -Wdangling-reference would warn (falsely) because the argument
-    // "true" is a temporary.
-    BOOST_MPL_ASSERT((std::is_same<
-                      decltype(rime::if_<policy>(true, six, five)),
-                      long double const &>) );
+    // if_ returns a reference to six, which is fine, but GCC 13's
+    // -Wdangling-reference warns because the argument "true" is a temporary.
+    // Other compilers do not know this warning (and warn about the pragma).
+#if defined(__GNUC__) && !defined(__clang__) && __GNUC__ >= 13
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wdangling-reference"
+#endif
+    auto && v5 = rime::if_<policy>(true, six, five);
+#if defined(__GNUC__) && !defined(__clang__) && __GNUC__ >= 13
+#    pragma GCC diagnostic pop
+#endif
+    BOOST_MPL_ASSERT((std::is_same<decltype(v5), long double const &>) );
 }
 
 BOOST_AUTO_TEST_SUITE_END()
