@@ -5,9 +5,10 @@
 #ifndef RIME_ASSERT_HPP_INCLUDED
 #define RIME_ASSERT_HPP_INCLUDED
 
+#include <type_traits>
+
 #include <cassert>
 
-#include "boost/core/enable_if.hpp"
 
 #include "core.hpp"
 
@@ -18,8 +19,7 @@ namespace detail {
     template <class Condition, class Enable = void> struct assert_;
 
     template <class Condition> struct assert_<
-        Condition,
-        typename boost::enable_if<rime::is_constant<Condition>>::type>
+        Condition, std::enable_if_t<rime::is_constant<Condition>::value>>
     {
         void operator()(Condition const &) const
         {
@@ -28,8 +28,7 @@ namespace detail {
     };
 
     template <class Condition> struct assert_<
-        Condition,
-        typename boost::disable_if<rime::is_constant<Condition>>::type>
+        Condition, std::enable_if_t<!rime::is_constant<Condition>::value>>
     {
         void operator()([[maybe_unused]] Condition const & condition) const
         {

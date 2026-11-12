@@ -10,7 +10,8 @@ operator() and operator[] must be defined inside the class.
 #ifndef RIME_DETAIL_VARIANT_OPERATOR_HPP_INCLUDED
 #define RIME_DETAIL_VARIANT_OPERATOR_HPP_INCLUDED
 
-#include "boost/core/enable_if.hpp"
+#include <type_traits>
+
 #include "boost/mpl/or.hpp"
 
 #include "variant_dispatch.hpp"
@@ -39,8 +40,8 @@ namespace rime {
         };                                                                    \
     } /* namespace variant_detail */                                          \
                                                                               \
-    template <class Variant> inline typename boost::lazy_enable_if<           \
-        is_variant<Variant>,                                                  \
+    template <class Variant> inline typename std::enable_if_t<                \
+        is_variant<Variant>::value,                                           \
         variant_detail::name##_result<Variant, void>>::type                   \
         operator operation(Variant && variant)                                \
     {                                                                         \
@@ -76,8 +77,9 @@ RIME_VARIANT_DEFINE_UNARY_OPERATOR(dereference, *)
         };                                                                    \
     } /* namespace variant_detail */                                          \
                                                                               \
-    template <class Variant> inline typename boost::lazy_enable_if<           \
-        is_variant<Variant>, variant_detail::name##_result<Variant>>::type    \
+    template <class Variant> inline typename std::enable_if_t<                \
+        is_variant<Variant>::value,                                           \
+        variant_detail::name##_result<Variant>>::type                         \
         operator operation(Variant && variant, int)                           \
     {                                                                         \
         return visit(variant_detail::name())(std::forward<Variant>(variant)); \
@@ -114,10 +116,11 @@ RIME_VARIANT_DEFINE_UNARY_POSTFIX_OPERATOR(postfix_decrement, --)
         };                                                                  \
     } /* namespace variant_detail */                                        \
                                                                             \
-    template <class LeftVariant, class RightVariant>                        \
-    inline typename boost::lazy_enable_if<                                  \
-        boost::mpl::or_<is_variant<LeftVariant>, is_variant<RightVariant>>, \
-        variant_detail::name##_result<LeftVariant, RightVariant>>::type     \
+    template <class LeftVariant, class RightVariant> inline                 \
+        typename std::enable_if_t<                                          \
+            boost::mpl::or_<                                                \
+                is_variant<LeftVariant>, is_variant<RightVariant>>::value,  \
+            variant_detail::name##_result<LeftVariant, RightVariant>>::type \
         operator operation(LeftVariant && left, RightVariant && right)      \
     {                                                                       \
         return visit(variant_detail::name())(                               \

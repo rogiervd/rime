@@ -8,7 +8,6 @@
 #include <cstddef>
 #include <type_traits>
 
-#include "boost/core/enable_if.hpp"
 #include "boost/mpl/and.hpp"
 #include "boost/mpl/if.hpp"
 #include "boost/mpl/integral_c.hpp"
@@ -101,8 +100,8 @@ public:
         class OtherConstant,
         class Enable1 = typename utility::disable_if_same_or_derived<
             constant, OtherConstant>::type,
-        class Enable2 = typename boost::enable_if<
-            same_constant<constant, OtherConstant>>::type>
+        class Enable2 =
+            std::enable_if_t<same_constant<constant, OtherConstant>::value>>
     constexpr constant(OtherConstant const &) noexcept
     {}
 
@@ -140,7 +139,7 @@ template <int content> struct int_ : constant<int, content>
         class Enable1 = typename utility::disable_if_same_or_derived<
             int_, OtherConstant>::type,
         class Enable2 =
-            typename boost::enable_if<same_constant<int_, OtherConstant>>::type>
+            std::enable_if_t<same_constant<int_, OtherConstant>::value>>
     constexpr int_(OtherConstant const &) noexcept
     {}
 
@@ -160,8 +159,8 @@ template <std::size_t content> struct size_t : constant<std::size_t, content>
         class OtherConstant,
         class Enable1 = typename utility::disable_if_same_or_derived<
             size_t, OtherConstant>::type,
-        class Enable2 = typename boost::enable_if<
-            same_constant<size_t, OtherConstant>>::type>
+        class Enable2 =
+            std::enable_if_t<same_constant<size_t, OtherConstant>::value>>
     constexpr size_t(OtherConstant const &) noexcept
     {}
 
@@ -181,8 +180,8 @@ template <bool content> struct bool_ : constant<bool, content>
         class OtherConstant,
         class Enable1 = typename utility::disable_if_same_or_derived<
             bool_, OtherConstant>::type,
-        class Enable2 = typename boost::enable_if<
-            same_constant<bool_, OtherConstant>>::type>
+        class Enable2 =
+            std::enable_if_t<same_constant<bool_, OtherConstant>::value>>
     constexpr bool_(OtherConstant const &) noexcept
     {}
 
@@ -283,15 +282,15 @@ Return the value of a compile-time constant of normal type.
 \return If the parameter is a compile-time constant, Type::value.
     Otherwise, the parameter itself.
 */
-template <class Type> inline typename boost::enable_if<
-    is_constant<Type>, typename value<Type>::type>::type
+template <class Type>
+inline std::enable_if_t<is_constant<Type>::value, typename value<Type>::type>
     get_value(Type const &)
 {
     return Type::value;
 }
-template <class Type> inline
-    typename boost::disable_if<is_constant<Type>, Type const &>::type
-    get_value(Type const & value)
+template <class Type>
+inline std::enable_if_t<!is_constant<Type>::value, Type const &> get_value(
+    Type const & value)
 {
     return value;
 }
@@ -431,9 +430,9 @@ namespace merge_policy {
         // Then, try to turn this into one constant.
         template <class Type1, class Type2> struct apply<
             Type1, Type2,
-            typename boost::enable_if<mpl::and_<
+            std::enable_if_t<mpl::and_<
                 is_constant<Type1>, is_constant<Type2>,
-                has_type<merge_value_type<Type1, Type2>>>>::type>
+                has_type<merge_value_type<Type1, Type2>>>::value>>
         : merge_constant<Type1, Type2> {};
     };
 

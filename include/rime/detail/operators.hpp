@@ -16,7 +16,6 @@ MPL constants: the behaviour of existing code does not change.
 
 #include <type_traits>
 
-#include "boost/core/enable_if.hpp"
 #include "boost/mpl/and.hpp"
 #include "boost/mpl/if.hpp"
 #include "boost/mpl/or.hpp"
@@ -34,14 +33,11 @@ namespace callable
     {
         template <class Left, class Right>
             auto operator() (Left const &, Right const &) const
-        -> typename boost::enable_if <
-            mpl::and_ <is_constant <Left>, is_constant <Right> >,
-            constant <
-                typename std::decay <decltype (Left::value + Right::value)
+        -> std::enable_if_t<mpl::and_ <is_constant <Left>, is_constant <Right>
+>::value, constant < typename std::decay <decltype (Left::value + Right::value)
                     >::type,
                 (Left::value + Right::value)
-            >
-        >::type
+            >>
         {
             typedef typename std::decay <decltype (
                 Left::value + Right::value)>::type ValueType;
@@ -50,10 +46,8 @@ namespace callable
 
         template <class Left, class Right>
             auto operator() (Left const & left, Right const & right) const
-        -> typename boost::disable_if <
-            mpl::and_ <is_constant <Left>, is_constant <Right> >,
-            decltype (get_value (left) + get_value (right))
-        >::type
+        -> std::enable_if_t<!mpl::and_ <is_constant <Left>, is_constant <Right>
+>::value, decltype (get_value (left) + get_value (right))>
         {
             return get_value (left) + get_value (right);
         }
@@ -64,67 +58,64 @@ static const callable::plus plus = {};
 
 template <class Left, class Right>
     auto operator + (Left const &, Right const &)
--> typename boost::enable_if <
-    mpl::and_ <is_constant <Left>, is_rime_<Right>,
-        mpl::or_ <is_rime_constant <Left>, is_rime_constant <Right> > >,
-    constant <
-        typename std::decay <decltype (Left::value + Right::value)>::type,
+-> std::enable_if_t<mpl::and_ <is_constant <Left>, is_rime_<Right>,
+        mpl::or_ <is_rime_constant <Left>, is_rime_constant <Right> > >::value,
+constant < typename std::decay <decltype (Left::value + Right::value)>::type,
             (Left::value + Right::value)
-    >
->::type
+    >>
 {
     typedef typename std::decay <decltype (
         Left::value + Right::value)>::type ValueType;
     return constant <ValueType, Left::value + Right::value>();
 }*/
 
-#define RIME_DEFINE_BINARY_OPERATOR(name, operation)                         \
-    namespace callable {                                                     \
-        struct name                                                          \
-        {                                                                    \
-            template <class Left, class Right>                               \
-            auto operator()(Left const &, Right const &) const ->            \
-                typename boost::enable_if<                                   \
-                    mpl::and_<is_constant<Left>, is_constant<Right>>,        \
-                    constant<                                                \
-                        typename std::decay<decltype((                       \
-                            Left::value operation Right::value))>::type,     \
-                        (Left::value operation Right::value)>>::type         \
-            {                                                                \
-                typedef typename std::decay<decltype((                       \
-                    Left::value operation Right::value))>::type ValueType;   \
-                return constant<                                             \
-                    ValueType, (Left::value operation Right::value)>();      \
-            }                                                                \
-                                                                             \
-            template <class Left, class Right>                               \
-            auto operator()(Left const & left, Right const & right) const -> \
-                typename boost::disable_if<                                  \
-                    mpl::and_<is_constant<Left>, is_constant<Right>>,        \
-                    decltype((get_value(left)                                \
-                                  operation get_value(right)))>::type        \
-            {                                                                \
-                return get_value(left) operation get_value(right);           \
-            }                                                                \
-        };                                                                   \
-    }                                                                        \
-                                                                             \
-    static const callable::name name = callable::name();                     \
-                                                                             \
-    template <class Left, class Right>                                       \
-    auto operator operation(Left const &, Right const &)                     \
-        ->typename boost::enable_if<                                         \
-            mpl::and_<                                                       \
-                is_constant<Left>, is_constant<Right>,                       \
-                mpl::or_<is_rime_constant<Left>, is_rime_constant<Right>>>,  \
-            constant<                                                        \
-                typename std::decay<decltype((                               \
-                    Left::value operation Right::value))>::type,             \
-                (Left::value operation Right::value)>>::type                 \
-    {                                                                        \
-        typedef typename std::decay<decltype((                               \
-            Left::value operation Right::value))>::type ValueType;           \
-        return constant<ValueType, (Left::value operation Right::value)>();  \
+#define RIME_DEFINE_BINARY_OPERATOR(name, operation)                          \
+    namespace callable {                                                      \
+        struct name                                                           \
+        {                                                                     \
+            template <class Left, class Right>                                \
+            auto operator()(Left const &, Right const &) const                \
+                -> std::enable_if_t<                                          \
+                    mpl::and_<is_constant<Left>, is_constant<Right>>::value,  \
+                    constant<                                                 \
+                        typename std::decay<decltype((                        \
+                            Left::value operation Right::value))>::type,      \
+                        (Left::value operation Right::value)>>                \
+            {                                                                 \
+                typedef typename std::decay<decltype((                        \
+                    Left::value operation Right::value))>::type ValueType;    \
+                return constant<                                              \
+                    ValueType, (Left::value operation Right::value)>();       \
+            }                                                                 \
+                                                                              \
+            template <class Left, class Right>                                \
+            auto operator()(Left const & left, Right const & right) const     \
+                -> std::enable_if_t<                                          \
+                    !mpl::and_<is_constant<Left>, is_constant<Right>>::value, \
+                    decltype((get_value(left) operation get_value(right)))>   \
+            {                                                                 \
+                return get_value(left) operation get_value(right);            \
+            }                                                                 \
+        };                                                                    \
+    }                                                                         \
+                                                                              \
+    static const callable::name name = callable::name();                      \
+                                                                              \
+    template <class Left, class Right>                                        \
+    auto operator operation(Left const &, Right const &)                      \
+        ->std::enable_if_t<                                                   \
+            mpl::and_<                                                        \
+                is_constant<Left>, is_constant<Right>,                        \
+                mpl::or_<is_rime_constant<Left>, is_rime_constant<Right>>>::  \
+                value,                                                        \
+            constant<                                                         \
+                typename std::decay<decltype((                                \
+                    Left::value operation Right::value))>::type,              \
+                (Left::value operation Right::value)>>                        \
+    {                                                                         \
+        typedef typename std::decay<decltype((                                \
+            Left::value operation Right::value))>::type ValueType;            \
+        return constant<ValueType, (Left::value operation Right::value)>();   \
     }
 
 RIME_DEFINE_BINARY_OPERATOR(plus, +)
@@ -153,12 +144,12 @@ RIME_DEFINE_BINARY_OPERATOR(greater_equal, >=)
         struct name                                                            \
         {                                                                      \
             template <class Argument> auto operator()(Argument const &) const  \
-                -> typename boost::enable_if<                                  \
-                    is_constant<Argument>,                                     \
+                -> std::enable_if_t<                                           \
+                    is_constant<Argument>::value,                              \
                     constant<                                                  \
                         typename std::decay<                                   \
                             decltype(operation Argument::value)>::type,        \
-                        (operation Argument::value)>>::type                    \
+                        (operation Argument::value)>>                          \
             {                                                                  \
                 typedef typename std::decay<                                   \
                     decltype(operation Argument::value)>::type ValueType;      \
@@ -166,10 +157,10 @@ RIME_DEFINE_BINARY_OPERATOR(greater_equal, >=)
             }                                                                  \
                                                                                \
             template <class Argument>                                          \
-            auto operator()(Argument const & argument) const ->                \
-                typename boost::disable_if<                                    \
-                    is_constant<Argument>,                                     \
-                    decltype(operation get_value(argument))>::type             \
+            auto operator()(Argument const & argument) const                   \
+                -> std::enable_if_t<                                           \
+                    !is_constant<Argument>::value,                             \
+                    decltype(operation get_value(argument))>                   \
             {                                                                  \
                 return operation get_value(argument);                          \
             }                                                                  \
@@ -179,12 +170,12 @@ RIME_DEFINE_BINARY_OPERATOR(greater_equal, >=)
     static const callable::name name = {};                                     \
                                                                                \
     template <class Argument> auto operator operation(Argument const &)        \
-        ->typename boost::enable_if<                                           \
-            is_constant<Argument>,                                             \
+        ->std::enable_if_t<                                                    \
+            is_constant<Argument>::value,                                      \
             constant<                                                          \
                 typename std::decay<                                           \
                     decltype(operation Argument::value)>::type,                \
-                (operation Argument::value)>>::type                            \
+                (operation Argument::value)>>                                  \
     {                                                                          \
         typedef typename std::decay<decltype(operation Argument::value)>::type \
             ValueType;                                                         \
@@ -249,8 +240,7 @@ namespace callable {
             };                                                                 \
                                                                                \
             template <typename Head, typename... Tail> struct name##runtime<   \
-                typename boost::disable_if<is_constant<Head>>::type, Head,     \
-                Tail...>                                                       \
+                std::enable_if_t<!is_constant<Head>::value>, Head, Tail...>    \
             {                                                                  \
                 bool operator()(Head const & head, Tail const &... tail) const \
                 {                                                              \
@@ -260,8 +250,7 @@ namespace callable {
             };                                                                 \
                                                                                \
             template <typename Head, typename... Tail> struct name##runtime<   \
-                typename boost::enable_if<is_constant<Head>>::type, Head,      \
-                Tail...>                                                       \
+                std::enable_if_t<is_constant<Head>::value>, Head, Tail...>     \
             {                                                                  \
                 bool operator()(Head const &, Tail const &... tail) const      \
                 {                                                              \
@@ -299,11 +288,12 @@ namespace callable {
                                                                                \
     template <class Left, class Right>                                         \
     auto operator operation(Left const &, Right const &)                       \
-        ->typename boost::enable_if<                                           \
+        ->std::enable_if_t<                                                    \
             mpl::and_<                                                         \
                 is_constant<Left>, is_constant<Right>,                         \
-                mpl::or_<is_rime_constant<Left>, is_rime_constant<Right>>>,    \
-            bool_<(Left::value operation Right::value)>>::type                 \
+                mpl::or_<is_rime_constant<Left>, is_rime_constant<Right>>>::   \
+                value,                                                         \
+            bool_<(Left::value operation Right::value)>>                       \
     {                                                                          \
         return bool_<(Left::value operation Right::value)>();                  \
     }

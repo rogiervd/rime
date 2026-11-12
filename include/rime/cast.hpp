@@ -5,7 +5,8 @@
 #ifndef RIME_CAST_HPP_INCLUDED
 #define RIME_CAST_HPP_INCLUDED
 
-#include "boost/core/enable_if.hpp"
+#include <type_traits>
+
 #include "boost/mpl/eval_if.hpp"
 #include "boost/mpl/identity.hpp"
 
@@ -43,14 +44,14 @@ namespace callable {
     template <class Target> struct cast
     {
         template <class Type>
-        typename boost::disable_if<rime::is_constant<Type>, Target>::type
-            operator()(Type const & v) const
+        std::enable_if_t<!rime::is_constant<Type>::value, Target> operator()(
+            Type const & v) const
         {
             return Target(v);
         }
 
-        template <class Type> typename boost::lazy_enable_if<
-            rime::is_constant<Type>,
+        template <class Type> typename std::enable_if_t<
+            rime::is_constant<Type>::value,
             types::detail::cast_constant<Target, Type>>::type
             operator()(Type const &) const
         {
