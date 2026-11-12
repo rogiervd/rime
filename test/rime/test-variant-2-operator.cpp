@@ -8,7 +8,6 @@
 #include <memory>
 #include <type_traits>
 
-#include "boost/mpl/assert.hpp"
 
 #include "meta/vector.hpp"
 
@@ -264,67 +263,65 @@ BOOST_AUTO_TEST_CASE(test_rime_make_variant_over)
     using rime::make_variant_over;
     using rime::variant;
 
-    BOOST_MPL_ASSERT(
-        (std::is_same<make_variant_over<meta::vector<int>>::type, int>) );
+    static_assert(
+        std::is_same_v<make_variant_over<meta::vector<int>>::type, int>);
 
-    BOOST_MPL_ASSERT(
-        (std::is_same<make_variant_over<meta::vector<int, int>>::type, int>) );
+    static_assert(
+        std::is_same_v<make_variant_over<meta::vector<int, int>>::type, int>);
 
-    BOOST_MPL_ASSERT((std::is_same<
-                      make_variant_over<meta::vector<int const, int>>::type,
-                      variant<int const, int>>) );
+    static_assert(std::is_same_v<
+                  make_variant_over<meta::vector<int const, int>>::type,
+                  variant<int const, int>>);
 
-    BOOST_MPL_ASSERT(
-        (std::is_same<
+    static_assert(
+        std::is_same_v<
             make_variant_over<meta::vector<double, int, int const, int>>::type,
-            variant<double, int, int const>>) );
+            variant<double, int, int const>>);
 
-    BOOST_MPL_ASSERT(
-        (std::is_same<
-            make_variant_over<meta::vector<int, rime::int_<10>>>::type, int>) );
+    static_assert(
+        std::is_same_v<
+            make_variant_over<meta::vector<int, rime::int_<10>>>::type, int>);
 
-    BOOST_MPL_ASSERT(
-        (std::is_same<
+    static_assert(
+        std::is_same_v<
             make_variant_over<meta::vector<bool, rime::bool_<false>>>::type,
-            bool>) );
+            bool>);
 
-    BOOST_MPL_ASSERT(
-        (std::is_same<
-            make_variant_over<meta::vector<bool, rime::true_type>>::type,
-            bool>) );
+    static_assert(std::is_same_v<
+                  make_variant_over<meta::vector<bool, rime::true_type>>::type,
+                  bool>);
 
-    BOOST_MPL_ASSERT((std::is_same<
-                      make_variant_over<
-                          meta::vector<rime::int_<1>, rime::int_<10>>>::type,
-                      int>) );
+    static_assert(std::is_same_v<
+                  make_variant_over<
+                      meta::vector<rime::int_<1>, rime::int_<10>>>::type,
+                  int>);
 
-    BOOST_MPL_ASSERT(
-        (std::is_same<
-            make_variant_over<
-                meta::vector<rime::true_type, rime::bool_<false>>>::type,
-            bool>) );
+    static_assert(std::is_same_v<
+                  make_variant_over<
+                      meta::vector<rime::true_type, rime::bool_<false>>>::type,
+                  bool>);
 
     // Constants with the same value type and value,
     // but different apparent type.
-    BOOST_MPL_ASSERT(
-        (rime::same_constant<rime::constant<int, 10>, rime::int_<10>>) );
+    static_assert(
+        rime::same_constant<rime::constant<int, 10>, rime::int_<10>>::value);
 
-    BOOST_MPL_ASSERT(
-        (std::is_same<
+    static_assert(
+        std::is_same_v<
             make_variant_over<
                 meta::vector<rime::constant<int, 10>, rime::int_<10>>>::type,
-            rime::constant<int, 10>>) );
+            rime::constant<int, 10>>);
 
-    BOOST_MPL_ASSERT((std::is_same<
-                      make_variant_over<meta::vector<
-                          rime::false_type, rime::constant<bool, false>>>::type,
-                      rime::constant<bool, false>>) );
+    static_assert(std::is_same_v<
+                  make_variant_over<meta::vector<
+                      rime::false_type, rime::constant<bool, false>>>::type,
+                  rime::constant<bool, false>>);
 
     // Don't turn two constants with the same type into their value type.
-    BOOST_MPL_ASSERT((std::is_same<
-                      make_variant_over<
-                          meta::vector<rime::true_type, rime::true_type>>::type,
-                      rime::true_type>) );
+    static_assert(std::is_same_v<
+                  make_variant_over<
+                      meta::vector<rime::true_type, rime::true_type>>::type,
+                  rime::true_type>);
 }
 
 template <typename Argument>

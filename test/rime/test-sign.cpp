@@ -11,7 +11,6 @@
 #include <string>
 #include <type_traits>
 
-#include "boost/mpl/assert.hpp"
 #include "boost/mpl/int.hpp"
 
 #include "rime/core.hpp"
@@ -56,52 +55,50 @@ BOOST_AUTO_TEST_CASE(test_rime_sign_types)
     static_assert(!rime::types::is_unsigned<std::string>::value, "");
 
     // make_signed.
-    BOOST_MPL_ASSERT(
-        (std::is_same<typename rime::types::make_signed<int>::type, int>) );
-    BOOST_MPL_ASSERT((
-        std::is_same<typename rime::types::make_signed<unsigned>::type, int>) );
-    BOOST_MPL_ASSERT(
-        (std::is_same<typename rime::types::make_signed<short>::type, short>) );
-    BOOST_MPL_ASSERT(
-        (std::is_same<
-            typename rime::types::make_signed<unsigned short>::type, short>) );
+    static_assert(
+        std::is_same_v<typename rime::types::make_signed<int>::type, int>);
+    static_assert(
+        std::is_same_v<typename rime::types::make_signed<unsigned>::type, int>);
+    static_assert(
+        std::is_same_v<typename rime::types::make_signed<short>::type, short>);
+    static_assert(
+        std::is_same_v<
+            typename rime::types::make_signed<unsigned short>::type, short>);
 
-    BOOST_MPL_ASSERT(
-        (rime::same_constant<
-            rime::types::make_signed<rime::int_<1>>::type, rime::int_<1>>) );
-    BOOST_MPL_ASSERT(
-        (rime::same_constant<
-            rime::types::make_signed<rime::constant<unsigned, 1>>::type,
-            rime::int_<1>>) );
-    BOOST_MPL_ASSERT(
-        (rime::same_constant<
+    static_assert(rime::same_constant<
+                  rime::types::make_signed<rime::int_<1>>::type,
+                  rime::int_<1>>::value);
+    static_assert(rime::same_constant<
+                  rime::types::make_signed<rime::constant<unsigned, 1>>::type,
+                  rime::int_<1>>::value);
+    static_assert(
+        rime::same_constant<
             rime::types::make_signed<std::integral_constant<unsigned, 2>>::type,
-            rime::int_<2>>) );
+            rime::int_<2>>::value);
 
     // make_unsigned.
-    BOOST_MPL_ASSERT(
-        (std::is_same<
-            typename rime::types::make_unsigned<int>::type, unsigned>) );
-    BOOST_MPL_ASSERT(
-        (std::is_same<
-            typename rime::types::make_unsigned<unsigned>::type, unsigned>) );
-    BOOST_MPL_ASSERT((std::is_same<
-                      typename rime::types::make_unsigned<short>::type,
-                      short unsigned>) );
-    BOOST_MPL_ASSERT((std::is_same<
-                      typename rime::types::make_unsigned<unsigned short>::type,
-                      short unsigned>) );
+    static_assert(std::is_same_v<
+                  typename rime::types::make_unsigned<int>::type, unsigned>);
+    static_assert(
+        std::is_same_v<
+            typename rime::types::make_unsigned<unsigned>::type, unsigned>);
+    static_assert(
+        std::is_same_v<
+            typename rime::types::make_unsigned<short>::type, short unsigned>);
+    static_assert(std::is_same_v<
+                  typename rime::types::make_unsigned<unsigned short>::type,
+                  short unsigned>);
 
-    BOOST_MPL_ASSERT((rime::same_constant<
-                      rime::types::make_unsigned<rime::int_<1>>::type,
-                      rime::constant<unsigned, 1u>>) );
-    BOOST_MPL_ASSERT((rime::same_constant<
-                      rime::types::make_unsigned<rime::constant<int, 1>>::type,
-                      rime::constant<unsigned, 1u>>) );
-    BOOST_MPL_ASSERT(
-        (rime::same_constant<
+    static_assert(rime::same_constant<
+                  rime::types::make_unsigned<rime::int_<1>>::type,
+                  rime::constant<unsigned, 1u>>::value);
+    static_assert(rime::same_constant<
+                  rime::types::make_unsigned<rime::constant<int, 1>>::type,
+                  rime::constant<unsigned, 1u>>::value);
+    static_assert(
+        rime::same_constant<
             rime::types::make_unsigned<std::integral_constant<int, 2>>::type,
-            rime::constant<unsigned, 2u>>) );
+            rime::constant<unsigned, 2u>>::value);
 
     // make_zero.
     RIME_CHECK_EQUAL(

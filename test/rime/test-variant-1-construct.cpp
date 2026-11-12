@@ -9,7 +9,6 @@
 #include <type_traits>
 #include <utility>
 
-#include "boost/mpl/assert.hpp"
 
 #include <string>
 #include "utility/test/tracked.hpp"
@@ -35,7 +34,7 @@ struct converted
     converted(convertee) {}
 };
 
-BOOST_MPL_ASSERT((std::is_convertible<convertee &&, converted>) );
+static_assert(std::is_convertible_v<convertee &&, converted>);
 
 int const && get_int_const()
 {
@@ -89,127 +88,137 @@ BOOST_AUTO_TEST_CASE(test_rime_variant_get_types)
     // return types for "get"
     {
         variant v(6);
-        BOOST_MPL_ASSERT((is_same<int &, decltype(rime::get<int>(v))>) );
-        BOOST_MPL_ASSERT((is_same<float &, decltype(rime::get<float>(v))>) );
-        BOOST_MPL_ASSERT((is_same<int &, decltype(rime::get<int &>(v))>) );
-        BOOST_MPL_ASSERT(
-            (is_same<int const &, decltype(rime::get<int const>(v))>) );
-        BOOST_MPL_ASSERT(
-            (is_same<int const &, decltype(rime::get<int const &>(v))>) );
-        BOOST_MPL_ASSERT(
-            (is_same<std::string &, decltype(rime::get<std::string>(v))>) );
-        BOOST_MPL_ASSERT((is_same<void *&, decltype(rime::get<void *>(v))>) );
-        BOOST_MPL_ASSERT(
-            (is_same<converted &, decltype(rime::get<converted>(v))>) );
-        BOOST_MPL_ASSERT((is_same<void, decltype(rime::get<void>(v))>) );
+        static_assert(is_same<int &, decltype(rime::get<int>(v))>::value);
+        static_assert(is_same<float &, decltype(rime::get<float>(v))>::value);
+        static_assert(is_same<int &, decltype(rime::get<int &>(v))>::value);
+        static_assert(
+            is_same<int const &, decltype(rime::get<int const>(v))>::value);
+        static_assert(
+            is_same<int const &, decltype(rime::get<int const &>(v))>::value);
+        static_assert(
+            is_same<std::string &, decltype(rime::get<std::string>(v))>::value);
+        static_assert(is_same<void *&, decltype(rime::get<void *>(v))>::value);
+        static_assert(
+            is_same<converted &, decltype(rime::get<converted>(v))>::value);
+        static_assert(is_same<void, decltype(rime::get<void>(v))>::value);
 
-        BOOST_MPL_ASSERT(
-            (is_same<int &&, decltype(rime::get<int>(make_variant(6)))>) );
-        BOOST_MPL_ASSERT(
-            (is_same<float &&, decltype(rime::get<float>(make_variant(6)))>) );
-        BOOST_MPL_ASSERT(
-            (is_same<int &, decltype(rime::get<int &>(make_variant(6)))>) );
-        BOOST_MPL_ASSERT((is_same<
-                          int const &&,
-                          decltype(rime::get<int const>(make_variant(6)))>) );
-        BOOST_MPL_ASSERT((is_same<
-                          int const &,
-                          decltype(rime::get<int const &>(make_variant(6)))>) );
-        BOOST_MPL_ASSERT((is_same<
-                          std::string &&,
-                          decltype(rime::get<std::string>(make_variant(6)))>) );
-        BOOST_MPL_ASSERT(
-            (is_same<void *&&, decltype(rime::get<void *>(make_variant(6)))>) );
-        BOOST_MPL_ASSERT((is_same<
-                          converted &&,
-                          decltype(rime::get<converted>(make_variant(6)))>) );
-        BOOST_MPL_ASSERT(
-            (is_same<void, decltype(rime::get<void>(make_variant(6)))>) );
+        static_assert(
+            is_same<int &&, decltype(rime::get<int>(make_variant(6)))>::value);
+        static_assert(
+            is_same<
+                float &&, decltype(rime::get<float>(make_variant(6)))>::value);
+        static_assert(
+            is_same<int &, decltype(rime::get<int &>(make_variant(6)))>::value);
+        static_assert(is_same<
+                      int const &&,
+                      decltype(rime::get<int const>(make_variant(6)))>::value);
+        static_assert(
+            is_same<
+                int const &,
+                decltype(rime::get<int const &>(make_variant(6)))>::value);
+        static_assert(
+            is_same<
+                std::string &&,
+                decltype(rime::get<std::string>(make_variant(6)))>::value);
+        static_assert(
+            is_same<
+                void *&&, decltype(rime::get<void *>(make_variant(6)))>::value);
+        static_assert(is_same<
+                      converted &&,
+                      decltype(rime::get<converted>(make_variant(6)))>::value);
+        static_assert(
+            is_same<void, decltype(rime::get<void>(make_variant(6)))>::value);
 
-        BOOST_MPL_ASSERT((is_same<int *, decltype(rime::get<int>(&v))>) );
-        BOOST_MPL_ASSERT((is_same<float *, decltype(rime::get<float>(&v))>) );
-        /*        BOOST_MPL_ASSERT ((is_same <fails,
-                    decltype (rime::get <int &> (&v))>));*/
-        BOOST_MPL_ASSERT(
-            (is_same<int const *, decltype(rime::get<int const>(&v))>) );
-        /*        BOOST_MPL_ASSERT ((is_same <fails,
-                    decltype (rime::get <int const &> (&v))>));*/
-        BOOST_MPL_ASSERT(
-            (is_same<std::string *, decltype(rime::get<std::string>(&v))>) );
-        BOOST_MPL_ASSERT((is_same<void **, decltype(rime::get<void *>(&v))>) );
-        BOOST_MPL_ASSERT(
-            (is_same<converted *, decltype(rime::get<converted>(&v))>) );
-        BOOST_MPL_ASSERT((is_same<void *, decltype(rime::get<void>(&v))>) );
+        static_assert(is_same<int *, decltype(rime::get<int>(&v))>::value);
+        static_assert(is_same<float *, decltype(rime::get<float>(&v))>::value);
+        /*        static_assert(is_same <fails,
+                    decltype (rime::get <int &> (&v))>::value);*/
+        static_assert(
+            is_same<int const *, decltype(rime::get<int const>(&v))>::value);
+        /*        static_assert(is_same <fails,
+                    decltype (rime::get <int const &> (&v))>::value);*/
+        static_assert(
+            is_same<
+                std::string *, decltype(rime::get<std::string>(&v))>::value);
+        static_assert(is_same<void **, decltype(rime::get<void *>(&v))>::value);
+        static_assert(
+            is_same<converted *, decltype(rime::get<converted>(&v))>::value);
+        static_assert(is_same<void *, decltype(rime::get<void>(&v))>::value);
 
         variant const vc(6);
-        BOOST_MPL_ASSERT((is_same<int const &, decltype(rime::get<int>(vc))>) );
-        BOOST_MPL_ASSERT(
-            (is_same<float const &, decltype(rime::get<float>(vc))>) );
-        BOOST_MPL_ASSERT((is_same<int &, decltype(rime::get<int &>(vc))>) );
-        BOOST_MPL_ASSERT(
-            (is_same<int const &, decltype(rime::get<int const>(vc))>) );
-        BOOST_MPL_ASSERT(
-            (is_same<int const &, decltype(rime::get<int const &>(vc))>) );
-        BOOST_MPL_ASSERT(
-            (is_same<
-                std::string const &, decltype(rime::get<std::string>(vc))>) );
-        BOOST_MPL_ASSERT(
-            (is_same<void * const &, decltype(rime::get<void *>(vc))>) );
-        BOOST_MPL_ASSERT(
-            (is_same<converted const &, decltype(rime::get<converted>(vc))>) );
-        BOOST_MPL_ASSERT((is_same<void, decltype(rime::get<void>(vc))>) );
+        static_assert(
+            is_same<int const &, decltype(rime::get<int>(vc))>::value);
+        static_assert(
+            is_same<float const &, decltype(rime::get<float>(vc))>::value);
+        static_assert(is_same<int &, decltype(rime::get<int &>(vc))>::value);
+        static_assert(
+            is_same<int const &, decltype(rime::get<int const>(vc))>::value);
+        static_assert(
+            is_same<int const &, decltype(rime::get<int const &>(vc))>::value);
+        static_assert(
+            is_same<std::string const &, decltype(rime::get<std::string>(vc))>::
+                value);
+        static_assert(
+            is_same<void * const &, decltype(rime::get<void *>(vc))>::value);
+        static_assert(
+            is_same<
+                converted const &, decltype(rime::get<converted>(vc))>::value);
+        static_assert(is_same<void, decltype(rime::get<void>(vc))>::value);
 
-        BOOST_MPL_ASSERT((is_same<
-                          int const &&,
-                          decltype(rime::get<int>(make_const_variant(6)))>) );
-        BOOST_MPL_ASSERT((is_same<
-                          float const &&,
-                          decltype(rime::get<float>(make_const_variant(6)))>) );
-        BOOST_MPL_ASSERT(
-            (is_same<
-                int &, decltype(rime::get<int &>(make_const_variant(6)))>) );
-        BOOST_MPL_ASSERT(
-            (is_same<
+        static_assert(is_same<
+                      int const &&,
+                      decltype(rime::get<int>(make_const_variant(6)))>::value);
+        static_assert(
+            is_same<
+                float const &&,
+                decltype(rime::get<float>(make_const_variant(6)))>::value);
+        static_assert(
+            is_same<int &, decltype(rime::get<int &>(make_const_variant(6)))>::
+                value);
+        static_assert(
+            is_same<
                 int const &&,
-                decltype(rime::get<int const>(make_const_variant(6)))>) );
-        BOOST_MPL_ASSERT(
-            (is_same<
-                int const &,
-                decltype(rime::get<int const &>(make_const_variant(6)))>) );
-        BOOST_MPL_ASSERT(
-            (is_same<
-                std::string const &&,
-                decltype(rime::get<std::string>(make_const_variant(6)))>) );
-        BOOST_MPL_ASSERT(
-            (is_same<
+                decltype(rime::get<int const>(make_const_variant(6)))>::value);
+        static_assert(is_same<
+                      int const &,
+                      decltype(rime::get<int const &>(
+                          make_const_variant(6)))>::value);
+        static_assert(is_same<
+                      std::string const &&,
+                      decltype(rime::get<std::string>(
+                          make_const_variant(6)))>::value);
+        static_assert(
+            is_same<
                 void * const &&,
-                decltype(rime::get<void *>(make_const_variant(6)))>) );
-        BOOST_MPL_ASSERT(
-            (is_same<
+                decltype(rime::get<void *>(make_const_variant(6)))>::value);
+        static_assert(
+            is_same<
                 converted const &&,
-                decltype(rime::get<converted>(make_const_variant(6)))>) );
-        BOOST_MPL_ASSERT(
-            (is_same<void, decltype(rime::get<void>(make_const_variant(6)))>) );
+                decltype(rime::get<converted>(make_const_variant(6)))>::value);
+        static_assert(
+            is_same<
+                void, decltype(rime::get<void>(make_const_variant(6)))>::value);
 
-        BOOST_MPL_ASSERT(
-            (is_same<int const *, decltype(rime::get<int>(&vc))>) );
-        BOOST_MPL_ASSERT(
-            (is_same<float const *, decltype(rime::get<float>(&vc))>) );
-        /*BOOST_MPL_ASSERT ((is_same <fails,
-            decltype (rime::get <int &> (&vc))>));*/
-        BOOST_MPL_ASSERT(
-            (is_same<int const *, decltype(rime::get<int const>(&vc))>) );
-        /*BOOST_MPL_ASSERT ((is_same <
-            decltype (rime::get <int const &> (&vc))>));*/
-        BOOST_MPL_ASSERT(
-            (is_same<
-                std::string const *, decltype(rime::get<std::string>(&vc))>) );
-        BOOST_MPL_ASSERT(
-            (is_same<void * const *, decltype(rime::get<void *>(&vc))>) );
-        BOOST_MPL_ASSERT(
-            (is_same<converted const *, decltype(rime::get<converted>(&vc))>) );
-        BOOST_MPL_ASSERT(
-            (is_same<void const *, decltype(rime::get<void>(&vc))>) );
+        static_assert(
+            is_same<int const *, decltype(rime::get<int>(&vc))>::value);
+        static_assert(
+            is_same<float const *, decltype(rime::get<float>(&vc))>::value);
+        /*static_assert(is_same <fails,
+            decltype (rime::get <int &> (&vc))>::value);*/
+        static_assert(
+            is_same<int const *, decltype(rime::get<int const>(&vc))>::value);
+        /*static_assert(is_same <
+            decltype (rime::get <int const &> (&vc))>::value);*/
+        static_assert(is_same<
+                      std::string const *,
+                      decltype(rime::get<std::string>(&vc))>::value);
+        static_assert(
+            is_same<void * const *, decltype(rime::get<void *>(&vc))>::value);
+        static_assert(
+            is_same<
+                converted const *, decltype(rime::get<converted>(&vc))>::value);
+        static_assert(
+            is_same<void const *, decltype(rime::get<void>(&vc))>::value);
     }
 
     // index_of
