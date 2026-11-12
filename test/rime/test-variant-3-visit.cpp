@@ -80,7 +80,7 @@ public:
     template <typename Left, typename Right>
     Left && operator()(Left && left, Right && right) const
     {
-        left += right;
+        left = static_cast<std::decay_t<Left>>(left + right);
         return std::forward<Left>(left);
     }
 
