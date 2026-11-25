@@ -5,7 +5,8 @@
 #ifndef RIME_VARIANT_FWD_HPP
 #define RIME_VARIANT_FWD_HPP
 
-#include "boost/core/enable_if.hpp"
+#include <type_traits>
+
 #include "boost/mpl/and.hpp"
 
 #include "meta/contains.hpp"
@@ -28,11 +29,11 @@ namespace merge_policy {
 template <typename Types, typename MergeTwo = merge_policy::conservative>
 struct make_variant_over;
 
-template <typename Actual, typename Variant> inline typename boost::enable_if<
+template <typename Actual, typename Variant> inline std::enable_if_t<
     boost::mpl::and_<
         is_variant<Variant>,
-        meta::contains<Actual, typename variant_types<Variant>::type>>,
-    typename ::utility::storage::get<Actual, Variant &&>::type>::type
+        meta::contains<Actual, typename variant_types<Variant>::type>>::value,
+    typename ::utility::storage::get<Actual, Variant &&>::type>
     get_unsafe(Variant && variant);
 
 }  // namespace rime

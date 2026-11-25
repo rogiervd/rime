@@ -20,7 +20,6 @@ being introduced first.
 #include <utility>
 
 #include "boost/config.hpp"
-#include "boost/core/enable_if.hpp"
 #include "boost/detail/workaround.hpp"
 #include "boost/mpl/if.hpp"
 
@@ -113,18 +112,16 @@ namespace variant_detail {
     Convert one type to its actual type as returned by get if it is a variant,
     and the original type if it is not.
     */
-    template <typename Argument, typename Actual> inline
-        typename boost::enable_if<
-            std::is_same<Argument, Actual>, Actual &&>::type
+    template <typename Argument, typename Actual>
+    inline std::enable_if_t<std::is_same_v<Argument, Actual>, Actual &&>
         convert_to_actual(Argument && argument)
     {
         return std::forward<Argument>(argument);
     }
 
-    template <typename Variant, typename Actual> inline
-        typename boost::enable_if<
-            is_variant<Variant>,
-            typename ::utility::storage::get<Actual, Variant &&>::type>::type
+    template <typename Variant, typename Actual> inline std::enable_if_t<
+        is_variant<Variant>::value,
+        typename ::utility::storage::get<Actual, Variant &&>::type>
         convert_to_actual(Variant && v)
     {
         return rime::get_unsafe<Actual>(std::forward<Variant>(v));
@@ -279,15 +276,15 @@ namespace variant_detail {
         Compute index for the actual type of one argument.
         This is always 0 if the argument type is not a variant.
         */
-        template <typename Type> static
-            typename boost::disable_if<is_variant<Type>, std::size_t>::type
-            which(Type &&)
+        template <typename Type>
+        static std::enable_if_t<!is_variant<Type>::value, std::size_t> which(
+            Type &&)
         {
             return 0;
         }
-        template <typename Type> static
-            typename boost::enable_if<is_variant<Type>, std::size_t>::type
-            which(Type && variant)
+        template <typename Type>
+        static std::enable_if_t<is_variant<Type>::value, std::size_t> which(
+            Type && variant)
         {
             return variant.which();
         }

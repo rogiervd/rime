@@ -7,7 +7,6 @@
 
 #include <type_traits>
 
-#include "boost/core/enable_if.hpp"
 #include "boost/mpl/and.hpp"
 #include "boost/mpl/not.hpp"
 
@@ -43,10 +42,10 @@ namespace callable {
         // Condition known to be true at compile time.
         template <
             class Condition, class IfTrue, class IfFalse, class... Arguments>
-        typename boost::lazy_enable_if<
+        typename std::enable_if_t<
             boost::mpl::and_<
                 rime::is_constant<Condition>,
-                typename std::decay<Condition>::type>,
+                typename std::decay<Condition>::type>::value,
             std::invoke_result<IfTrue, Arguments...>>::type
             operator()(
                 Condition &&, IfTrue && if_true, IfFalse &&,
@@ -59,10 +58,10 @@ namespace callable {
         // Condition known to be false at compile time.
         template <
             class Condition, class IfTrue, class IfFalse, class... Arguments>
-        typename boost::lazy_enable_if<
+        typename std::enable_if_t<
             boost::mpl::and_<
                 rime::is_constant<Condition>,
-                boost::mpl::not_<typename std::decay<Condition>::type>>,
+                boost::mpl::not_<typename std::decay<Condition>::type>>::value,
             std::invoke_result<IfFalse, Arguments...>>::type
             operator()(
                 Condition &&, IfTrue &&, IfFalse && if_false,
@@ -83,8 +82,8 @@ namespace callable {
         // Run-time condition.
         template <
             class Condition, class IfTrue, class IfFalse, class... Arguments>
-        typename boost::lazy_enable_if<
-            boost::mpl::not_<rime::is_constant<Condition>>,
+        typename std::enable_if_t<
+            boost::mpl::not_<rime::is_constant<Condition>>::value,
             merged_result_type<IfTrue, IfFalse, Arguments...>>::type
             operator()(
                 Condition && condition, IfTrue && if_true, IfFalse && if_false,

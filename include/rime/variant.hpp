@@ -17,7 +17,6 @@ Define a variant type, similar to boost::variant.
 
 #include <type_traits>
 
-#include "boost/core/enable_if.hpp"
 #include "boost/mpl/and.hpp"
 #include "boost/mpl/bind.hpp"
 #include "boost/mpl/eval_if.hpp"
@@ -303,7 +302,7 @@ private:
             typename conversion_for<Actual>::numbered_candidates>
     void construct(
         Actual && actual,
-        typename boost::disable_if<meta::empty<NumberedCandidates>>::type * = 0)
+        std::enable_if_t<!meta::empty<NumberedCandidates>::value> * = 0)
     {
         typedef typename meta::first<NumberedCandidates>::type interpretation;
 
@@ -336,7 +335,7 @@ private:
             typename conversion_for<Actual>::numbered_candidates>
     void construct(
         Actual && actual,
-        typename boost::enable_if<meta::empty<NumberedCandidates>>::type * = 0);
+        std::enable_if_t<meta::empty<NumberedCandidates>::value> * = 0);
 
     void construct_void()
     {
@@ -364,7 +363,7 @@ public:
     template <typename Actual> variant(
         Actual && actual,
         // Make sure that the copy constructor is picked up.
-        typename boost::disable_if<is_variant<Actual>>::type * = 0)
+        std::enable_if_t<!is_variant<Actual>::value> * = 0)
     {
         // Trigger the assertion here already.
         // This keeps the backtrace in the compiler error shortish.
@@ -438,7 +437,7 @@ public:
     /// Generalised copy constructor
     template <typename ThatVariant> variant(
         ThatVariant const & that,
-        typename boost::enable_if<is_variant<ThatVariant>>::type * = 0)
+        std::enable_if_t<is_variant<ThatVariant>::value> * = 0)
     {
         construct_from_other_variant(that);
     }
@@ -452,9 +451,9 @@ public:
     /// Generalised move constructor
     template <typename ThatVariant> variant(
         ThatVariant && that,
-        typename boost::enable_if<boost::mpl::and_<
+        std::enable_if_t<boost::mpl::and_<
             is_variant<ThatVariant>,
-            boost::mpl::not_<std::is_reference<ThatVariant>>>>::type * = 0)
+            boost::mpl::not_<std::is_reference<ThatVariant>>>::value> * = 0)
     {
         construct_from_other_variant(std::forward<ThatVariant>(that));
     }
@@ -524,7 +523,7 @@ public:
     an exception is thrown during construction.
     */
     template <class ThatVariant>
-    typename boost::enable_if<is_variant<ThatVariant>>::type replace(
+    std::enable_if_t<is_variant<ThatVariant>::value> replace(
         ThatVariant && that)
     {
         destruct_content();
@@ -566,8 +565,8 @@ public:
     \return true iff type Actual is contained.
     */
     template <typename Actual>
-    typename boost::enable_if<meta::contains<Actual, types>, bool>::type
-        contains() const
+    std::enable_if_t<meta::contains<Actual, types>::value, bool> contains()
+        const
     {
         return (this->which() == index_of<Actual>::value);
     }
@@ -848,22 +847,22 @@ namespace variant_detail {
 
 }  // namespace variant_detail
 
-template <typename Actual, typename Variant> inline typename boost::enable_if<
+template <typename Actual, typename Variant> inline std::enable_if_t<
     boost::mpl::and_<
         is_variant<Variant>,
-        meta::contains<Actual, typename variant_types<Variant>::type>>,
-    typename ::utility::storage::get<Actual, Variant &&>::type>::type
+        meta::contains<Actual, typename variant_types<Variant>::type>>::value,
+    typename ::utility::storage::get<Actual, Variant &&>::type>
     get_unsafe(Variant && variant)
 {
     variant_detail::get<Actual> implementation;
     return implementation(std::forward<Variant>(variant));
 }
 
-template <typename Actual, typename Variant> inline typename boost::enable_if<
+template <typename Actual, typename Variant> inline std::enable_if_t<
     boost::mpl::and_<
         is_variant<Variant>,
-        meta::contains<Actual, typename variant_types<Variant>::type>>,
-    typename ::utility::storage::get<Actual, Variant &&>::type>::type
+        meta::contains<Actual, typename variant_types<Variant>::type>>::value,
+    typename ::utility::storage::get<Actual, Variant &&>::type>
     get(Variant && variant)
 {
     if (!variant.template contains<Actual>()) {
@@ -874,9 +873,9 @@ template <typename Actual, typename Variant> inline typename boost::enable_if<
 
 template <
     typename Actual, typename Variant,
-    class Enable = typename boost::enable_if<boost::mpl::and_<
+    class Enable = std::enable_if_t<boost::mpl::and_<
         is_variant<Variant>,
-        meta::contains<Actual, typename variant_types<Variant>::type>>>::type>
+        meta::contains<Actual, typename variant_types<Variant>::type>>::value>>
 inline auto get(Variant * variant)
     -> decltype(variant_detail::get<Actual>()(variant))
 {

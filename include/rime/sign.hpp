@@ -11,7 +11,6 @@ Handle sign mismatch in a correct and pleasant way.
 
 #include <type_traits>
 
-#include "boost/core/enable_if.hpp"
 #include "boost/mpl/and.hpp"
 #include "boost/mpl/eval_if.hpp"
 #include "boost/mpl/identity.hpp"
@@ -95,16 +94,16 @@ namespace callable {
         : rime::types::detail::convert_integral_value<Convert, Type> {};
 
         // Constant: default-initialise.
-        template <class Type> typename boost::enable_if<
-            is_constant<Type>, typename result<Type>::type>::type
+        template <class Type>
+        std::enable_if_t<is_constant<Type>::value, typename result<Type>::type>
             operator()(Type const &) const
         {
             return typename result<Type>::type();
         }
 
         // Run-time value: construct.
-        template <class Type> typename boost::disable_if<
-            is_constant<Type>, typename result<Type>::type>::type
+        template <class Type>
+        std::enable_if_t<!is_constant<Type>::value, typename result<Type>::type>
             operator()(Type const & v) const
         {
             return typename result<Type>::type(v);
@@ -117,14 +116,14 @@ namespace callable {
     struct make_zero
     {
         template <class Type>
-        typename boost::disable_if<rime::is_constant<Type>, Type>::type
-            operator()(Type const &) const
+        std::enable_if_t<!rime::is_constant<Type>::value, Type> operator()(
+            Type const &) const
         {
             return Type();
         }
 
-        template <class Type> typename boost::lazy_enable_if<
-            rime::is_constant<Type>, rime::types::make_zero<Type>>::type
+        template <class Type> typename std::enable_if_t<
+            rime::is_constant<Type>::value, rime::types::make_zero<Type>>::type
             operator()(Type const &) const
         {
             return typename rime::types::make_zero<Type>::type();
@@ -144,19 +143,19 @@ namespace callable {
         // Default implementation.
         template <class Left, class Right> static auto apply(
             Left const & left, Right const & right,
-            typename boost::disable_if<boost::mpl::or_<
+            std::enable_if_t<!boost::mpl::or_<
                 boost::mpl::and_<
                     types::is_unsigned<Left>, types::is_signed<Right>>,
                 boost::mpl::and_<
-                    types::is_signed<Left>, types::is_unsigned<Right>>>>::
-                type * = 0) RETURNS(rime::less(left, right));
+                    types::is_signed<Left>, types::is_unsigned<Right>>>::
+                                 value> * = 0) RETURNS(rime::less(left, right));
 
         // Unsigned < signed: consider special case of signed < 0.
         template <class Unsigned, class Signed> static auto apply(
             Unsigned const & u, Signed const & s,
-            typename boost::enable_if<boost::mpl::and_<
+            std::enable_if_t<boost::mpl::and_<
                 types::is_unsigned<Unsigned>,
-                types::is_signed<Signed>>>::type * = 0)
+                types::is_signed<Signed>>::value> * = 0)
             RETURNS(
                 rime::and_(
                     !rime::less(s, rime::make_zero(s)),
@@ -165,9 +164,9 @@ namespace callable {
         // Signed < unsigned: consider special case of signed < 0.
         template <class Signed, class Unsigned> static auto apply(
             Signed const & s, Unsigned const & u,
-            typename boost::enable_if<boost::mpl::and_<
+            std::enable_if_t<boost::mpl::and_<
                 types::is_signed<Signed>,
-                types::is_unsigned<Unsigned>>>::type * = 0)
+                types::is_unsigned<Unsigned>>::value> * = 0)
             RETURNS(
                 rime::or_(
                     rime::less(s, rime::make_zero(s)),
