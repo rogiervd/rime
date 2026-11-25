@@ -7,9 +7,6 @@
 
 #include <type_traits>
 
-#include "boost/mpl/and.hpp"
-#include "boost/mpl/not.hpp"
-
 #include "utility/returns.hpp"
 
 #include "core.hpp"
@@ -36,9 +33,8 @@ namespace callable {
         // Condition known to be true at compile time.
         template <class Condition, class ResultIfTrue, class ResultIfFalse>
         std::enable_if_t<
-            boost::mpl::and_<
-                rime::is_constant<Condition>,
-                typename std::decay<Condition>::type>::value,
+            std::conjunction_v<
+                rime::is_constant<Condition>, std::decay_t<Condition>>,
             ResultIfTrue>
             operator()(
                 Condition &&, ResultIfTrue && if_true, ResultIfFalse &&) const
@@ -49,9 +45,9 @@ namespace callable {
         // Condition known to be false at compile time.
         template <class Condition, class ResultIfTrue, class ResultIfFalse>
         std::enable_if_t<
-            boost::mpl::and_<
+            std::conjunction_v<
                 rime::is_constant<Condition>,
-                boost::mpl::not_<typename std::decay<Condition>::type>>::value,
+                std::negation<std::decay_t<Condition>>>,
             ResultIfFalse>
             operator()(
                 Condition &&, ResultIfTrue &&, ResultIfFalse && if_false) const
@@ -62,8 +58,8 @@ namespace callable {
         // Run-time condition.
         template <
             class Condition, class ResultIfTrue, class ResultIfFalse,
-            class Enable = std::enable_if_t<
-                boost::mpl::not_<rime::is_constant<Condition>>::value>>
+            class Enable =
+                std::enable_if_t<!rime::is_constant<Condition>::value>>
         typename MergePolicy::template apply<ResultIfTrue, ResultIfFalse>::type
             operator()(
                 Condition && condition, ResultIfTrue && if_true,

@@ -11,10 +11,8 @@ Handle sign mismatch in a correct and pleasant way.
 
 #include <type_traits>
 
-#include "boost/mpl/and.hpp"
 #include "boost/mpl/eval_if.hpp"
 #include "boost/mpl/identity.hpp"
-#include "boost/mpl/or.hpp"
 
 #include "utility/returns.hpp"
 
@@ -143,19 +141,19 @@ namespace callable {
         // Default implementation.
         template <class Left, class Right> static auto apply(
             Left const & left, Right const & right,
-            std::enable_if_t<!boost::mpl::or_<
-                boost::mpl::and_<
-                    types::is_unsigned<Left>, types::is_signed<Right>>,
-                boost::mpl::and_<
-                    types::is_signed<Left>, types::is_unsigned<Right>>>::
-                                 value> * = 0) RETURNS(rime::less(left, right));
+            std::enable_if_t<
+                !((types::is_unsigned<Left>::value
+                   && types::is_signed<Right>::value)
+                  || (types::is_signed<Left>::value
+                      && types::is_unsigned<Right>::value))> * = 0)
+            RETURNS(rime::less(left, right));
 
         // Unsigned < signed: consider special case of signed < 0.
         template <class Unsigned, class Signed> static auto apply(
             Unsigned const & u, Signed const & s,
-            std::enable_if_t<boost::mpl::and_<
-                types::is_unsigned<Unsigned>,
-                types::is_signed<Signed>>::value> * = 0)
+            std::enable_if_t<
+                types::is_unsigned<Unsigned>::value
+                && types::is_signed<Signed>::value> * = 0)
             RETURNS(
                 rime::and_(
                     !rime::less(s, rime::make_zero(s)),
@@ -164,9 +162,9 @@ namespace callable {
         // Signed < unsigned: consider special case of signed < 0.
         template <class Signed, class Unsigned> static auto apply(
             Signed const & s, Unsigned const & u,
-            std::enable_if_t<boost::mpl::and_<
-                types::is_signed<Signed>,
-                types::is_unsigned<Unsigned>>::value> * = 0)
+            std::enable_if_t<
+                types::is_signed<Signed>::value
+                && types::is_unsigned<Unsigned>::value> * = 0)
             RETURNS(
                 rime::or_(
                     rime::less(s, rime::make_zero(s)),

@@ -7,8 +7,6 @@
 
 #include <type_traits>
 
-#include "boost/mpl/and.hpp"
-
 #include "meta/contains.hpp"
 #include "utility/storage.hpp"
 
@@ -30,9 +28,8 @@ template <typename Types, typename MergeTwo = merge_policy::conservative>
 struct make_variant_over;
 
 template <typename Actual, typename Variant> inline std::enable_if_t<
-    boost::mpl::and_<
-        is_variant<Variant>,
-        meta::contains<Actual, typename variant_types<Variant>::type>>::value,
+    is_variant<Variant>::value
+        && meta::contains<Actual, typename variant_types<Variant>::type>::value,
     typename ::utility::storage::get<Actual, Variant &&>::type>
     get_unsafe(Variant && variant);
 
