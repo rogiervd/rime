@@ -451,9 +451,9 @@ public:
     /// Generalised move constructor
     template <typename ThatVariant> variant(
         ThatVariant && that,
-        std::enable_if_t<boost::mpl::and_<
-            is_variant<ThatVariant>,
-            boost::mpl::not_<std::is_reference<ThatVariant>>>::value> * = 0)
+        std::enable_if_t<
+            is_variant<ThatVariant>::value
+            && !std::is_reference_v<ThatVariant>> * = 0)
     {
         construct_from_other_variant(std::forward<ThatVariant>(that));
     }
@@ -848,9 +848,8 @@ namespace variant_detail {
 }  // namespace variant_detail
 
 template <typename Actual, typename Variant> inline std::enable_if_t<
-    boost::mpl::and_<
-        is_variant<Variant>,
-        meta::contains<Actual, typename variant_types<Variant>::type>>::value,
+    is_variant<Variant>::value
+        && meta::contains<Actual, typename variant_types<Variant>::type>::value,
     typename ::utility::storage::get<Actual, Variant &&>::type>
     get_unsafe(Variant && variant)
 {
@@ -859,9 +858,8 @@ template <typename Actual, typename Variant> inline std::enable_if_t<
 }
 
 template <typename Actual, typename Variant> inline std::enable_if_t<
-    boost::mpl::and_<
-        is_variant<Variant>,
-        meta::contains<Actual, typename variant_types<Variant>::type>>::value,
+    is_variant<Variant>::value
+        && meta::contains<Actual, typename variant_types<Variant>::type>::value,
     typename ::utility::storage::get<Actual, Variant &&>::type>
     get(Variant && variant)
 {
@@ -873,9 +871,10 @@ template <typename Actual, typename Variant> inline std::enable_if_t<
 
 template <
     typename Actual, typename Variant,
-    class Enable = std::enable_if_t<boost::mpl::and_<
-        is_variant<Variant>,
-        meta::contains<Actual, typename variant_types<Variant>::type>>::value>>
+    class Enable = std::enable_if_t<
+        is_variant<Variant>::value
+        && meta::contains<
+            Actual, typename variant_types<Variant>::type>::value>>
 inline auto get(Variant * variant)
     -> decltype(variant_detail::get<Actual>()(variant))
 {

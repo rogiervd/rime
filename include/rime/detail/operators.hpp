@@ -33,9 +33,10 @@ namespace callable
     {
         template <class Left, class Right>
             auto operator() (Left const &, Right const &) const
-        -> std::enable_if_t<mpl::and_ <is_constant <Left>, is_constant <Right>
->::value, constant < typename std::decay <decltype (Left::value + Right::value)
-                    >::type,
+        -> std::enable_if_t<
+            is_constant <Left>::value && is_constant <Right>::value,
+            constant < typename std::decay <
+                    decltype (Left::value + Right::value)>::type,
                 (Left::value + Right::value)
             >>
         {
@@ -46,8 +47,9 @@ namespace callable
 
         template <class Left, class Right>
             auto operator() (Left const & left, Right const & right) const
-        -> std::enable_if_t<!mpl::and_ <is_constant <Left>, is_constant <Right>
->::value, decltype (get_value (left) + get_value (right))>
+        -> std::enable_if_t<
+            !(is_constant <Left>::value && is_constant <Right>::value),
+            decltype (get_value (left) + get_value (right))>
         {
             return get_value (left) + get_value (right);
         }
@@ -58,8 +60,8 @@ static const callable::plus plus = {};
 
 template <class Left, class Right>
     auto operator + (Left const &, Right const &)
--> std::enable_if_t<mpl::and_ <is_constant <Left>, is_rime_<Right>,
-        mpl::or_ <is_rime_constant <Left>, is_rime_constant <Right> > >::value,
+-> std::enable_if_t<is_constant <Left>::value && is_constant <Right>::value
+    && (is_rime_constant <Left>::value || is_rime_constant <Right>::value),
 constant < typename std::decay <decltype (Left::value + Right::value)>::type,
             (Left::value + Right::value)
     >>
@@ -76,7 +78,7 @@ constant < typename std::decay <decltype (Left::value + Right::value)>::type,
             template <class Left, class Right>                                \
             auto operator()(Left const &, Right const &) const                \
                 -> std::enable_if_t<                                          \
-                    mpl::and_<is_constant<Left>, is_constant<Right>>::value,  \
+                    is_constant<Left>::value && is_constant<Right>::value,    \
                     constant<                                                 \
                         typename std::decay<decltype((                        \
                             Left::value operation Right::value))>::type,      \
@@ -91,7 +93,7 @@ constant < typename std::decay <decltype (Left::value + Right::value)>::type,
             template <class Left, class Right>                                \
             auto operator()(Left const & left, Right const & right) const     \
                 -> std::enable_if_t<                                          \
-                    !mpl::and_<is_constant<Left>, is_constant<Right>>::value, \
+                    !(is_constant<Left>::value && is_constant<Right>::value), \
                     decltype((get_value(left) operation get_value(right)))>   \
             {                                                                 \
                 return get_value(left) operation get_value(right);            \
@@ -104,10 +106,9 @@ constant < typename std::decay <decltype (Left::value + Right::value)>::type,
     template <class Left, class Right>                                        \
     auto operator operation(Left const &, Right const &)                      \
         ->std::enable_if_t<                                                   \
-            mpl::and_<                                                        \
-                is_constant<Left>, is_constant<Right>,                        \
-                mpl::or_<is_rime_constant<Left>, is_rime_constant<Right>>>::  \
-                value,                                                        \
+            is_constant<Left>::value && is_constant<Right>::value             \
+                && (is_rime_constant<Left>::value                             \
+                    || is_rime_constant<Right>::value),                       \
             constant<                                                         \
                 typename std::decay<decltype((                                \
                     Left::value operation Right::value))>::type,              \
@@ -289,10 +290,9 @@ namespace callable {
     template <class Left, class Right>                                         \
     auto operator operation(Left const &, Right const &)                       \
         ->std::enable_if_t<                                                    \
-            mpl::and_<                                                         \
-                is_constant<Left>, is_constant<Right>,                         \
-                mpl::or_<is_rime_constant<Left>, is_rime_constant<Right>>>::   \
-                value,                                                         \
+            is_constant<Left>::value && is_constant<Right>::value              \
+                && (is_rime_constant<Left>::value                              \
+                    || is_rime_constant<Right>::value),                        \
             bool_<(Left::value operation Right::value)>>                       \
     {                                                                          \
         return bool_<(Left::value operation Right::value)>();                  \

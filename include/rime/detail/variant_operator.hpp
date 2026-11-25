@@ -12,8 +12,6 @@ operator() and operator[] must be defined inside the class.
 
 #include <type_traits>
 
-#include "boost/mpl/or.hpp"
-
 #include "variant_dispatch.hpp"
 #include "variant_fwd.hpp"
 
@@ -92,40 +90,39 @@ RIME_VARIANT_DEFINE_UNARY_POSTFIX_OPERATOR(postfix_decrement, --)
 
 /* Binary operators */
 
-#define RIME_VARIANT_DEFINE_BINARY_POSTFIX_OPERATOR(name, operation)        \
-    namespace variant_detail {                                              \
-        struct name                                                         \
-        {                                                                   \
-            template <typename LeftActual, typename RightActual>            \
-            decltype(std::declval<LeftActual &&>()                          \
-                         operation std::declval<RightActual &&>())          \
-                operator()(LeftActual && left, RightActual && right) const  \
-            {                                                               \
-                return std::forward<LeftActual &&>(left)                    \
-                    operation std::forward<RightActual &&>(right);          \
-            }                                                               \
-        };                                                                  \
-                                                                            \
-        /* This class is necessary to wrap decltype() in GCC 4.6. */        \
-        template <typename LeftVariant, typename RightVariant>              \
-        struct name##_result                                                \
-        {                                                                   \
-            typedef decltype(visit(name())(                                 \
-                std::declval<LeftVariant &&>(),                             \
-                std::declval<RightVariant &&>())) type;                     \
-        };                                                                  \
-    } /* namespace variant_detail */                                        \
-                                                                            \
-    template <class LeftVariant, class RightVariant> inline                 \
-        typename std::enable_if_t<                                          \
-            boost::mpl::or_<                                                \
-                is_variant<LeftVariant>, is_variant<RightVariant>>::value,  \
-            variant_detail::name##_result<LeftVariant, RightVariant>>::type \
-        operator operation(LeftVariant && left, RightVariant && right)      \
-    {                                                                       \
-        return visit(variant_detail::name())(                               \
-            std::forward<LeftVariant>(left),                                \
-            std::forward<RightVariant>(right));                             \
+#define RIME_VARIANT_DEFINE_BINARY_POSTFIX_OPERATOR(name, operation)           \
+    namespace variant_detail {                                                 \
+        struct name                                                            \
+        {                                                                      \
+            template <typename LeftActual, typename RightActual>               \
+            decltype(std::declval<LeftActual &&>()                             \
+                         operation std::declval<RightActual &&>())             \
+                operator()(LeftActual && left, RightActual && right) const     \
+            {                                                                  \
+                return std::forward<LeftActual &&>(left)                       \
+                    operation std::forward<RightActual &&>(right);             \
+            }                                                                  \
+        };                                                                     \
+                                                                               \
+        /* This class is necessary to wrap decltype() in GCC 4.6. */           \
+        template <typename LeftVariant, typename RightVariant>                 \
+        struct name##_result                                                   \
+        {                                                                      \
+            typedef decltype(visit(name())(                                    \
+                std::declval<LeftVariant &&>(),                                \
+                std::declval<RightVariant &&>())) type;                        \
+        };                                                                     \
+    } /* namespace variant_detail */                                           \
+                                                                               \
+    template <class LeftVariant, class RightVariant> inline                    \
+        typename std::enable_if_t<                                             \
+            is_variant<LeftVariant>::value || is_variant<RightVariant>::value, \
+            variant_detail::name##_result<LeftVariant, RightVariant>>::type    \
+        operator operation(LeftVariant && left, RightVariant && right)         \
+    {                                                                          \
+        return visit(variant_detail::name())(                                  \
+            std::forward<LeftVariant>(left),                                   \
+            std::forward<RightVariant>(right));                                \
     }
 
 RIME_VARIANT_DEFINE_BINARY_POSTFIX_OPERATOR(plus, +)

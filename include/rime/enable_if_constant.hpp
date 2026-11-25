@@ -7,9 +7,6 @@
 
 #include <type_traits>
 
-#include "boost/mpl/and.hpp"
-#include "boost/mpl/not.hpp"
-
 #include "core.hpp"
 
 namespace rime {
@@ -32,8 +29,7 @@ Contain a type \a type iff \a Constant is a compile-time constant with value
 */
 template <class Constant, class Result = void> struct enable_if_constant_true
 : std::enable_if<
-      boost::mpl::and_<
-          is_constant<Constant>, typename std::decay<Constant>::type>::value,
+      std::conjunction_v<is_constant<Constant>, std::decay_t<Constant>>,
       Result> {};
 
 /**
@@ -42,9 +38,8 @@ Contain a type \a type iff \a Constant is not a compile-time constant with value
 */
 template <class Constant, class Result = void> struct enable_if_constant_false
 : std::enable_if<
-      boost::mpl::and_<
-          is_constant<Constant>,
-          boost::mpl::not_<typename std::decay<Constant>::type>>::value,
+      std::conjunction_v<
+          is_constant<Constant>, std::negation<std::decay_t<Constant>>>,
       Result> {};
 
 /**
@@ -53,8 +48,7 @@ Contain a type \a type iff \a Constant is a compile-time constant with value
 */
 template <class Constant, class Result = void> struct disable_if_constant_true
 : std::enable_if<
-      !boost::mpl::and_<
-          is_constant<Constant>, typename std::decay<Constant>::type>::value,
+      !std::conjunction_v<is_constant<Constant>, std::decay_t<Constant>>,
       Result> {};
 
 /**
@@ -63,9 +57,8 @@ Contain a type \a type iff \a Constant is not a compile-time constant with value
 */
 template <class Constant, class Result = void> struct disable_if_constant_false
 : std::enable_if<
-      !boost::mpl::and_<
-          is_constant<Constant>,
-          boost::mpl::not_<typename std::decay<Constant>::type>>::value,
+      !std::conjunction_v<
+          is_constant<Constant>, std::negation<std::decay_t<Constant>>>,
       Result> {};
 
 }  // namespace rime

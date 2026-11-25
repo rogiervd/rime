@@ -430,9 +430,9 @@ namespace merge_policy {
         // Then, try to turn this into one constant.
         template <class Type1, class Type2> struct apply<
             Type1, Type2,
-            std::enable_if_t<mpl::and_<
-                is_constant<Type1>, is_constant<Type2>,
-                has_type<merge_value_type<Type1, Type2>>>::value>>
+            std::enable_if_t<
+                is_constant<Type1>::value && is_constant<Type2>::value
+                && has_type<merge_value_type<Type1, Type2>>::value>>
         : merge_constant<Type1, Type2> {};
     };
 

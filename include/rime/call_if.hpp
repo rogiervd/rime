@@ -7,9 +7,6 @@
 
 #include <type_traits>
 
-#include "boost/mpl/and.hpp"
-#include "boost/mpl/not.hpp"
-
 #include "utility/returns.hpp"
 
 #include "core.hpp"
@@ -43,9 +40,8 @@ namespace callable {
         template <
             class Condition, class IfTrue, class IfFalse, class... Arguments>
         typename std::enable_if_t<
-            boost::mpl::and_<
-                rime::is_constant<Condition>,
-                typename std::decay<Condition>::type>::value,
+            std::conjunction_v<
+                rime::is_constant<Condition>, std::decay_t<Condition>>,
             std::invoke_result<IfTrue, Arguments...>>::type
             operator()(
                 Condition &&, IfTrue && if_true, IfFalse &&,
@@ -59,9 +55,9 @@ namespace callable {
         template <
             class Condition, class IfTrue, class IfFalse, class... Arguments>
         typename std::enable_if_t<
-            boost::mpl::and_<
+            std::conjunction_v<
                 rime::is_constant<Condition>,
-                boost::mpl::not_<typename std::decay<Condition>::type>>::value,
+                std::negation<std::decay_t<Condition>>>,
             std::invoke_result<IfFalse, Arguments...>>::type
             operator()(
                 Condition &&, IfTrue &&, IfFalse && if_false,
@@ -83,7 +79,7 @@ namespace callable {
         template <
             class Condition, class IfTrue, class IfFalse, class... Arguments>
         typename std::enable_if_t<
-            boost::mpl::not_<rime::is_constant<Condition>>::value,
+            !rime::is_constant<Condition>::value,
             merged_result_type<IfTrue, IfFalse, Arguments...>>::type
             operator()(
                 Condition && condition, IfTrue && if_true, IfFalse && if_false,
