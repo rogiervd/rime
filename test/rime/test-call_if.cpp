@@ -8,7 +8,6 @@
 #include "rime/call_if.hpp"
 
 #include <type_traits>
-#include "boost/mpl/assert.hpp"
 
 #include "rime/check/check_equal.hpp"
 #include "rime/core.hpp"
@@ -79,7 +78,7 @@ BOOST_AUTO_TEST_CASE(test_rime_call_if_merge)
 
     auto v2 =
         rime::call_if<policy>(false, return_as_double(), return_as_float(), 7);
-    BOOST_MPL_ASSERT((std::is_same<decltype(v2), double>) );
+    static_assert(std::is_same_v<decltype(v2), double>);
     BOOST_CHECK_EQUAL(v2, 7.);
 }
 

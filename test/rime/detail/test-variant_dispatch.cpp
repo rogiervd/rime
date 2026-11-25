@@ -7,8 +7,6 @@
 
 #include <type_traits>
 
-#include "boost/mpl/assert.hpp"
-
 #include "meta/vector.hpp"
 
 #include "rime/detail/variant_dispatch.hpp"
@@ -26,86 +24,81 @@ BOOST_AUTO_TEST_CASE(test_rime_detail_dispatch)
             rime::variant<int, long> const &,
             rime::variant<bool, double> const>>
             list;
-        BOOST_MPL_ASSERT(
-            (std::is_same<
+        static_assert(
+            std::is_same_v<
                 list::type,
                 meta::vector<
                     meta::vector<int, bool>, meta::vector<int, double>,
-                    meta::vector<long, bool>, meta::vector<long, double>>>) );
+                    meta::vector<long, bool>, meta::vector<long, double>>>);
     }
     {
         typedef possible_actual_types_for<meta::vector<>> list;
-        BOOST_MPL_ASSERT(
-            (std::is_same<list::type, meta::vector<meta::vector<>>>) );
+        static_assert(std::is_same_v<list::type, meta::vector<meta::vector<>>>);
         BOOST_CHECK_EQUAL(list::get_index(), 0u);
     }
     {
         typedef possible_actual_types_for<meta::vector<int>> list;
-        BOOST_MPL_ASSERT(
-            (std::is_same<list::type, meta::vector<meta::vector<int>>>) );
+        static_assert(
+            std::is_same_v<list::type, meta::vector<meta::vector<int>>>);
         BOOST_CHECK_EQUAL(list::get_index(4), 0u);
     }
     {
         typedef possible_actual_types_for<meta::vector<int const &>> list;
-        BOOST_MPL_ASSERT(
-            (std::is_same<
-                list::type, meta::vector<meta::vector<int const &>>>) );
+        static_assert(std::is_same_v<
+                      list::type, meta::vector<meta::vector<int const &>>>);
         BOOST_CHECK_EQUAL(list::get_index(4), 0u);
     }
     {
         typedef possible_actual_types_for<meta::vector<int, long>> list;
-        BOOST_MPL_ASSERT(
-            (std::is_same<list::type, meta::vector<meta::vector<int, long>>>) );
+        static_assert(
+            std::is_same_v<list::type, meta::vector<meta::vector<int, long>>>);
         BOOST_CHECK_EQUAL(list::get_index(4, 5l), 0u);
     }
     {
         typedef possible_actual_types_for<meta::vector<int const &, long>> list;
-        BOOST_MPL_ASSERT(
-            (std::is_same<
-                list::type, meta::vector<meta::vector<int const &, long>>>) );
+        static_assert(
+            std::is_same_v<
+                list::type, meta::vector<meta::vector<int const &, long>>>);
         BOOST_CHECK_EQUAL(list::get_index(4, 5l), 0u);
     }
     {
         typedef possible_actual_types_for<
             meta::vector<rime::variant<int, long>>>
             list;
-        BOOST_MPL_ASSERT(
-            (std::is_same<
-                list::type,
-                meta::vector<meta::vector<int>, meta::vector<long>>>) );
+        static_assert(std::is_same_v<
+                      list::type,
+                      meta::vector<meta::vector<int>, meta::vector<long>>>);
         // Postpone checking get_index
     }
     {
         typedef possible_actual_types_for<
             meta::vector<rime::variant<int, long>, bool>>
             list;
-        BOOST_MPL_ASSERT(
-            (std::is_same<
-                list::type,
-                meta::vector<
-                    meta::vector<int, bool>, meta::vector<long, bool>>>) );
+        static_assert(std::is_same_v<
+                      list::type,
+                      meta::vector<
+                          meta::vector<int, bool>, meta::vector<long, bool>>>);
     }
     {
         typedef possible_actual_types_for<
             meta::vector<bool, rime::variant<int, long> &>>
             list;
-        BOOST_MPL_ASSERT(
-            (std::is_same<
-                list::type,
-                meta::vector<
-                    meta::vector<bool, int>, meta::vector<bool, long>>>) );
+        static_assert(std::is_same_v<
+                      list::type,
+                      meta::vector<
+                          meta::vector<bool, int>, meta::vector<bool, long>>>);
     }
     {
         typedef possible_actual_types_for<meta::vector<
             rime::variant<int, long> const &,
             rime::variant<bool, double> const>>
             list;
-        BOOST_MPL_ASSERT(
-            (std::is_same<
+        static_assert(
+            std::is_same_v<
                 list::type,
                 meta::vector<
                     meta::vector<int, bool>, meta::vector<int, double>,
-                    meta::vector<long, bool>, meta::vector<long, double>>>) );
+                    meta::vector<long, bool>, meta::vector<long, double>>>);
     }
 }
 
