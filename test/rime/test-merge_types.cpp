@@ -145,12 +145,12 @@ BOOST_AUTO_TEST_CASE(test_merge_policy_collapse)
     typedef rime::merge_policy::collapse collapse;
 
 #define SHOULD_NOT_COLLAPSE(Type1, Type2) \
-    BOOST_MPL_ASSERT_NOT(                 \
-        (is_implemented<rime::merge_policy::collapse, Type1, Type2>) )
+    static_assert(                        \
+        !is_implemented<rime::merge_policy::collapse, Type1, Type2>::value)
 
 #define SHOULD_COLLAPSE_TO(Type1, Type2, Result) \
-    BOOST_MPL_ASSERT(                            \
-        (std::is_same<collapse::apply<Type1, Type2>::type, Result>) )
+    static_assert(                               \
+        std::is_same<collapse::apply<Type1, Type2>::type, Result>::value)
 
     // Check that no numeric conversions happen.
     SHOULD_NOT_COLLAPSE(int, long);
